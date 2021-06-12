@@ -1,7 +1,8 @@
-import { add } from './index';
+import { Compiler } from './index';
+import grammar from './grammar';
 
-describe('test', () => {
-  it('should execute', () => {
-    expect(add(1, 1)).toBe(2);
+describe('Compiler', () => {
+  it('should parse a program', () => {
+    const compiler = new Compiler(grammar);
   });
 });
