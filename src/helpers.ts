@@ -1,59 +1,27 @@
 const MAX_INTEGER = 4294967295;
-
-class Context {
-  labels: Map<string, any>;
-  references: Map<string, any>;
-
-  reset() {
-    this.labels = new Map();
-    this.references = new Map();
-  }
-}
-
-export const context = new Context();
-
 export class Placeholder {
   constructor(readonly name: string) {}
 }
 
-export class Int32Reference {
-  value = 0;
-
-  valueOf() {
-    return toInt32(this.value);
-  }
+export class Reference {
+  constructor(readonly name: string) {}
 }
 
 export class ByteReference {
   value = 0;
+  constructor(readonly name: string) {}
 
   valueOf() {
     return Number(this.value);
   }
 }
 
-export function createLabel(label: string) {
-  if (!context.labels.has(label)) {
-    context.labels.set(label, new Int32Reference());
-  }
+export function createReference(label: string) {
+  return new Reference(label);
+}
 
+export function createPlaceholder(label: string) {
   return new Placeholder(label);
-}
-
-export function getLabel(label: string) {
-  if (!context.labels.has(label)) {
-    throw new Error('Label not declared yet: ' + label);
-  }
-
-  return context.labels.get(label);
-}
-
-export function useReference(label: string) {
-  if (!context.references.has(label)) {
-    context.references.set(label, new ByteReference());
-  }
-
-  return context.references.get(label);
 }
 
 export function gpioAddress(pin: number) {
@@ -64,12 +32,16 @@ export function gpioAddress(pin: number) {
   return GPIO_PIN_ADDR;
 }
 
-export function toInt32(number: number) {
+export function numberToInt32(number: number) {
   if (number > MAX_INTEGER) {
     throw new SyntaxError('number is too large');
   }
 
   return Array.from(new Uint8Array(new Uint32Array([number]).buffer));
+}
+
+export function int32ToNumber(int32: number[]) {
+  return Array.from(new Uint32Array(new Uint8Array(int32).buffer))[0];
 }
 
 export function parseInt32(hex: string) {
@@ -85,5 +57,20 @@ export function zeroPad(string: string) {
 }
 
 export function toHex32(number: number) {
-  return toInt32(number).map((x) => zeroPad(x.toString(16)));
+  return numberToInt32(number).map((x) => zeroPad(x.toString(16)));
+}
+
+export function stringToHexBytes(string: string) {
+  return string
+    .split('')
+    .reduce((stack, next, index) => {
+      if (index % 2 === 0) {
+        stack.push(next);
+      } else {
+        stack.push(stack.pop() + next);
+      }
+
+      return stack;
+    }, [])
+    .join(' ');
 }

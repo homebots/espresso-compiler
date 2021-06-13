@@ -1,32 +1,24 @@
 import * as peg from 'pegjs';
 import * as helpers from './helpers';
-import { flatten } from './helpers';
-import { Node } from './syntax/node';
-import * as T from './tokens';
+import grammar from './grammar';
 
-export class Parser {
-  private parser: peg.Parser;
-
-  constructor(private grammar: string = '') {}
-
-  parse(code: string) {
-    return this.parser.parse(code);
-  }
-
-  setGrammar(grammar: string) {
-    this.grammar = grammar;
-    this.parser = this.createParser();
-  }
-
-  private createParser() {
-    if (!this.grammar) {
-      throw new Error('Missing gramar definitions');
-    }
-
-    const parserCode = peg.generate(this.grammar, { output: 'source', optimize: 'speed' });
-    const parserFunction = Function('_', 'T', 'helpers', 'return 0, ' + parserCode);
-    const parser = parserFunction(helpers, T) as unknown as peg.Parser;
+export function createParser(grammar: string): peg.Parser {
+  try {
+    const parserCode = peg.generate(grammar, { output: 'source', optimize: 'speed' });
+    const parserFunction = Function('_', 'return 0, ' + parserCode);
+    const parser = parserFunction(helpers) as unknown as peg.Parser;
 
     return parser;
+  } catch (error) {
+    return {
+      SyntaxError: SyntaxError,
+
+      parse() {
+        console.debug(grammar);
+        throw new Error('Invalid grammar: ' + error.message);
+      },
+    };
   }
 }
+
+export const defaultParser = createParser(grammar);

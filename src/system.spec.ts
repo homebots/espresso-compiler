@@ -1,0 +1,95 @@
+import { Compiler } from './index';
+import { defaultParser } from './parser';
+
+describe('Compiler', () => {
+  it('should parse an empty program', () => {
+    const compiler = new Compiler(defaultParser);
+    expect(compiler.compile('')).toStrictEqual([]);
+  });
+
+  it('should delay execution for a given amount of time', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `delay 1000`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0x02, 0xe8, 0x03, 0x00, 0x00]);
+  });
+
+  it('should stop execution', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `halt`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xfe]);
+  });
+
+  it('should restart the program', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `restart`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xfc]);
+  });
+
+  it('should do nothing', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `noop`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0x01]);
+  });
+
+  it('should sleep for a given amount of time', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `sleep 2000`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0x3f, 0xd0, 0x07, 0x00, 0x00]);
+  });
+
+  it('should jump to a given location', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `jump to 0x00000001`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0x04, 0x01, 0x00, 0x00, 0x00]);
+  });
+
+  it('should jump to a given label', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `
+    @begin
+      noop
+      jump to end
+
+    @middle
+      noop
+      jump to begin
+
+    @end
+      noop
+      jump to middle
+    `;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([
+      // begin
+      0x01,
+
+      // jump to end (12)
+      0x04, 0x0c, 0x00, 0x00, 0x00,
+
+      // middle
+      0x01,
+
+      // jump to begin (0)
+      0x04, 0x00, 0x00, 0x00, 0x00,
+
+      // end
+      0x01,
+
+      // jump to middle (6)
+      0x04, 0x06, 0x00, 0x00, 0x00,
+    ]);
+  });
+});

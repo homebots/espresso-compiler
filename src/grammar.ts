@@ -1,73 +1,42 @@
 export default `
 Program
-  = c:Line*
+  = c:Line* { return c }
 
 Line "statement"
-  = Spaces c:Statement NewLine? { return c } / Comment
+  = Spaces c:Statement NewLine? { return c }
 
 Comment "comment"
   = ('//' [^\\n]+) { return [] }
 
 Statement "statement"
-  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction
+  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
+SystemInstruction
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / sleep
 
-DefineTag "new label"
-  = '@' label:Label { return _.createLabel(label); }
+delay = 'delay' Spaces delay:Integer { return [0x02, ..._.numberToInt32(delay)]; }
+halt "halt" = 'halt' { return [0xfe]; }
+restart = 'restart' { return [0xfc]; }
+noop = 'noop' { return [0x01]; }
+sleep = 'sleep' Spaces delay:Integer { return [0x3f, ..._.numberToInt32(delay)]; }
 
-HexDigit "hexadecimal"
-  = [0-9A-Fa-f]
+jump_to =
+  'jump to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
+  'jump to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
 
-Integer "integer"
-	= [1-9][0-9]* { return Number(text()) }
+// --
+
+jumpif = 'jumpif' { return [0x0f]; }
+yield = 'yield' { return [0xfa]; }
+sysinfo = 'sysinfo' { return [0xfd]; }
+debug = 'debug' { return [0xfb]; }
+dump = 'dump' { return [0xf9]; }
+print = 'print' { return [0x03]; }
 
 Label "label"
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
 
-Spaces "space"
-  = [ \\t]*
-
-NewLine "new line"
-  = [\\n]+
-
-Address "address"
-  = '0x' h:(Byte Byte Byte Byte) { return h }
-
-Byte "Byte"
-  = HexDigit HexDigit { return parseInt(text(), 16) }
-
-Separator "separator"
-  = ',' Spaces
-
-Digit "0..9"
-  = [0-9]
-
-PinMode "pin mode"
-  = mode:[0-3] { return Number(mode) }
-
-Slot "slot"
-  = '#' d:Digit { return Number(d) }
-
-Pin "pin"
-  = 'pin ' pin:Digit { return Number(pin) }
-
-Operand "operand"
-  = Slot / Address / Pin
-SystemInstruction
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump / jumpif / delay_v / delay / sleep
-
-halt "halt" = 'halt' { return [0xfe]; }
-restart = 'restart' { return [0xfc]; }
-sysinfo = 'sysinfo' { return [0xfd]; }
-debug = 'debug' { return [0xfb]; }
-dump = 'dump' { return [0xf9]; }
-noop = 'noop' { return [0x01]; }
-yield = 'yield' { return [0xfa]; }
-print = 'print' { return [0x03]; }
-jump = 'jump' Spaces a:Address { return [0x04, a]; } / 'jump to' Spaces t:Label { return [0x04, _.getLabel(t)] }
-jumpif = 'jumpif' { return [0x0f]; }
-delay = 'delay' Spaces delay:Integer { return [0x02, ..._.toInt32(delay)]; }
-delay_v = 'delay_v' { return [0x1c]; }
-sleep = 'sleep' { return [0x3f]; }
+DefineTag "new label"
+  = '@' label:Label { return _.createReference(label); }
 
 MemoryInstruction
   = memget / memset / push_b / push_i / copy
@@ -77,6 +46,27 @@ memset = 'memset' { return [0x06]; }
 push_b = 'push_b' { return [0x07]; }
 push_i = 'push_i' { return [0x08]; }
 copy = 'copy' { return [0x1b]; }
+
+Operator
+  = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
+
+gte = 'gte' { return [0x0a]; }
+gt = 'gt' { return [0x09]; }
+lte = 'lte' { return [0x0c]; }
+lt = 'lt' { return [0x0b]; }
+equal = 'equal' { return [0x0d]; }
+notequal = 'notequal' { return [0x0e]; }
+xor = 'xor' { return [0x10]; }
+and = 'and' { return [0x11]; }
+or = 'or' { return [0x12]; }
+not = 'not' Spaces target:Variable Separator operand:Operand { return [0x13, target, operand]; }
+inc = 'inc' { return [0x14]; }
+dec = 'dec' { return [0x15]; }
+add = 'add' { return [0x16]; }
+sub = 'sub' { return [0x17]; }
+mul = 'mul' { return [0x18]; }
+div = 'div' { return [0x19]; }
+mod = 'mod' { return [0x1a]; }
 
 IoInstruction
   = iowrite / ioread / iomode / iotype / ioallout
@@ -107,4 +97,43 @@ i2getack = 'i2getack' { return [0x46]; }
 i2find = 'i2find' { return [0x48]; }
 i2writeack = 'i2writeack' { return [0x49]; }
 i2writeack_b = 'i2writeack_b' { return [0x4a]; }
+
+HexDigit "hexadecimal"
+  = [0-9A-Fa-f]
+
+Integer "integer"
+	= [1-9][0-9]* { return Number(text()) }
+
+Spaces "space"
+  = [ \\t]*
+
+NewLine "new line"
+  = [\\n]+
+
+HexByte "HexByte"
+  = HexDigit HexDigit { return text() }
+
+Byte "Byte"
+  = HexDigit HexDigit { return parseInt(text(), 16) }
+
+Separator "separator"
+  = ',' Spaces
+
+Digit "0..9"
+  = [0-9]
+
+PinMode "pin mode"
+  = mode:[0-3] { return Number(mode) }
+
+Variable "variable"
+  = '#' d:Digit { return Number(d) }
+
+Address "address"
+  = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
+
+Pin "pin"
+  = 'pin ' pin:Digit { return Number(pin) }
+
+Operand "operand"
+  = Variable / Address / Pin
 `;

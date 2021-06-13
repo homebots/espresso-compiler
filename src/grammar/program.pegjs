@@ -1,14 +1,11 @@
 Program
-  = c:Line*
+  = c:Line* { return c }
 
 Line "statement"
-  = Spaces c:Statement NewLine? { return c } / Comment
+  = Spaces c:Statement NewLine? { return c }
 
 Comment "comment"
   = ('//' [^\\n]+) { return [] }
 
 Statement "statement"
-  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction
-
-DefineTag "new label"
-  = '@' label:Label { return _.createLabel(label); }
+  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
