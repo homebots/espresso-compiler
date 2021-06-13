@@ -1,9 +1,11 @@
-
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 
 Integer "integer"
 	= [1-9][0-9]* { return Number(text()) }
+
+String "string"
+	= [']+ string:[^']* [']+ { return string.concat(0) }
 
 Spaces "space"
   = [ \\t]*
@@ -15,7 +17,7 @@ HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
-  = HexDigit HexDigit { return parseInt(text(), 16) }
+  = HexDigit HexDigit { return _.bytesFromHex(text()) }
 
 Separator "separator"
   = ',' Spaces
@@ -37,3 +39,7 @@ Pin "pin"
 
 Operand "operand"
   = Variable / Address / Pin
+
+True = 'true' { return 1 }
+False = 'false' { return 0 }
+Boolean = True / False

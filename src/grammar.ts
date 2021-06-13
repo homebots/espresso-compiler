@@ -23,14 +23,23 @@ jump_to =
   'jump to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
   'jump to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
 
+yield
+  = 'yield' Spaces delay:Integer { return [0xfa, ..._.numberToInt32(delay)]; }
+
+sysinfo
+  = 'sysinfo' { return [0xfd]; }
+
+debug
+  = 'debug' Spaces byte:Boolean { return [0xfb, byte]; }
+
+dump
+  = 'dump' { return [0xf9]; }
+
 // --
 
+print = 'print' Spaces string:String { return [0x03, ...string]; }
+
 jumpif = 'jumpif' { return [0x0f]; }
-yield = 'yield' { return [0xfa]; }
-sysinfo = 'sysinfo' { return [0xfd]; }
-debug = 'debug' { return [0xfb]; }
-dump = 'dump' { return [0xf9]; }
-print = 'print' { return [0x03]; }
 
 Label "label"
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
@@ -97,12 +106,14 @@ i2getack = 'i2getack' { return [0x46]; }
 i2find = 'i2find' { return [0x48]; }
 i2writeack = 'i2writeack' { return [0x49]; }
 i2writeack_b = 'i2writeack_b' { return [0x4a]; }
-
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 
 Integer "integer"
 	= [1-9][0-9]* { return Number(text()) }
+
+String "string"
+	= [']+ string:[^']* [']+ { return string.concat(0) }
 
 Spaces "space"
   = [ \\t]*
@@ -114,7 +125,7 @@ HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
-  = HexDigit HexDigit { return parseInt(text(), 16) }
+  = HexDigit HexDigit { return _.bytesFromHex(text()) }
 
 Separator "separator"
   = ',' Spaces
@@ -136,4 +147,7 @@ Pin "pin"
 
 Operand "operand"
   = Variable / Address / Pin
-`;
+
+True = 'true' { return 1 }
+False = 'false' { return 0 }
+Boolean = True / False`;

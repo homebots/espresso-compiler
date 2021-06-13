@@ -74,3 +74,7 @@ export function stringToHexBytes(string: string) {
     }, [])
     .join(' ');
 }
+
+export function bytesFromHex(hex: string) {
+  return parseInt(hex, 16);
+}

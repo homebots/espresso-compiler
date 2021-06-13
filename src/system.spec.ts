@@ -55,6 +55,50 @@ describe('Compiler', () => {
     expect(output).toStrictEqual([0x04, 0x01, 0x00, 0x00, 0x00]);
   });
 
+  it('should delay a given time (micro seconds)', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `yield 10`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xfa, 0x0a, 0x00, 0x00, 0x00]);
+  });
+
+  it('should print system information to serial output', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `sysinfo`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xfd]);
+  });
+
+  it('should print program and execution memory details to serial output', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `dump`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xf9]);
+  });
+
+  it('should print a string serial output', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `print 'foo'`;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0x03, ...'foo'.split('')]);
+  });
+
+  it('should toggle serial output', () => {
+    const compiler = new Compiler(defaultParser);
+    const program = `
+    debug true
+    noop
+    debug false
+    `;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([0xfb, 1, 1, 0xfb, 0]);
+  });
+
   it('should jump to a given label', () => {
     const compiler = new Compiler(defaultParser);
     const program = `
