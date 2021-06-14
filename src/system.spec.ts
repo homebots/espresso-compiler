@@ -72,14 +72,11 @@ describe('Compiler', () => {
   });
 
   it('should print a string serial output', () => {
-    const program = `
-    noop
-    print 'foo'
-    `;
+    const program = `print 'foo'`;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x03, ...characters]);
+    expect(output).toStrictEqual([0x03, ...characters, 0]);
   });
 
   it('should toggle serial output', () => {

@@ -69,3 +69,7 @@ export function stringToHexBytes(string: string): string {
 export function bytesFromHex(hex: string): number {
   return parseInt(hex, 16);
 }
+
+export function toBinaryString(value: unknown[]): number[] {
+  return value.map((c) => String(c).charCodeAt(0)).concat(0);
+}
