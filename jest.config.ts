@@ -1,7 +1,8 @@
 export default {
+  cache: false,
+  clearMocks: true,
   collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageProvider: 'v8',
+  // coverageProvider: 'v8',
   coverageThreshold: {
     global: {
       branches: 100,
@@ -12,8 +13,12 @@ export default {
   },
   maxWorkers: '90%',
   moduleFileExtensions: ['js', 'ts'],
-  preset: 'ts-jest',
   slowTestThreshold: 1,
-  testEnvironment: 'jest-environment-node',
-  testMatch: ['**/src/*.spec.ts'],
+  // testEnvironment: 'jest-environment-node',
+  testEnvironment: 'node',
+  testMatch: ['**/*.spec.ts'],
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+  },
+  verbose: true,
 };
