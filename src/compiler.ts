@@ -1,12 +1,13 @@
-import * as peg from 'pegjs';
 import { numberToInt32, Placeholder, Reference } from './helpers';
+import * as helpers from './helpers';
+import grammar from './grammar';
 
 const NUMBER = 'number';
 
 export class Compiler {
-  constructor(private parser: peg.Parser) {}
+  private parser = grammar(helpers);
 
-  compile(code: string) {
+  compile(code: string): number[] {
     code = code.trim();
 
     if (!code) {
@@ -17,7 +18,7 @@ export class Compiler {
       const nodes = this.parse(code).flat(2);
       const bytes = this.replaceReferences(nodes);
 
-      return bytes;
+      return bytes as number[];
     } catch (error) {
       if (error.location) {
         throw new SyntaxError(
@@ -29,7 +30,7 @@ export class Compiler {
     }
   }
 
-  parse(code: string) {
+  parse(code: string): unknown[] {
     return this.parser.parse(code);
   }
 
@@ -40,7 +41,7 @@ export class Compiler {
     return nodes;
   }
 
-  private filterOutReferences(nodes: any[]) {
+  private filterOutReferences<T>(nodes: Array<T | Reference | Placeholder>) {
     const references = new Map();
     const nodesWithoutReferences = [];
     const max = nodes.length;
@@ -60,13 +61,13 @@ export class Compiler {
         continue;
       }
 
-      throw ReferenceError('Invalid token found at ' + index);
+      throw ReferenceError('Invalid token found at ' + index + ': ' + node);
     }
 
     return { nodesWithoutReferences, references };
   }
 
-  private replacePlaceholders(nodes: any[], references: Map<string, number>) {
+  private replacePlaceholders<T>(nodes: Array<T | Reference | Placeholder>, references: Map<string, number>) {
     const output = [];
 
     for (let index = 0; index < nodes.length; ) {

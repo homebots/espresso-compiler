@@ -7,24 +7,15 @@ export class Reference {
   constructor(readonly name: string) {}
 }
 
-export class ByteReference {
-  value = 0;
-  constructor(readonly name: string) {}
-
-  valueOf() {
-    return Number(this.value);
-  }
-}
-
-export function createReference(label: string) {
+export function createReference(label: string): Reference {
   return new Reference(label);
 }
 
-export function createPlaceholder(label: string) {
+export function createPlaceholder(label: string): Placeholder {
   return new Placeholder(label);
 }
 
-export function gpioAddress(pin: number) {
+export function gpioAddress(pin: number): number {
   const GPIO_BASEADDR = 0x60000300;
   const GPIO_PIN0_ADDRESS = 0x28;
   const GPIO_PIN_ADDR = GPIO_BASEADDR + GPIO_PIN0_ADDRESS + pin * 4;
@@ -32,7 +23,7 @@ export function gpioAddress(pin: number) {
   return GPIO_PIN_ADDR;
 }
 
-export function numberToInt32(number: number) {
+export function numberToInt32(number: number): number[] {
   if (number > MAX_INTEGER) {
     throw new SyntaxError('number is too large');
   }
@@ -40,11 +31,11 @@ export function numberToInt32(number: number) {
   return Array.from(new Uint8Array(new Uint32Array([number]).buffer));
 }
 
-export function int32ToNumber(int32: number[]) {
+export function int32ToNumber(int32: number[]): number {
   return Array.from(new Uint32Array(new Uint8Array(int32).buffer))[0];
 }
 
-export function parseInt32(hex: string) {
+export function parseInt32(hex: string): number {
   return hex
     .split(' ')
     .map((x) => parseInt(x, 16))
@@ -52,15 +43,15 @@ export function parseInt32(hex: string) {
     .reduce((a, n) => new Uint32Array([n])[0] + a, 0);
 }
 
-export function zeroPad(string: string) {
+export function zeroPad(string: string): string {
   return (string.length === 1 ? '0' : '') + string;
 }
 
-export function toHex32(number: number) {
-  return numberToInt32(number).map((x) => zeroPad(x.toString(16)));
-}
+// export function toHex32(number: number): string[] {
+//   return numberToInt32(number).map((x) => zeroPad(x.toString(16)));
+// }
 
-export function stringToHexBytes(string: string) {
+export function stringToHexBytes(string: string): string {
   return string
     .split('')
     .reduce((stack, next, index) => {
@@ -75,6 +66,6 @@ export function stringToHexBytes(string: string) {
     .join(' ');
 }
 
-export function bytesFromHex(hex: string) {
+export function bytesFromHex(hex: string): number {
   return parseInt(hex, 16);
 }

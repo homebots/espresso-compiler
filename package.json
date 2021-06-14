@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint src/**/*.ts",
-    "ci": "npm ci && npm run lint && npm run test"
+    "ci": "npm ci && npm run lint && npm run test",
+    "build": "rm -rf dist/ && sh update-grammar.sh && tsc -p tsconfig.build.json",
+    "tdd": "jest --watchAll",
+    "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/grammar.ts",
+    "all": "npm run build && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,9 @@
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/pegjs": "^0.10.2",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "eslint": "^7.28.0",
     "jest": "^27.0.4",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",

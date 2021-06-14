@@ -1,14 +1,14 @@
 import { Compiler } from './index';
-import { defaultParser } from './parser';
+// import { defaultParser } from './parser';
 
 describe('Compiler', () => {
+  const compiler = new Compiler();
+
   it('should parse an empty program', () => {
-    const compiler = new Compiler(defaultParser);
     expect(compiler.compile('')).toStrictEqual([]);
   });
 
   it('should delay execution for a given amount of time', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `delay 1000`;
     const output = compiler.compile(program);
 
@@ -16,7 +16,6 @@ describe('Compiler', () => {
   });
 
   it('should stop execution', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `halt`;
     const output = compiler.compile(program);
 
@@ -24,7 +23,6 @@ describe('Compiler', () => {
   });
 
   it('should restart the program', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `restart`;
     const output = compiler.compile(program);
 
@@ -32,7 +30,6 @@ describe('Compiler', () => {
   });
 
   it('should do nothing', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `noop`;
     const output = compiler.compile(program);
 
@@ -40,7 +37,6 @@ describe('Compiler', () => {
   });
 
   it('should sleep for a given amount of time', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `sleep 2000`;
     const output = compiler.compile(program);
 
@@ -48,7 +44,6 @@ describe('Compiler', () => {
   });
 
   it('should jump to a given location', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `jump to 0x00000001`;
     const output = compiler.compile(program);
 
@@ -56,7 +51,6 @@ describe('Compiler', () => {
   });
 
   it('should delay a given time (micro seconds)', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `yield 10`;
     const output = compiler.compile(program);
 
@@ -64,7 +58,6 @@ describe('Compiler', () => {
   });
 
   it('should print system information to serial output', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `sysinfo`;
     const output = compiler.compile(program);
 
@@ -72,7 +65,6 @@ describe('Compiler', () => {
   });
 
   it('should print program and execution memory details to serial output', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `dump`;
     const output = compiler.compile(program);
 
@@ -80,15 +72,17 @@ describe('Compiler', () => {
   });
 
   it('should print a string serial output', () => {
-    const compiler = new Compiler(defaultParser);
-    const program = `print 'foo'`;
+    const program = `
+    noop
+    print 'foo'
+    `;
+    const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x03, ...'foo'.split('')]);
+    expect(output).toStrictEqual([0x03, ...characters]);
   });
 
   it('should toggle serial output', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `
     debug true
     noop
@@ -100,7 +94,6 @@ describe('Compiler', () => {
   });
 
   it('should jump to a given label', () => {
-    const compiler = new Compiler(defaultParser);
     const program = `
     @begin
       noop

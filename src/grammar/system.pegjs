@@ -23,9 +23,10 @@ debug
 dump
   = 'dump' { return [0xf9]; }
 
-// --
+print
+  = 'print' Spaces string:String { return [0x03, ...string]; }
 
-print = 'print' Spaces string:String { return [0x03, ...string]; }
+// --
 
 jumpif = 'jumpif' { return [0x0f]; }
 

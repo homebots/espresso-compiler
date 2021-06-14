@@ -5,13 +5,15 @@ Integer "integer"
 	= [1-9][0-9]* { return Number(text()) }
 
 String "string"
-	= [']+ string:[^']* [']+ { return string.concat(0) }
+  = "'" string:(!"'" .)* "'"
+  // { return string.concat(0) }
+    // ["] string:[^']* [^"] { return string.concat(0) }
 
 Spaces "space"
-  = [ \\t]*
+  = [ \t]*
 
 NewLine "new line"
-  = [\\n]+
+  = [\n]+
 
 HexByte "HexByte"
   = HexDigit HexDigit { return text() }
