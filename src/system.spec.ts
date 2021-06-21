@@ -126,4 +126,34 @@ describe('Compiler', () => {
       0x04, 0x06, 0x00, 0x00, 0x00,
     ]);
   });
+
+  it('should jump to a label based on the value of a variable', () => {
+    const program = `
+      noop
+    @begin
+      noop
+      if #0 then jump to begin
+    `;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([
+      0x01,
+
+      // begin
+      0x01,
+
+      // jump if #0 to (1)
+      0x0f, 0x00, 0x01, 0x00, 0x00, 0x00,
+    ]);
+  });
+
+  it('should allow a variable declaration', () => {
+    const program = `
+      var $a
+      not $a, $a
+    `;
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([]);
+  });
 });

@@ -1,11 +1,16 @@
-import { numberToInt32, Placeholder, Reference } from './helpers';
+import { numberToInt32 } from './helpers';
+import { Node, isReference, isPlaceholder, isIdentifier } from './types';
 import * as helpers from './helpers';
 import grammar from './grammar';
 
-const NUMBER = 'number';
+type Nodes = Array<Node | number>;
 
 export class Compiler {
   private parser = grammar(helpers);
+
+  parse(code: string): Nodes {
+    return this.parser.parse(code);
+  }
 
   compile(code: string): number[] {
     code = code.trim();
@@ -16,78 +21,102 @@ export class Compiler {
 
     try {
       const nodes = this.parse(code).flat(2);
-      const bytes = this.replaceReferences(nodes);
+      const bytes = this.replaceNodes(nodes);
 
-      return bytes as number[];
+      return bytes;
     } catch (error) {
-      if (error.location) {
-        throw new SyntaxError(
-          'At ' + error.location.start.line + ',' + error.location.start.column + ': ' + error.message,
-        );
-      }
-
-      throw error;
+      this.handleError(error);
     }
   }
 
-  parse(code: string): unknown[] {
-    return this.parser.parse(code);
+  handleError(error: any): void {
+    if (error.location) {
+      throw new SyntaxError(
+        'At ' + error.location.start.line + ',' + error.location.start.column + ': ' + error.message,
+      );
+    }
+
+    throw error;
   }
 
-  replaceReferences<T>(input: Array<T | Reference | Placeholder>): T[] {
-    const { nodesWithoutReferences, references } = this.filterOutReferences(input);
-    const nodes = this.replacePlaceholders(nodesWithoutReferences, references);
-
-    return nodes;
-  }
-
-  private filterOutReferences<T>(nodes: Array<T | Reference | Placeholder>) {
+  replaceNodes(nodes: Nodes): Array<number> {
     const references = new Map();
-    const nodesWithoutReferences = [];
-    const max = nodes.length;
+    const identifiers = new Map();
 
-    for (let index = 0; index < max; ) {
-      const node = nodes[index];
+    this.tagIdentifiers(nodes, identifiers);
 
-      if (typeof node === NUMBER || node instanceof Placeholder) {
-        nodesWithoutReferences.push(node);
-        index++;
-        continue;
-      }
+    nodes = this.filterReferences(nodes, references);
+    nodes = this.replacePlaceholders(nodes, references);
+    nodes = this.replaceIdentifiers(nodes);
 
-      if (node instanceof Reference) {
-        references.set(node.name, index - references.size);
-        index++;
-        continue;
-      }
-
-      throw ReferenceError('Invalid token found at ' + index + ': ' + node);
-    }
-
-    return { nodesWithoutReferences, references };
+    return nodes as number[];
   }
 
-  private replacePlaceholders<T>(nodes: Array<T | Reference | Placeholder>, references: Map<string, number>) {
+  private filterReferences(nodes: Nodes, references: Map<string, number>) {
+    return nodes.filter((item, index) => {
+      if (isReference(item)) {
+        references.set(item.name, index - references.size);
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  private tagIdentifiers(nodes: Nodes, identifiers: Map<string, number>) {
+    return nodes.forEach((item) => {
+      if (!isIdentifier(item)) return;
+
+      if (!identifiers.has(item.name)) {
+        item.id = identifiers.size;
+        identifiers.set(item.name, identifiers.size);
+        return;
+      }
+
+      item.id = identifiers.get(item.name);
+    });
+  }
+
+  private replaceIdentifiers(nodes: Nodes) {
+    return nodes.map((node) => {
+      if (isIdentifier(node)) {
+        return node.id;
+      }
+
+      return node;
+    });
+  }
+
+  private replacePlaceholders(nodes: Nodes, references: Map<string, number>) {
     const output = [];
 
     for (let index = 0; index < nodes.length; ) {
       const node = nodes[index];
 
-      if (typeof node === NUMBER) {
-        output.push(node);
-        index++;
-        continue;
-      }
-
-      if (node instanceof Placeholder) {
+      if (isPlaceholder(node)) {
         output.push(...numberToInt32(references.get(node.name)));
         index += 4;
         continue;
       }
 
-      throw ReferenceError('Invalid token found at ' + index);
+      output.push(node);
+      index++;
     }
 
     return output;
   }
+
+  // protected replaceNode<A, T>(
+  //   nodes: Array<A>,
+  //   type: { new (): T },
+  //   replacer: (node: T, index: number) => number,
+  // ): Array<A | number> {
+  //   return nodes.map((node, index) => {
+  //     if (typeof node === OBJECT && node instanceof type) {
+  //       return replacer(node, index);
+  //     }
+
+  //     return node;
+  //   });
+  // }
 }

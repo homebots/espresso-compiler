@@ -2,6 +2,8 @@
 Operator
   = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
 
+not = 'not' Spaces target:Operand Separator operand:Operand { return [0x13, target, operand]; }
+
 gte = 'gte' { return [0x0a]; }
 gt = 'gt' { return [0x09]; }
 lte = 'lte' { return [0x0c]; }
@@ -11,7 +13,6 @@ notequal = 'notequal' { return [0x0e]; }
 xor = 'xor' { return [0x10]; }
 and = 'and' { return [0x11]; }
 or = 'or' { return [0x12]; }
-not = 'not' Spaces target:Variable Separator operand:Operand { return [0x13, target, operand]; }
 inc = 'inc' { return [0x14]; }
 dec = 'dec' { return [0x15]; }
 add = 'add' { return [0x16]; }

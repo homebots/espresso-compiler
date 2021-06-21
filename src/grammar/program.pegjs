@@ -8,4 +8,4 @@ Comment "comment"
   = ('//' [^\n]+) { return [] }
 
 Statement "statement"
-  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
+  = DefineLabel / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment

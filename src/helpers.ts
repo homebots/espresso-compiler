@@ -1,18 +1,25 @@
+import { Identifier, PinValue, PinValue, Placeholder, Reference } from './types';
+
 const MAX_INTEGER = 4294967295;
-export class Placeholder {
-  constructor(readonly name: string) {}
+
+export function createReference(name: string): Reference {
+  return { type: 'reference', name };
 }
 
-export class Reference {
-  constructor(readonly name: string) {}
+export function createPlaceholder(name: string): Placeholder {
+  return { type: 'placeholder', name };
 }
 
-export function createReference(label: string): Reference {
-  return new Reference(label);
+export function getIdentifier(name: string): Identifier {
+  return { type: 'identifier', name, id: 0 };
 }
 
-export function createPlaceholder(label: string): Placeholder {
-  return new Placeholder(label);
+export function toPinValue(number: number): [PinValue, number] {
+  return [{ type: 'pin', number }, 0x00];
+}
+
+export function toIdentifierValue(name: string): [Identifier, number] {
+  return [getIdentifier(name), 0x00];
 }
 
 export function gpioAddress(pin: number): number {

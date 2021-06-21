@@ -9,19 +9,31 @@ Comment "comment"
   = ('//' [^\n]+) { return [] }
 
 Statement "statement"
-  = DefineTag / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
-SystemInstruction
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / sleep
+  = DefineLabel / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
+SystemInstruction 'system instruction'
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / sleep / Declaration
 
-delay = 'delay' Spaces delay:Integer { return [0x02, ..._.numberToInt32(delay)]; }
-halt "halt" = 'halt' { return [0xfe]; }
-restart = 'restart' { return [0xfc]; }
-noop = 'noop' { return [0x01]; }
-sleep = 'sleep' Spaces delay:Integer { return [0x3f, ..._.numberToInt32(delay)]; }
+delay
+  = 'delay' Spaces delay:Integer { return [0x02, ..._.numberToInt32(delay)]; }
+
+halt
+  = 'halt' { return [0xfe]; }
+
+restart
+  = 'restart' { return [0xfc]; }
+
+noop
+  = 'noop' { return [0x01]; }
+
+sleep
+  = 'sleep' Spaces delay:Integer { return [0x3f, ..._.numberToInt32(delay)]; }
 
 jump_to =
-  'jump to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
-  'jump to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
+  'jump' Spaces 'to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
+  'jump' Spaces 'to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
+
+jumpif =
+  'if' Spaces condition:Condition Spaces'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
   = 'yield' Spaces delay:Integer { return [0xfa, ..._.numberToInt32(delay)]; }
@@ -38,16 +50,17 @@ dump
 print
   = 'print' Spaces string:String { return [0x03, ...string]; }
 
-// --
-
-jumpif = 'jumpif' { return [0x0f]; }
-
-Label "label"
+Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
 
-DefineTag "new label"
+DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
+Condition
+  = Variable
+
+Declaration
+  = 'var' Spaces t:Identifier { return t }
 MemoryInstruction
   = memget / memset / push_b / push_i / copy
 
@@ -116,17 +129,17 @@ Integer "integer"
 String "string"
   = "'" string:(!"'" .)* "'" { return _.toBinaryString(string.map(s => s[1])) }
 
-Spaces "space"
-  = [ \t]*
-
-NewLine "new line"
-  = [\n]+
-
 HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
   = HexDigit HexDigit { return _.bytesFromHex(text()) }
+
+Spaces "space"
+  = [ \t]*
+
+NewLine "new line"
+  = [\n]+
 
 Separator "separator"
   = ',' Spaces
@@ -134,11 +147,14 @@ Separator "separator"
 Digit "0..9"
   = [0-9]
 
+Alpha "a-z"
+  = [a-z]i
+
+Alphanumeric "a-z or 0-9"
+  = [a-z]i
+
 PinMode "pin mode"
   = mode:[0-3] { return Number(mode) }
-
-Variable "variable"
-  = '#' d:Digit { return Number(d) }
 
 Address "address"
   = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
@@ -152,3 +168,23 @@ Operand "operand"
 True = 'true' { return 1 }
 False = 'false' { return 0 }
 Boolean = True / False
+
+Variable "variable"
+  = '#' d:Digit { return Number(d) }
+
+Identifier
+  = !ReservedWord name:IdentifierName { return name; }
+
+IdentifierName "identifier"
+  = '$' head:IdentifierChar tail:IdentifierChar* { return _.getIdentifier(head + tail.join('')); }
+
+IdentifierChar
+  = Alphanumeric
+  / "$"
+  / "_"
+
+ReservedWord
+  = 'var'
+
+// Identifier "identifier"
+//   = a:Alpha b:Alphanumeric* { return _.getIdentifierCode(text()) }

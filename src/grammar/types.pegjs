@@ -7,17 +7,17 @@ Integer "integer"
 String "string"
   = "'" string:(!"'" .)* "'" { return _.toBinaryString(string.map(s => s[1])) }
 
-Spaces "space"
-  = [ \t]*
-
-NewLine "new line"
-  = [\n]+
-
 HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
   = HexDigit HexDigit { return _.bytesFromHex(text()) }
+
+Spaces "space"
+  = [ \t]*
+
+NewLine "new line"
+  = [\n]+
 
 Separator "separator"
   = ',' Spaces
@@ -25,21 +25,41 @@ Separator "separator"
 Digit "0..9"
   = [0-9]
 
+Alpha "a-z"
+  = [a-z]i
+
+Alphanumeric "a-z or 0-9"
+  = [a-z]i
+
 PinMode "pin mode"
   = mode:[0-3] { return Number(mode) }
 
-Variable "variable"
-  = '#' d:Digit { return Number(d) }
-
 Address "address"
-  = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
+  = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.toAddress([d, c, b, a]) }
+  // = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
 
 Pin "pin"
-  = 'pin ' pin:Digit { return Number(pin) }
+  = 'pin ' pin:Digit { return _.toPinValue(Number(pin)) }
 
-Operand "operand"
-  = Variable / Address / Pin
+True
+  = 'true' { return 1 }
 
-True = 'true' { return 1 }
-False = 'false' { return 0 }
-Boolean = True / False
+False
+  = 'false' { return 0 }
+
+Boolean
+  = True / False
+
+// Variable "variable"
+//   = '#' d:Digit { return Number(d) }
+
+Identifier "identifier"
+  = '$' head:IdentifierChar tail:IdentifierChar* { return _.toIdentifierValue(head + tail.join('')); }
+
+IdentifierChar
+  = Alphanumeric
+  / "$"
+  / "_"
+
+Value "identifier, address or IO pin"
+  = Identifier / Address / Pin
