@@ -1,5 +1,4 @@
 import { Compiler } from './index';
-// import { defaultParser } from './parser';
 
 describe('Compiler', () => {
   const compiler = new Compiler();
@@ -149,7 +148,6 @@ describe('Compiler', () => {
 
   it('should allow a variable declaration', () => {
     const program = `
-      var $a
       not $a, $a
     `;
     const output = compiler.compile(program);

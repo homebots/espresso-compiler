@@ -1,8 +1,9 @@
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / sleep / Declaration
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / Declaration
 
 delay
-  = 'delay' Spaces delay:Integer { return [0x02, ..._.numberToInt32(delay)]; }
+  = 'delay' Spaces delay:IntegerValue { return [0x02, ...delay]; } /
+  'sleep' Spaces delay:IntegerValue { return [0x3f, ...delay]; }
 
 halt
   = 'halt' { return [0xfe]; }
@@ -13,18 +14,15 @@ restart
 noop
   = 'noop' { return [0x01]; }
 
-sleep
-  = 'sleep' Spaces delay:Integer { return [0x3f, ..._.numberToInt32(delay)]; }
-
 jump_to =
-  'jump' Spaces 'to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
+  'jump' Spaces 'to' Spaces address:AddressValue { return [0x04, ...address]; } /
   'jump' Spaces 'to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
 
 jumpif =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
-  = 'yield' Spaces delay:Integer { return [0xfa, ..._.numberToInt32(delay)]; }
+  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...T.IntegerValue.create(delay)]; }
 
 sysinfo
   = 'sysinfo' { return [0xfd]; }

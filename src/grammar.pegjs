@@ -11,10 +11,11 @@ Comment "comment"
 Statement "statement"
   = DefineLabel / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / sleep / Declaration
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / Declaration
 
 delay
-  = 'delay' Spaces delay:Integer { return [0x02, ..._.numberToInt32(delay)]; }
+  = 'delay' Spaces delay:IntegerValue { return [0x02, ...delay]; } /
+  'sleep' Spaces delay:IntegerValue { return [0x3f, ...delay]; }
 
 halt
   = 'halt' { return [0xfe]; }
@@ -25,18 +26,15 @@ restart
 noop
   = 'noop' { return [0x01]; }
 
-sleep
-  = 'sleep' Spaces delay:Integer { return [0x3f, ..._.numberToInt32(delay)]; }
-
 jump_to =
-  'jump' Spaces 'to' Spaces address:Address { return [0x04, ..._.numberToInt32(address)]; } /
+  'jump' Spaces 'to' Spaces address:AddressValue { return [0x04, ...address]; } /
   'jump' Spaces 'to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
 
 jumpif =
-  'if' Spaces condition:Condition Spaces'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
-  = 'yield' Spaces delay:Integer { return [0xfa, ..._.numberToInt32(delay)]; }
+  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...T.IntegerValue.create(delay)]; }
 
 sysinfo
   = 'sysinfo' { return [0xfd]; }
@@ -56,9 +54,6 @@ Label
 DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
-Condition
-  = Variable
-
 Declaration
   = 'var' Spaces t:Identifier { return t }
 MemoryInstruction
@@ -73,6 +68,8 @@ copy = 'copy' { return [0x1b]; }
 Operator
   = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
 
+not = 'not' Spaces target:Value Separator value:Value { return [0x13, target, value]; }
+
 gte = 'gte' { return [0x0a]; }
 gt = 'gt' { return [0x09]; }
 lte = 'lte' { return [0x0c]; }
@@ -82,7 +79,6 @@ notequal = 'notequal' { return [0x0e]; }
 xor = 'xor' { return [0x10]; }
 and = 'and' { return [0x11]; }
 or = 'or' { return [0x12]; }
-not = 'not' Spaces target:Variable Separator operand:Operand { return [0x13, target, operand]; }
 inc = 'inc' { return [0x14]; }
 dec = 'dec' { return [0x15]; }
 add = 'add' { return [0x16]; }
@@ -94,8 +90,8 @@ mod = 'mod' { return [0x1a]; }
 IoInstruction
   = iowrite / ioread / iomode / iotype / ioallout
 
-iowrite = 'io write' Spaces Pin Separator Operand { return [0x31]; }
-ioread = 'io read' Spaces Pin Separator Operand { return [0x32]; }
+iowrite = 'io write' Spaces Pin Separator Value { return [0x31]; }
+ioread = 'io read' Spaces Pin Separator Value { return [0x32]; }
 iomode = 'io mode' Spaces Pin Separator PinMode { return [0x35]; }
 iotype = 'io type' Spaces Pin Separator Digit { return [0x36]; }
 ioallout = 'io allout' { return [0x37]; }
@@ -123,17 +119,11 @@ i2writeack_b = 'i2writeack_b' { return [0x4a]; }
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 
-Integer "integer"
-	= [1-9][0-9]* { return Number(text()) }
-
-String "string"
-  = "'" string:(!"'" .)* "'" { return _.toBinaryString(string.map(s => s[1])) }
-
 HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
-  = HexDigit HexDigit { return _.bytesFromHex(text()) }
+  = HexDigit HexDigit { return parseInt(text(), 16) }
 
 Spaces "space"
   = [ \t]*
@@ -156,35 +146,45 @@ Alphanumeric "a-z or 0-9"
 PinMode "pin mode"
   = mode:[0-3] { return Number(mode) }
 
+True
+  = 'true' { return 1 }
+
+False
+  = 'false' { return 0 }
+
+Boolean
+  = True / False
+
+Integer "integer"
+  = [1-9][0-9]* { return Number(text()) }
+
+SignedInteger
+  = '-' int:Integer { return -1 * int }
+
+String "string"
+  = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
+
 Address "address"
-  = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
+  = '0x' a:Byte b:Byte c:Byte d:Byte { return [d, c, b, a] }
 
 Pin "pin"
-  = 'pin ' pin:Digit { return Number(pin) }
+  = 'pin ' pin:Digit { return new T.PinValue(Number(pin)) }
 
-Operand "operand"
-  = Variable / Address / Pin
-
-True = 'true' { return 1 }
-False = 'false' { return 0 }
-Boolean = True / False
-
-Variable "variable"
-  = '#' d:Digit { return Number(d) }
-
-Identifier
-  = !ReservedWord name:IdentifierName { return name; }
-
-IdentifierName "identifier"
-  = '$' head:IdentifierChar tail:IdentifierChar* { return _.getIdentifier(head + tail.join('')); }
+Identifier "identifier"
+  = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 
 IdentifierChar
   = Alphanumeric
   / "$"
   / "_"
 
-ReservedWord
-  = 'var'
+IdentifierValue = name:Identifier  { return T.IdentifierValue.create(name) }
+ByteValue = byte:Byte { return T.ByteValue.create(byte) } / pin:Pin { return T.PinValue.create(pin) }
+AddressValue = address:Address { return T.AddressValue.create(address) }
+IntegerValue = number:Integer { return T.IntegerValue.create(number) }
+SignedIntegerValue = number:SignedInteger { return T.SignedIntegerValue.create(number) }
+NumberValue = IntegerValue / SignedIntegerValue
+StringValue = string:String { return T.StringValue.create(string) }
 
-// Identifier "identifier"
-//   = a:Alpha b:Alphanumeric* { return _.getIdentifierCode(text()) }
+Value "identifier, address or IO pin"
+  = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue

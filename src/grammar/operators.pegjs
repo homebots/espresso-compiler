@@ -2,7 +2,7 @@
 Operator
   = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
 
-not = 'not' Spaces target:Operand Separator operand:Operand { return [0x13, target, operand]; }
+not = 'not' Spaces target:Value Separator value:Value { return [0x13, target, value]; }
 
 gte = 'gte' { return [0x0a]; }
 gt = 'gt' { return [0x09]; }

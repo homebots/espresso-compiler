@@ -1,17 +1,11 @@
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 
-Integer "integer"
-	= [1-9][0-9]* { return Number(text()) }
-
-String "string"
-  = "'" string:(!"'" .)* "'" { return _.toBinaryString(string.map(s => s[1])) }
-
 HexByte "HexByte"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
-  = HexDigit HexDigit { return _.bytesFromHex(text()) }
+  = HexDigit HexDigit { return parseInt(text(), 16) }
 
 Spaces "space"
   = [ \t]*
@@ -34,13 +28,6 @@ Alphanumeric "a-z or 0-9"
 PinMode "pin mode"
   = mode:[0-3] { return Number(mode) }
 
-Address "address"
-  = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.toAddress([d, c, b, a]) }
-  // = '0x' a:Byte b:Byte c:Byte d:Byte  { return _.int32ToNumber([d, c, b, a]) }
-
-Pin "pin"
-  = 'pin ' pin:Digit { return _.toPinValue(Number(pin)) }
-
 True
   = 'true' { return 1 }
 
@@ -50,16 +37,36 @@ False
 Boolean
   = True / False
 
-// Variable "variable"
-//   = '#' d:Digit { return Number(d) }
+Integer "integer"
+  = [1-9][0-9]* { return Number(text()) }
+
+SignedInteger
+  = '-' int:Integer { return -1 * int }
+
+String "string"
+  = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
+
+Address "address"
+  = '0x' a:Byte b:Byte c:Byte d:Byte { return [d, c, b, a] }
+
+Pin "pin"
+  = 'pin ' pin:Digit { return new T.PinValue(Number(pin)) }
 
 Identifier "identifier"
-  = '$' head:IdentifierChar tail:IdentifierChar* { return _.toIdentifierValue(head + tail.join('')); }
+  = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 
 IdentifierChar
   = Alphanumeric
   / "$"
   / "_"
 
+IdentifierValue = name:Identifier  { return T.IdentifierValue.create(name) }
+ByteValue = byte:Byte { return T.ByteValue.create(byte) } / pin:Pin { return T.PinValue.create(pin) }
+AddressValue = address:Address { return T.AddressValue.create(address) }
+IntegerValue = number:Integer { return T.IntegerValue.create(number) }
+SignedIntegerValue = number:SignedInteger { return T.SignedIntegerValue.create(number) }
+NumberValue = IntegerValue / SignedIntegerValue
+StringValue = string:String { return T.StringValue.create(string) }
+
 Value "identifier, address or IO pin"
-  = Identifier / Address / Pin
+  = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue

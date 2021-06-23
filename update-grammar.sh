@@ -14,7 +14,7 @@ cat src/grammar/types.pegjs >> $target
 
 pegjs --optimize speed --format commonjs -o src/grammar.out src/grammar.pegjs
 
-echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\nexport default function (_: any): peg.Parser {const module = { exports: null };" > src/grammar.ts
+echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\nexport default function (_: any, T: any): peg.Parser {const module = { exports: null };" > src/grammar.ts
 cat src/grammar.out >> src/grammar.ts
 echo 'return module.exports as peg.Parser;}' >> src/grammar.ts
 

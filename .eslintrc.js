@@ -7,6 +7,6 @@ module.exports = {
     'one-var': [2, 'never'],
     'no-control-regex': [0],
     'prefer-const': [2],
-    'no-unused-vars': [2, { args: 'none' }],
+    '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
   },
 };

@@ -1,12 +1,17 @@
-import { numberToInt32 } from './helpers';
 import { Node, isReference, isPlaceholder, isIdentifier } from './types';
 import * as helpers from './helpers';
+import * as types from './types';
 import grammar from './grammar';
 
 type Nodes = Array<Node | number>;
 
+interface ParseError {
+  location: { start: { line: number; column: number } };
+  message: string;
+}
+
 export class Compiler {
-  private parser = grammar(helpers);
+  private parser = grammar(helpers, types);
 
   parse(code: string): Nodes {
     return this.parser.parse(code);
@@ -29,8 +34,8 @@ export class Compiler {
     }
   }
 
-  handleError(error: any): void {
-    if (error.location) {
+  handleError<T>(error: ParseError | T): void {
+    if ('location' in error) {
       throw new SyntaxError(
         'At ' + error.location.start.line + ',' + error.location.start.column + ': ' + error.message,
       );
