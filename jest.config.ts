@@ -2,7 +2,7 @@ export default {
   cache: false,
   clearMocks: true,
   collectCoverage: true,
-  // coverageProvider: 'v8',
+  coverageProvider: 'v8',
   coverageThreshold: {
     global: {
       branches: 100,
@@ -11,10 +11,9 @@ export default {
       statements: 100,
     },
   },
-  maxWorkers: '90%',
+  maxWorkers: 1,
   moduleFileExtensions: ['js', 'ts'],
   slowTestThreshold: 1,
-  // testEnvironment: 'jest-environment-node',
   testEnvironment: 'node',
   testMatch: ['**/*.spec.ts'],
   transform: {
