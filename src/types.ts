@@ -23,72 +23,98 @@ export enum ValueType {
   String,
 }
 
-export class IdentifierValue {
+abstract class ValueAbstract {
+  readonly type: ValueType;
+}
+
+export class IdentifierValue extends ValueAbstract {
   readonly type = ValueType.Identifier;
-  constructor(readonly value: number) {}
+  constructor(readonly value: number) {
+    super();
+  }
 
   static create(value: number): unknown {
     return [new IdentifierValue(value)];
   }
 }
 
-export class ByteValue {
+export class ByteValue extends ValueAbstract {
   readonly type = ValueType.Byte;
-  constructor(readonly value: number) {}
+  constructor(readonly value: number) {
+    super();
+  }
 
   static create(value: number): unknown {
     return [new ByteValue(value)];
   }
 }
 
-export class PinValue {
+export class PinValue extends ValueAbstract {
   readonly type = ValueType.Pin;
-  constructor(readonly value: number) {}
+  constructor(readonly value: number) {
+    super();
+  }
 
   static create(value: number): unknown {
     return [new PinValue(value)];
   }
 }
 
-export class IntegerValue {
+export class IntegerValue extends ValueAbstract {
   readonly type = ValueType.Integer;
-  constructor(readonly value: number) {}
+  constructor(readonly value: number) {
+    super();
+  }
 
   static create(value: number): unknown {
     return [new IntegerValue(value), 0, 0, 0];
   }
 }
 
-export class SignedIntegerValue {
+export class SignedIntegerValue extends ValueAbstract {
   readonly type = ValueType.SignedInteger;
-  constructor(readonly value: number) {}
+  constructor(readonly value: number) {
+    super();
+  }
 
   static create(value: number): unknown {
     return [new SignedIntegerValue(value), 0, 0, 0];
   }
 }
 
-export class AddressValue {
+export class AddressValue extends ValueAbstract {
   readonly type = ValueType.Address;
-  constructor(readonly value: number[]) {}
+  constructor(readonly value: number[]) {
+    super();
+  }
 
   static create(value: number[]): unknown {
     return [new AddressValue(value), 0, 0, 0];
   }
 }
 
-export class StringValue {
+export class StringValue extends ValueAbstract {
   readonly type = ValueType.String;
-  constructor(readonly value: string) {}
+  constructor(readonly value: string[]) {
+    super();
+  }
 
-  static create(value: string): unknown {
+  static create(value: string[]): unknown {
     return [new StringValue(value)].concat(Array(value.length).fill(0));
   }
 }
 
 type Value = IdentifierValue | ByteValue | PinValue | IntegerValue | SignedIntegerValue | AddressValue | StringValue;
 
-export function serializeType(type: Value): number[] {
+export function isValue(subject: unknown): subject is Value {
+  return subject instanceof ValueAbstract;
+}
+
+export function serializeValue(value: Value): number[] {
+  return [value.type].concat(valueToByteArray(value));
+}
+
+function valueToByteArray(type: Value): number[] {
   switch (type.type) {
     case ValueType.Address:
       return numberToInt32(bytesToNumber(type.value));
@@ -131,9 +157,6 @@ export function bytesToNumber(int32bytes: number[]): number {
   return Array.from(new Uint32Array(new Uint8Array(int32bytes).buffer))[0];
 }
 
-export function stringToBytes(string: string): number[] {
-  return string
-    .split('')
-    .map((c) => c.charCodeAt(0))
-    .concat([0]);
+export function stringToBytes(string: string[]): number[] {
+  return string.map((c) => c.charCodeAt(0)).concat([0]);
 }

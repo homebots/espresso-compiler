@@ -1,5 +1,5 @@
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / Declaration
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
 
 delay
   = 'delay' Spaces delay:IntegerValue { return [0x02, ...delay]; } /
@@ -22,7 +22,7 @@ jumpif =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
-  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...T.IntegerValue.create(delay)]; }
+  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...delay]; }
 
 sysinfo
   = 'sysinfo' { return [0xfd]; }
@@ -34,7 +34,7 @@ dump
   = 'dump' { return [0xf9]; }
 
 print
-  = 'print' Spaces string:String { return [0x03, ...string]; }
+  = 'print' Spaces value:Value { return [0x03, ...value]; }
 
 Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
@@ -42,5 +42,5 @@ Label
 DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
-Declaration
+DeclareVar
   = 'var' Spaces t:Identifier { return t }

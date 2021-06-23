@@ -11,7 +11,7 @@ Comment "comment"
 Statement "statement"
   = DefineLabel / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / Declaration
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
 
 delay
   = 'delay' Spaces delay:IntegerValue { return [0x02, ...delay]; } /
@@ -34,7 +34,7 @@ jumpif =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
-  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...T.IntegerValue.create(delay)]; }
+  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...delay]; }
 
 sysinfo
   = 'sysinfo' { return [0xfd]; }
@@ -46,7 +46,7 @@ dump
   = 'dump' { return [0xf9]; }
 
 print
-  = 'print' Spaces string:String { return [0x03, ...string]; }
+  = 'print' Spaces value:Value { return [0x03, ...value]; }
 
 Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
@@ -54,7 +54,7 @@ Label
 DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
-Declaration
+DeclareVar
   = 'var' Spaces t:Identifier { return t }
 MemoryInstruction
   = memget / memset / push_b / push_i / copy
@@ -125,8 +125,11 @@ HexByte "HexByte"
 Byte "Byte"
   = HexDigit HexDigit { return parseInt(text(), 16) }
 
+Space
+  = [ \t]
+
 Spaces "space"
-  = [ \t]*
+  = Space*
 
 NewLine "new line"
   = [\n]+
@@ -136,6 +139,9 @@ Separator "separator"
 
 Digit "0..9"
   = [0-9]
+
+NonZeroDigit "1..9"
+  = [1-9]
 
 Alpha "a-z"
   = [a-z]i
@@ -156,7 +162,8 @@ Boolean
   = True / False
 
 Integer "integer"
-  = [1-9][0-9]* { return Number(text()) }
+  = "0" { return 0 }
+  / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
 
 SignedInteger
   = '-' int:Integer { return -1 * int }
@@ -168,7 +175,7 @@ Address "address"
   = '0x' a:Byte b:Byte c:Byte d:Byte { return [d, c, b, a] }
 
 Pin "pin"
-  = 'pin ' pin:Digit { return new T.PinValue(Number(pin)) }
+  = 'pin ' pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
 
 Identifier "identifier"
   = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
@@ -179,7 +186,8 @@ IdentifierChar
   / "_"
 
 IdentifierValue = name:Identifier  { return T.IdentifierValue.create(name) }
-ByteValue = byte:Byte { return T.ByteValue.create(byte) } / pin:Pin { return T.PinValue.create(pin) }
+PinValue =  pin:Pin { return T.PinValue.create(pin) }
+ByteValue = byte:Byte { return T.ByteValue.create(byte) } / PinValue
 AddressValue = address:Address { return T.AddressValue.create(address) }
 IntegerValue = number:Integer { return T.IntegerValue.create(number) }
 SignedIntegerValue = number:SignedInteger { return T.SignedIntegerValue.create(number) }
@@ -187,4 +195,4 @@ NumberValue = IntegerValue / SignedIntegerValue
 StringValue = string:String { return T.StringValue.create(string) }
 
 Value "identifier, address or IO pin"
-  = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue
+  = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue

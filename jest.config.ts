@@ -1,5 +1,6 @@
 export default {
-  cache: true,
+  cache: false,
+  maxWorkers: 1,
   clearMocks: true,
   collectCoverage: true,
   coverageProvider: 'v8',

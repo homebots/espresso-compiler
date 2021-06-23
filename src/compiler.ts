@@ -1,4 +1,4 @@
-import { Node, isReference, isPlaceholder, isIdentifier } from './types';
+import { Node, isReference, isPlaceholder, numberToInt32, isValue, serializeValue } from './types';
 import * as helpers from './helpers';
 import * as types from './types';
 import grammar from './grammar';
@@ -46,13 +46,14 @@ export class Compiler {
 
   replaceNodes(nodes: Nodes): Array<number> {
     const references = new Map();
-    const identifiers = new Map();
+    // const identifiers = new Map();
 
-    this.tagIdentifiers(nodes, identifiers);
+    // this.tagIdentifiers(nodes, identifiers);
 
     nodes = this.filterReferences(nodes, references);
     nodes = this.replacePlaceholders(nodes, references);
-    nodes = this.replaceIdentifiers(nodes);
+    nodes = this.replaceValues(nodes);
+    // nodes = this.replaceIdentifiers(nodes);
 
     return nodes as number[];
   }
@@ -68,29 +69,29 @@ export class Compiler {
     });
   }
 
-  private tagIdentifiers(nodes: Nodes, identifiers: Map<string, number>) {
-    return nodes.forEach((item) => {
-      if (!isIdentifier(item)) return;
+  // private tagIdentifiers(nodes: Nodes, identifiers: Map<string, number>) {
+  //   return nodes.forEach((item) => {
+  //     if (!isIdentifier(item)) return;
 
-      if (!identifiers.has(item.name)) {
-        item.id = identifiers.size;
-        identifiers.set(item.name, identifiers.size);
-        return;
-      }
+  //     if (!identifiers.has(item.name)) {
+  //       item.id = identifiers.size;
+  //       identifiers.set(item.name, identifiers.size);
+  //       return;
+  //     }
 
-      item.id = identifiers.get(item.name);
-    });
-  }
+  //     item.id = identifiers.get(item.name);
+  //   });
+  // }
 
-  private replaceIdentifiers(nodes: Nodes) {
-    return nodes.map((node) => {
-      if (isIdentifier(node)) {
-        return node.id;
-      }
+  // private replaceIdentifiers(nodes: Nodes) {
+  //   return nodes.map((node) => {
+  //     if (isIdentifier(node)) {
+  //       return node.id;
+  //     }
 
-      return node;
-    });
-  }
+  //     return node;
+  //   });
+  // }
 
   private replacePlaceholders(nodes: Nodes, references: Map<string, number>) {
     const output = [];
@@ -101,6 +102,27 @@ export class Compiler {
       if (isPlaceholder(node)) {
         output.push(...numberToInt32(references.get(node.name)));
         index += 4;
+        continue;
+      }
+
+      output.push(node);
+      index++;
+    }
+
+    return output;
+  }
+
+  private replaceValues(nodes: Nodes) {
+    const output = [];
+
+    for (let index = 0; index < nodes.length; ) {
+      const node = nodes[index];
+
+      if (isValue(node)) {
+        const value = serializeValue(node);
+
+        output.push(...value);
+        index += value.length;
         continue;
       }
 

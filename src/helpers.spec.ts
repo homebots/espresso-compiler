@@ -1,4 +1,5 @@
-import { int32ToNumber, numberToInt32, stringToHexBytes } from './helpers';
+import { stringToHexBytes } from './helpers';
+import { bytesToNumber, numberToInt32 } from './types';
 
 describe('helpers', () => {
   describe('numberToInt32', () => {
@@ -7,9 +8,9 @@ describe('helpers', () => {
     });
   });
 
-  describe('int32ToNumber', () => {
+  describe('bytesToNumber', () => {
     it('should convert int32 sequence of bytes to a number', () => {
-      expect(int32ToNumber([232, 3, 0, 0])).toEqual(1000);
+      expect(bytesToNumber([232, 3, 0, 0])).toEqual(1000);
     });
   });
 

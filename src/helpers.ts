@@ -20,13 +20,13 @@ export function createPlaceholder(name: string): Placeholder {
 //   return [getIdentifier(name), 0x00];
 // }
 
-// export function gpioAddress(pin: number): number {
-//   const GPIO_BASEADDR = 0x60000300;
-//   const GPIO_PIN0_ADDRESS = 0x28;
-//   const GPIO_PIN_ADDR = GPIO_BASEADDR + GPIO_PIN0_ADDRESS + pin * 4;
+export function pinToAddress(pin: number): number {
+  const GPIO_BASEADDR = 0x60000300;
+  const GPIO_PIN0_ADDRESS = 0x28;
+  const GPIO_PIN_ADDR = GPIO_BASEADDR + GPIO_PIN0_ADDRESS + pin * 4;
 
-//   return GPIO_PIN_ADDR;
-// }
+  return GPIO_PIN_ADDR;
+}
 
 export function parseInt32(hex: string): number {
   return hex
