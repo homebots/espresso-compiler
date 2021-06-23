@@ -1,0 +1,14 @@
+name: Tests
+on: [push, workflow_dispatch]
+
+jobs:
+  check:
+    name: Build & Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: actions/checkout@v2
+      - name: ci
+        run: npm run ci
