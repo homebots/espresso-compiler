@@ -1,3 +1,4 @@
+
 SystemInstruction 'system instruction'
   = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
 
@@ -43,4 +44,4 @@ DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
 DeclareVar
-  = 'var' Spaces t:Identifier { return t }
+  = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }

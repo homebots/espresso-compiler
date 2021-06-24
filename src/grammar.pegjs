@@ -10,6 +10,7 @@ Comment "comment"
 
 Statement "statement"
   = DefineLabel / SystemInstruction / MemoryInstruction / Operator / IoInstruction / WifiInstruction / I2cInstruction / Comment
+
 SystemInstruction 'system instruction'
   = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
 
@@ -55,15 +56,18 @@ DefineLabel
   = '@' label:Label { return _.createReference(label); }
 
 DeclareVar
-  = 'var' Spaces t:Identifier { return t }
+  = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }
 MemoryInstruction
-  = memget / memset / push_b / push_i / copy
+  = memget / memset / copy
+  // push_b / push_i
 
-memget = 'memget' { return [0x05]; }
-memset = 'memset' { return [0x06]; }
-push_b = 'push_b' { return [0x07]; }
-push_i = 'push_i' { return [0x08]; }
-copy = 'copy' { return [0x1b]; }
+memget = 'memget' Spaces IdentifierValue Separator Value { return [0x05]; }
+memset = 'memset' Spaces MemoryWriteValue Separator Value { return [0x06]; }
+// push_b = 'push_b' { return [0x07]; }
+// push_i = 'push_i' { return [0x08]; }
+copy = 'copy' IdentifierValue Value { return [0x1b]; }
+
+MemoryWriteValue = AddressValue / PinValue
 
 Operator
   = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
@@ -90,19 +94,20 @@ mod = 'mod' { return [0x1a]; }
 IoInstruction
   = iowrite / ioread / iomode / iotype / ioallout
 
-iowrite = 'io write' Spaces Pin Separator Value { return [0x31]; }
-ioread = 'io read' Spaces Pin Separator Value { return [0x32]; }
+iowrite = 'io write' Spaces Pin Separator IoValue { return [0x31]; }
+ioread = 'io read' Spaces Pin Separator IoValue { return [0x32]; }
 iomode = 'io mode' Spaces Pin Separator PinMode { return [0x35]; }
 iotype = 'io type' Spaces Pin Separator Digit { return [0x36]; }
 ioallout = 'io allout' { return [0x37]; }
 
+IoValue = ByteValue / IdentifierValue
 WifiInstruction
   = wificonnect / wifidisconnect / wifistatus / wifilist
 
-wificonnect = 'net connect' { return [0x3a]; }
+wificonnect = 'net connect' net:StringValue Separator pwd:StringValue { return [0x3a, ...net, ...pwd]; }
 wifidisconnect = 'net disconnect' { return [0x3b]; }
 wifistatus = 'net status' { return [0x3c]; }
-wifilist = 'wifilist' { return [0x3e]; }
+wifilist = 'net list' { return [0x3e]; }
 I2cInstruction
   = i2setup / i2start / i2stop / i2write / i2read / i2setack / i2getack / i2find / i2writeack / i2writeack_b
 
@@ -116,6 +121,7 @@ i2getack = 'i2getack' { return [0x46]; }
 i2find = 'i2find' { return [0x48]; }
 i2writeack = 'i2writeack' { return [0x49]; }
 i2writeack_b = 'i2writeack_b' { return [0x4a]; }
+
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 

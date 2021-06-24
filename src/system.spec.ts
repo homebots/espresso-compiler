@@ -1,5 +1,5 @@
 import { Compiler } from './index';
-import { ValueType, bytesToNumber } from './types';
+import { bytesToNumber, ValueType } from './types';
 
 describe('Compiler', () => {
   const compiler = new Compiler();
@@ -71,19 +71,16 @@ describe('Compiler', () => {
     expect(output).toStrictEqual([0xf9]);
   });
 
-  it('should print a string to serial output', () => {
-    const program = `print 'foo'`;
+  it('should print values to serial output', () => {
+    const program = `
+    print 1048576
+    noop
+    print 'foo'
+    `;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x03, ValueType.String, ...characters, 0]);
-  });
-
-  it('should print a number to serial output', () => {
-    const program = `print 1048576`;
-    const output = compiler.compile(program);
-
-    expect(output).toStrictEqual([0x03, ValueType.Integer, 0, 0, 16, 0]);
+    expect(output).toStrictEqual([0x03, ValueType.Integer, 0, 0, 16, 0, 0x03, ValueType.String, ...characters, 0]);
     expect(bytesToNumber([0, 0, 16, 0])).toBe(1048576);
   });
 

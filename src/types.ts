@@ -141,8 +141,16 @@ export function isPlaceholder(item: unknown): item is Placeholder {
   return Boolean(item && typeof item === OBJECT && (item as Node).type === 'placeholder');
 }
 
-export function isIdentifier(item: unknown): item is null {
-  return Boolean(item && typeof item === OBJECT && (item as Node).type === 'identifier');
+export class DeclareIdentifier {
+  constructor(readonly name: string) {}
+
+  static create(name: string): unknown {
+    return [new DeclareIdentifier(name)];
+  }
+}
+
+export function isIdentifier(item: unknown): item is DeclareIdentifier {
+  return Boolean(item && item instanceof DeclareIdentifier);
 }
 
 export function numberToInt32(number: number): number[] {
