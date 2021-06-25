@@ -51,8 +51,8 @@ export class Compiler {
     // this.tagIdentifiers(nodes, identifiers);
 
     nodes = this.filterReferences(nodes, references);
-    nodes = this.replacePlaceholders(nodes, references);
     nodes = this.replaceValues(nodes);
+    nodes = this.replacePlaceholders(nodes, references);
     // nodes = this.replaceIdentifiers(nodes);
 
     return nodes as number[];
@@ -122,7 +122,7 @@ export class Compiler {
         const value = serializeValue(node);
 
         output.push(...value);
-        index += value.length;
+        index += value.length - 1;
         continue;
       }
 

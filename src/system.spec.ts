@@ -74,13 +74,30 @@ describe('Compiler', () => {
   it('should print values to serial output', () => {
     const program = `
     print 1048576
-    noop
     print 'foo'
+    print 5
     `;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x03, ValueType.Integer, 0, 0, 16, 0, 0x03, ValueType.String, ...characters, 0]);
+    expect(output).toStrictEqual([
+      0x03,
+      ValueType.Integer,
+      0,
+      0,
+      16,
+      0,
+      0x03,
+      ValueType.String,
+      ...characters,
+      0,
+      0x03,
+      ValueType.Integer,
+      5,
+      0,
+      0,
+      0,
+    ]);
     expect(bytesToNumber([0, 0, 16, 0])).toBe(1048576);
   });
 
