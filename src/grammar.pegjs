@@ -15,39 +15,39 @@ SystemInstruction 'system instruction'
   = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
 
 delay
-  = 'delay' Spaces delay:IntegerValue { return [0x02, ...delay]; } /
-  'sleep' Spaces delay:IntegerValue { return [0x3f, ...delay]; }
+  = 'delay' Spaces delay:IntegerValue { return [OpCodes.Delay, ...delay]; } /
+    'sleep' Spaces delay:IntegerValue { return [OpCodes.Sleep, ...delay]; }
 
 halt
-  = 'halt' { return [0xfe]; }
+  = 'halt' { return [OpCodes.Halt]; }
 
 restart
-  = 'restart' { return [0xfc]; }
+  = 'restart' { return [OpCodes.Restart]; }
 
 noop
-  = 'noop' { return [0x01]; }
+  = 'noop' { return [OpCodes.Noop]; }
 
 jump_to =
-  'jump' Spaces 'to' Spaces address:AddressValue { return [0x04, ...address]; } /
-  'jump' Spaces 'to' Spaces t:Label { return [0x04, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
+  'jump' Spaces 'to' Spaces address:AddressValue { return [OpCodes.JumpTo, ...address]; } /
+  'jump' Spaces 'to' Spaces t:Label { return [OpCodes.JumpTo, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
 
 jumpif =
-  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [0x0f, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [OpCodes.JumpIf, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
 
 yield
-  = 'yield' Spaces delay:IntegerValue { return [0xfa, ...delay]; }
+  = 'yield' Spaces delay:IntegerValue { return [OpCodes.Yield, ...delay]; }
 
 sysinfo
-  = 'sysinfo' { return [0xfd]; }
+  = 'sysinfo' { return [OpCodes.SystemInfo]; }
 
 debug
-  = 'debug' Spaces byte:Boolean { return [0xfb, byte]; }
+  = 'debug' Spaces byte:Boolean { return [OpCodes.Debug, byte]; }
 
 dump
-  = 'dump' { return [0xf9]; }
+  = 'dump' { return [OpCodes.Dump]; }
 
 print
-  = 'print' Spaces value:Value { return [0x03, ...value]; }
+  = 'print' Spaces value:Value { return [OpCodes.Print, ...value]; }
 
 Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
@@ -57,6 +57,7 @@ DefineLabel
 
 DeclareVar
   = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }
+
 MemoryInstruction
   = memget / memset / copy
   // push_b / push_i

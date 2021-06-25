@@ -2,6 +2,7 @@ import { Node, isReference, isPlaceholder, numberToInt32, isValue, serializeValu
 import * as helpers from './helpers';
 import * as types from './types';
 import grammar from './grammar';
+import { OpCodes } from './opcodes';
 
 type Nodes = Array<Node | number>;
 
@@ -11,7 +12,7 @@ interface ParseError {
 }
 
 export class Compiler {
-  private parser = grammar(helpers, types);
+  private parser = grammar(helpers, types, OpCodes);
 
   parse(code: string): Nodes {
     return this.parser.parse(code);
@@ -132,18 +133,4 @@ export class Compiler {
 
     return output;
   }
-
-  // protected replaceNode<A, T>(
-  //   nodes: Array<A>,
-  //   type: { new (): T },
-  //   replacer: (node: T, index: number) => number,
-  // ): Array<A | number> {
-  //   return nodes.map((node, index) => {
-  //     if (typeof node === OBJECT && node instanceof type) {
-  //       return replacer(node, index);
-  //     }
-
-  //     return node;
-  //   });
-  // }
 }
