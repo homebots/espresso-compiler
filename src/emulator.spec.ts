@@ -44,8 +44,10 @@ describe('vm emulator', () => {
     const bytes = compiler.compile(`
       @begin
       io write pin 0, 0x01
+      print 'on'
       delay 1000
       io write pin 0, 0x00
+      print 'off'
       delay 1000
       jump to begin
     `);
@@ -55,7 +57,15 @@ describe('vm emulator', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    expectHops(program, clock, [4, 10, 14, 20, 0]);
+    expectHops(program, clock, [4, 9, 15, 19, 25, 31, 0]);
+    expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
+      'io write 0 1',
+      'print on',
+      'delay 1000',
+      'io write 0 0',
+      'print off',
+      'delay 1000',
+    ]);
   });
 });
 

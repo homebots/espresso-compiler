@@ -24,31 +24,23 @@ export class Program {
         break;
 
       case OpCodes.Halt:
-        this.trace('halt');
-        this.clock.stop();
+        this.halt();
+        break;
+
+      case OpCodes.Print:
+        this.print();
         break;
 
       case OpCodes.IoWrite:
-        {
-          const pin = this.readByte();
-          const value = +this.readValue();
-          this.pins[pin] = value;
-          this.trace('io write', pin, value);
-        }
+        this.ioWrite();
         break;
 
       case OpCodes.Delay:
-        {
-          const delay = this.readValue();
-          this.trace('delay', delay);
-        }
+        this.delay();
         break;
 
       case OpCodes.JumpTo:
-        {
-          const position = this.readNumber();
-          this.counter = position;
-        }
+        this.jumpTo();
         break;
     }
 
@@ -79,6 +71,19 @@ export class Program {
     return bytesToNumber(bytes);
   }
 
+  readString(): string {
+    const string = [];
+
+    while (this.bytes[this.counter] !== 0) {
+      string.push(String.fromCharCode(this.bytes[this.counter]));
+      this.move(1);
+    }
+
+    this.move(1);
+
+    return string.join('');
+  }
+
   readValue(): string | number {
     const type: ValueType = this.readByte();
 
@@ -90,7 +95,37 @@ export class Program {
       case ValueType.Integer:
       case ValueType.Address:
         return this.readNumber();
+
+      case ValueType.String:
+        return this.readString();
     }
+  }
+
+  halt(): void {
+    this.trace('halt');
+    this.clock.stop();
+  }
+
+  print(): void {
+    const value = this.readValue();
+    this.trace('print', value);
+  }
+
+  ioWrite(): void {
+    const pin = this.readByte();
+    const value = +this.readValue();
+    this.pins[pin] = value;
+    this.trace('io write', pin, value);
+  }
+
+  delay(): void {
+    const delay = this.readValue();
+    this.trace('delay', delay);
+  }
+
+  jumpTo(): void {
+    const position = this.readNumber();
+    this.counter = position;
   }
 }
 
