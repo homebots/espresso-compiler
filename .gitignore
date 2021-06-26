@@ -3,3 +3,5 @@ coverage/
 .vscode/
 dist/tmp/
 dist/
+grammar.out
+grammar.pegjs

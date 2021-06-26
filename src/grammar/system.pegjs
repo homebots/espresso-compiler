@@ -17,10 +17,10 @@ noop
 
 jump_to =
   'jump' Spaces 'to' Spaces address:AddressValue { return [OpCodes.JumpTo, ...address]; } /
-  'jump' Spaces 'to' Spaces t:Label { return [OpCodes.JumpTo, _.createPlaceholder(t), 0x00, 0x00, 0x00] }
+  'jump' Spaces 'to' Spaces label:Label { return [OpCodes.JumpTo, T.Placeholder.create(label), 0, 0, 0] }
 
 jumpif =
-  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [OpCodes.JumpIf, ...condition, _.createPlaceholder(label), 0x00, 0x00, 0x00] }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [OpCodes.JumpIf, ...condition, T.Placeholder.create(label), 0, 0, 0] }
 
 yield
   = 'yield' Spaces delay:IntegerValue { return [OpCodes.Yield, ...delay]; }
@@ -41,7 +41,7 @@ Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
 
 DefineLabel
-  = '@' label:Label { return _.createReference(label); }
+  = '@' label:Label { return T.Reference.create(label); }
 
 DeclareVar
   = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }
