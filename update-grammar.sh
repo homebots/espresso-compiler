@@ -18,6 +18,9 @@ echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\
 cat src/grammar.out >> src/grammar.ts
 echo 'return module.exports as peg.Parser;}' >> src/grammar.ts
 
+rm src/grammar.pegjs
+rm src/grammar.out
+
 eslint --quiet src/**/*.ts --fix
 eslint --quiet src/**/*.ts --fix
 

@@ -1,7 +1,6 @@
-import { stringToHexBytes } from './helpers';
-import { bytesToNumber, numberToInt32 } from './types';
+import { stringToHexBytes, bytesToNumber, numberToInt32 } from './types';
 
-describe('helpers', () => {
+describe('data helpers', () => {
   describe('numberToInt32', () => {
     it('should convert a number to four bytes', () => {
       expect(numberToInt32(1000)).toEqual([232, 3, 0, 0]);

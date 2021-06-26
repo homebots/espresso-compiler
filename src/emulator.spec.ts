@@ -1,29 +1,69 @@
 import { Compiler } from './compiler';
-import { Emulator } from './emulator';
+import { Emulator, Program } from './emulator';
 import { StepClock } from './emulator/clock';
+import { CaptureOutput } from './emulator/output';
 
 describe('vm emulator', () => {
   const compiler = new Compiler();
 
-  it('should run an input program', async () => {
+  it('should run one instruction and halt program', async () => {
     const emulator = new Emulator();
     const stepper = new StepClock();
     const bytes = compiler.compile(`
       noop
       halt
     `);
-    const program = emulator.load(bytes, stepper);
 
-    expect(program.exitCode).toBe(0);
+    const program = emulator.load(bytes, stepper);
+    expect(program.counter).toBe(0);
+    expectHops(program, stepper, [1, 2]);
+  });
+
+  it('should stop program if there are no further instruction', async () => {
+    const emulator = new Emulator();
+    const stepper = new StepClock();
+    const bytes = compiler.compile(`
+      noop
+      noop
+    `);
+
+    const program = emulator.load(bytes, stepper);
     expect(program.counter).toBe(0);
 
     stepper.tick();
-    expect(program.counter).toBe(1);
-
     stepper.tick();
+    stepper.tick();
+
     expect(program.counter).toBe(2);
-    expect(program.exitCode).toBe(0);
+  });
+
+  it('should run blinky', async () => {
+    const emulator = new Emulator();
+    const clock = new StepClock();
+    const output = new CaptureOutput();
+    const bytes = compiler.compile(`
+      @begin
+      io write pin 0, 0x01
+      delay 1000
+      io write pin 0, 0x00
+      delay 1000
+      jump to begin
+    `);
+
+    const program = emulator.load(bytes, clock, output);
+
+    expect(program.counter).toBe(0);
+    expect(program.pins[0]).toBe(0);
+
+    expectHops(program, clock, [4, 10, 14, 20, 0]);
   });
 });
+
+function expectHops(program: Program, clock: StepClock, hops: number[]) {
+  hops.forEach((hop) => {
+    clock.tick();
+    expect(program.counter).toBe(hop);
+  });
+}
 
 // const delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time));

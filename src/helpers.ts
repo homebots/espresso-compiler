@@ -18,21 +18,6 @@ export function zeroPad(string: string): string {
   return (string.length === 1 ? '0' : '') + string;
 }
 
-export function stringToHexBytes(string: string): string {
-  return string
-    .split('')
-    .reduce((stack, next, index) => {
-      if (index % 2 === 0) {
-        stack.push(next);
-      } else {
-        stack.push(stack.pop() + next);
-      }
-
-      return stack;
-    }, [])
-    .join(' ');
-}
-
 export function bytesFromHex(hex: string): number {
   return parseInt(hex, 16);
 }

@@ -2,10 +2,10 @@
 IoInstruction
   = iowrite / ioread / iomode / iotype / ioallout
 
-iowrite = 'io write' Spaces Pin Separator IoValue { return [0x31]; }
-ioread = 'io read' Spaces Pin Separator IoValue { return [0x32]; }
-iomode = 'io mode' Spaces Pin Separator PinMode { return [0x35]; }
-iotype = 'io type' Spaces Pin Separator Digit { return [0x36]; }
-ioallout = 'io allout' { return [0x37]; }
+iowrite = 'io write' Spaces pin:Pin Separator value:IoValue { return [OpCodes.IoWrite, pin, ...value]; }
+ioread = 'io read' Spaces pin:Pin Separator value:IoValue { return [OpCodes.IoRead, pin, ...value]; }
+iomode = 'io mode' Spaces pin:Pin Separator mode:PinMode { return [OpCodes.IoMode, pin, mode]; }
+iotype = 'io type' Spaces pin:Pin Separator type:Digit { return [OpCodes.IoType, pin, type]; }
+ioallout = 'io allout' { return [OpCodes.IoAllOut]; }
 
 IoValue = ByteValue / IdentifierValue

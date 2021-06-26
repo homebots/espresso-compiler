@@ -1,10 +1,9 @@
-import { Node, isReference, isPlaceholder, numberToInt32, isValue, serializeValue } from './types';
-import * as helpers from './helpers';
+import { Reference, Placeholder, isReference, isPlaceholder, numberToInt32, isValue, serializeValue } from './types';
 import * as types from './types';
 import grammar from './grammar';
 import { OpCodes } from './opcodes';
 
-type Nodes = Array<Node | number>;
+type Nodes = Array<Reference | Placeholder | number>;
 
 interface ParseError {
   location: { start: { line: number; column: number } };
@@ -12,7 +11,7 @@ interface ParseError {
 }
 
 export class Compiler {
-  private parser = grammar(helpers, types, OpCodes);
+  private parser = grammar(types, OpCodes);
 
   parse(code: string): Nodes {
     return this.parser.parse(code);
@@ -48,7 +47,6 @@ export class Compiler {
   replaceNodes(nodes: Nodes): Array<number> {
     const references = new Map();
     // const identifiers = new Map();
-
     // this.tagIdentifiers(nodes, identifiers);
 
     nodes = this.filterReferences(nodes, references);

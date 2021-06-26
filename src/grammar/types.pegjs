@@ -2,11 +2,11 @@
 HexDigit "hexadecimal"
   = [0-9A-Fa-f]
 
-HexByte "HexByte"
+HexByte "byte hex"
   = HexDigit HexDigit { return text() }
 
 Byte "Byte"
-  = HexDigit HexDigit { return parseInt(text(), 16) }
+  = '0x' HexDigit HexDigit { return parseInt(text(), 16) }
 
 Space
   = [ \t]
@@ -55,7 +55,7 @@ String "string"
   = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 
 Address "address"
-  = '0x' a:Byte b:Byte c:Byte d:Byte { return [d, c, b, a] }
+  = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return [d, c, b, a] }
 
 Pin "pin"
   = 'pin ' pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }

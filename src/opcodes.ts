@@ -11,4 +11,11 @@ export const OpCodes = {
   Restart: 0xfc,
   SystemInfo: 0xfd,
   Halt: 0xfe,
+
+  // IO
+  IoWrite: 0x31,
+  IoRead: 0x32,
+  IoMode: 0x35,
+  IoType: 0x36,
+  IoAllOut: 0x37,
 };

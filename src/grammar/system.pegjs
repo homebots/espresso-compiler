@@ -1,6 +1,6 @@
 
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jumpif / delay / DeclareVar
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jump_if / delay / DeclareVar
 
 delay
   = 'delay' Spaces delay:IntegerValue { return [OpCodes.Delay, ...delay]; } /
@@ -19,7 +19,7 @@ jump_to =
   'jump' Spaces 'to' Spaces address:AddressValue { return [OpCodes.JumpTo, ...address]; } /
   'jump' Spaces 'to' Spaces label:Label { return [OpCodes.JumpTo, T.Placeholder.create(label), 0, 0, 0] }
 
-jumpif =
+jump_if =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [OpCodes.JumpIf, ...condition, T.Placeholder.create(label), 0, 0, 0] }
 
 yield

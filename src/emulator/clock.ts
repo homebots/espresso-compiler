@@ -14,7 +14,6 @@ export class StepClock implements Clock {
   }
 
   stop(): void {
-    this.steps = 0;
     this.paused = true;
   }
 
