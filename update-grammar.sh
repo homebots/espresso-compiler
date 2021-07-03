@@ -1,27 +1,26 @@
-target=src/grammar.pegjs
+grammarSpec=src/grammar.pegjs
+grammarFile=src/compiler/grammar.ts
 
-echo '' > $target
-# echo 'export default `' > $target
-cat src/grammar/program.pegjs >> $target
-cat src/grammar/system.pegjs >> $target
-cat src/grammar/memory.pegjs >> $target
-cat src/grammar/operators.pegjs >> $target
-cat src/grammar/io.pegjs >> $target
-cat src/grammar/wifi.pegjs >> $target
-cat src/grammar/i2c.pegjs >> $target
-cat src/grammar/types.pegjs >> $target
-# echo '`;' >> $target
+echo '' > $grammarSpec
+
+cat src/grammar/program.pegjs >> $grammarSpec
+cat src/grammar/system.pegjs >> $grammarSpec
+cat src/grammar/memory.pegjs >> $grammarSpec
+cat src/grammar/operators.pegjs >> $grammarSpec
+cat src/grammar/io.pegjs >> $grammarSpec
+cat src/grammar/wifi.pegjs >> $grammarSpec
+cat src/grammar/i2c.pegjs >> $grammarSpec
+cat src/grammar/types.pegjs >> $grammarSpec
 
 pegjs --optimize speed --format commonjs -o src/grammar.out src/grammar.pegjs
-
-echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\nexport default function (T: any, OpCodes: Record<string, number>): peg.Parser {const module = { exports: null };" > src/grammar.ts
-cat src/grammar.out >> src/grammar.ts
-echo 'return module.exports as peg.Parser;}' >> src/grammar.ts
-
 rm src/grammar.pegjs
-rm src/grammar.out
 
-eslint --quiet src/**/*.ts --fix
-eslint --quiet src/**/*.ts --fix
+echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\nimport * as T from './compiler/types';\nimport {OpCodes}  from './compiler';\nexport default function (T: any, OpCodes: Record<string, number>): peg.Parser {const module = { exports: null };" > $grammarFile
+cat src/grammar.out >> $grammarFile
+rm src/grammar.out
+echo 'return module.exports as peg.Parser;}' >> $grammarFile
+
+eslint --quiet $grammarFile --fix
+eslint --quiet $grammarFile --fix
 
 exit 0

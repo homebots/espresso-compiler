@@ -1,6 +1,6 @@
-export * from './compiler/values';
-export * from './compiler/references';
-export * from './compiler/data-convertion';
+export * from './values';
+export * from './references';
+export * from './data-convertion';
 
 export class DeclareIdentifier {
   constructor(readonly name: string) {}

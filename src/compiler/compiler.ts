@@ -1,6 +1,6 @@
 import { Reference, Placeholder, isReference, isPlaceholder, numberToInt32, isValue, serializeValue } from './types';
 import * as types from './types';
-import grammar from './grammar';
+import grammar from '../grammar';
 import { OpCodes } from './opcodes';
 
 type Nodes = Array<Reference | Placeholder | number>;

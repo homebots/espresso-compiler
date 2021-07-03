@@ -1,7 +1,4 @@
-import { Compiler } from './compiler';
-import { Emulator, Program } from './emulator';
-import { StepClock } from './emulator/clock';
-import { CaptureOutput } from './emulator/output';
+import { Compiler, Emulator, Program, StepClock, CaptureOutput } from './index';
 
 describe('vm emulator', () => {
   const compiler = new Compiler();

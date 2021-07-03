@@ -1,4 +1,4 @@
-import { stringToHexBytes, bytesToNumber, numberToInt32 } from './types';
+import { stringToHexBytes, bytesToNumber, numberToInt32 } from './index';
 
 describe('data helpers', () => {
   describe('numberToInt32', () => {

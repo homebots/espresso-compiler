@@ -1,7 +1,7 @@
-import { Clock, TimerClock } from './emulator/clock';
-import { NullOutput, ProgramOutput } from './emulator/output';
-import { OpCodes } from './opcodes';
-import { bytesToNumber, ValueType } from './types';
+import { Clock, TimerClock } from './clock';
+import { NullOutput, ProgramOutput } from './output';
+import { OpCodes } from '../opcodes';
+import { bytesToNumber, ValueType } from '../compiler/types';
 
 export class Program {
   constructor(readonly bytes: number[], readonly clock: Clock, readonly output: ProgramOutput) {

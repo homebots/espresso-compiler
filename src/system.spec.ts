@@ -1,5 +1,4 @@
-import { Compiler } from './index';
-import { bytesToNumber, ValueType } from './types';
+import { Compiler, bytesToNumber, ValueType } from './index';
 
 describe('Compiler', () => {
   const compiler = new Compiler();
