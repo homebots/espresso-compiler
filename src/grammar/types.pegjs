@@ -36,10 +36,10 @@ PinMode "pin mode"
   = mode:[0-3] { return Number(mode) }
 
 True
-  = 'true' { return 1 }
+  = ('true' / '1') { return 1 }
 
 False
-  = 'false' { return 0 }
+  = ('false' / '0') { return 0 }
 
 Boolean
   = True / False
@@ -70,6 +70,7 @@ IdentifierChar
 
 IdentifierValue = name:Identifier  { return T.IdentifierValue.create(name) }
 PinValue =  pin:Pin { return T.PinValue.create(pin) }
+BooleanValue = bool:Boolean { return T.ByteValue.create(bool) }
 ByteValue = byte:Byte { return T.ByteValue.create(byte) } / PinValue
 AddressValue = address:Address { return T.AddressValue.create(address) }
 IntegerValue = number:Integer { return T.IntegerValue.create(number) }
@@ -77,5 +78,5 @@ SignedIntegerValue = number:SignedInteger { return T.SignedIntegerValue.create(n
 NumberValue = IntegerValue / SignedIntegerValue
 StringValue = string:String { return T.StringValue.create(string) }
 
-Value "identifier, address or IO pin"
-  = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue
+Value "value"
+  = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue / BooleanValue

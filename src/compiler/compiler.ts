@@ -1,7 +1,5 @@
 import { Reference, Placeholder, isReference, isPlaceholder, numberToInt32, isValue, serializeValue } from './types';
-import * as types from './types';
-import grammar from '../grammar';
-import { OpCodes } from './opcodes';
+import parser from './parser';
 
 type Nodes = Array<Reference | Placeholder | number>;
 
@@ -11,7 +9,7 @@ interface ParseError {
 }
 
 export class Compiler {
-  private parser = grammar(types, OpCodes);
+  private parser = parser();
 
   parse(code: string): Nodes {
     return this.parser.parse(code);

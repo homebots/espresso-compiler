@@ -8,4 +8,4 @@ iomode = 'io mode' Spaces pin:Pin Separator mode:PinMode { return [OpCodes.IoMod
 iotype = 'io type' Spaces pin:Pin Separator type:Digit { return [OpCodes.IoType, pin, type]; }
 ioallout = 'io allout' { return [OpCodes.IoAllOut]; }
 
-IoValue = ByteValue / IdentifierValue
+IoValue = ByteValue / IdentifierValue / BooleanValue

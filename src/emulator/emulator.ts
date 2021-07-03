@@ -1,7 +1,6 @@
+import { bytesToNumber, OpCodes, ValueType } from '../compiler';
 import { Clock, TimerClock } from './clock';
 import { NullOutput, ProgramOutput } from './output';
-import { OpCodes } from '../opcodes';
-import { bytesToNumber, ValueType } from '../compiler/types';
 
 export class Program {
   constructor(readonly bytes: number[], readonly clock: Clock, readonly output: ProgramOutput) {

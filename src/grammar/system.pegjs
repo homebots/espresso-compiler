@@ -41,7 +41,7 @@ Label
   = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
 
 DefineLabel
-  = '@' label:Label { return T.Reference.create(label); }
+  = 'fn' Spaces label:Label { return T.Reference.create(label); }
 
 DeclareVar
   = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }

@@ -113,15 +113,15 @@ describe('Compiler', () => {
 
   it('should jump to a given label', () => {
     const program = `
-    @begin
+    fn begin
       noop
       jump to end
 
-    @middle
+    fn middle
       noop
       jump to begin
 
-    @end
+    fn end
       noop
       jump to middle
     `;

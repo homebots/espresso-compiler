@@ -39,14 +39,12 @@ describe('vm emulator', () => {
     const clock = new StepClock();
     const output = new CaptureOutput();
     const bytes = compiler.compile(`
-      @begin
-      io write pin 0, 0x01
-      print 'on'
-      delay 1000
-      io write pin 0, 0x00
-      print 'off'
-      delay 1000
-      jump to begin
+      fn begin
+        io write pin 0, 0x01
+        delay 1000
+        io write pin 0, 0x00
+        delay 1000
+        jump to begin
     `);
 
     const program = emulator.load(bytes, clock, output);
