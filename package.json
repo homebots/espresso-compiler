@@ -1,12 +1,13 @@
 {
-  "name": "typescript-template",
-  "version": "1.0.0",
-  "description": "A template for Typescript projects",
-  "main": "index.js",
+  "name": "@homebots/espresso-compiler",
+  "version": "0.0.0",
+  "description": "Translate a program into bytecode for Homebots VM",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest",
     "ci": "npm ci && npm run lint && npm run test",
-    "build": "rm -rf dist/ && sh update-grammar.sh && tsc -p tsconfig.build.json",
+    "build": "rm -rf dist/ && sh update-grammar.sh && npm run package",
+    "package": "ncc build src/index.ts --no-cache --target es2020",
     "tdd": "jest --watchAll",
     "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/grammar.ts",
     "all": "npm run build && npm run lint && npm run test"
@@ -28,6 +29,7 @@
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
+    "@vercel/ncc": "^0.28.6",
     "eslint": "^7.28.0",
     "jest": "^27.0.4",
     "prettier": "^2.3.2",

@@ -1,4 +1,4 @@
-import { Compiler, bytesToNumber, ValueType } from './index';
+import { Compiler, bytesToNumber, ValueType, OpCodes } from './index';
 
 describe('Compiler', () => {
   const compiler = new Compiler();
@@ -11,63 +11,63 @@ describe('Compiler', () => {
     const program = `delay 1000`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x02, ValueType.Integer, 0xe8, 0x03, 0x00, 0x00]);
+    expect(output).toStrictEqual([OpCodes.Delay, ValueType.Integer, 0xe8, 0x03, 0x00, 0x00]);
   });
 
   it('should stop execution', () => {
     const program = `halt`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xfe]);
+    expect(output).toStrictEqual([OpCodes.Halt]);
   });
 
   it('should restart the program', () => {
     const program = `restart`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xfc]);
+    expect(output).toStrictEqual([OpCodes.Restart]);
   });
 
   it('should do nothing', () => {
     const program = `noop`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x01]);
+    expect(output).toStrictEqual([OpCodes.Noop]);
   });
 
   it('should sleep for a given amount of time', () => {
     const program = `sleep 2000`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x3f, ValueType.Integer, 0xd0, 0x07, 0x00, 0x00]);
+    expect(output).toStrictEqual([OpCodes.Sleep, ValueType.Integer, 0xd0, 0x07, 0x00, 0x00]);
   });
 
   it('should jump to a given location', () => {
     const program = `jump to 0x00000001`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0x04, ValueType.Address, 0x01, 0x00, 0x00, 0x00]);
+    expect(output).toStrictEqual([OpCodes.JumpTo, ValueType.Address, 0x01, 0x00, 0x00, 0x00]);
   });
 
   it('should delay a given time (micro seconds)', () => {
     const program = `yield 10`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xfa, ValueType.Integer, 0x0a, 0x00, 0x00, 0x00]);
+    expect(output).toStrictEqual([OpCodes.Yield, ValueType.Integer, 0x0a, 0x00, 0x00, 0x00]);
   });
 
   it('should print system information to serial output', () => {
     const program = `sysinfo`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xfd]);
+    expect(output).toStrictEqual([OpCodes.SystemInfo]);
   });
 
   it('should print program and execution memory details to serial output', () => {
     const program = `dump`;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xf9]);
+    expect(output).toStrictEqual([OpCodes.Dump]);
   });
 
   it('should print values to serial output', () => {
@@ -80,17 +80,17 @@ describe('Compiler', () => {
     const output = compiler.compile(program);
 
     expect(output).toStrictEqual([
-      0x03,
+      OpCodes.Print,
       ValueType.Integer,
       0,
       0,
       16,
       0,
-      0x03,
+      OpCodes.Print,
       ValueType.String,
       ...characters,
       0,
-      0x03,
+      OpCodes.Print,
       ValueType.Integer,
       5,
       0,
@@ -108,20 +108,20 @@ describe('Compiler', () => {
     `;
     const output = compiler.compile(program);
 
-    expect(output).toStrictEqual([0xfb, 1, 1, 0xfb, 0]);
+    expect(output).toStrictEqual([OpCodes.Debug, 0x1, OpCodes.Noop, OpCodes.Debug, 0]);
   });
 
   it('should jump to a given label', () => {
     const program = `
-    fn begin
+    @begin
       noop
       jump to end
 
-    fn middle
+    @middle
       noop
       jump to begin
 
-    fn end
+    @end
       noop
       jump to middle
     `;
@@ -132,19 +132,31 @@ describe('Compiler', () => {
       0x01,
 
       // jump to end (12)
-      0x04, 0x0c, 0x00, 0x00, 0x00,
+      OpCodes.JumpTo,
+      0x0c,
+      0x00,
+      0x00,
+      0x00,
 
       // middle
       0x01,
 
       // jump to begin (0)
-      0x04, 0x00, 0x00, 0x00, 0x00,
+      OpCodes.JumpTo,
+      0x00,
+      0x00,
+      0x00,
+      0x00,
 
       // end
       0x01,
 
       // jump to middle (6)
-      0x04, 0x06, 0x00, 0x00, 0x00,
+      OpCodes.JumpTo,
+      0x06,
+      0x00,
+      0x00,
+      0x00,
     ]);
   });
 });

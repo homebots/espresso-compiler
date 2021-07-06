@@ -15,7 +15,7 @@ cat src/grammar/types.pegjs >> $grammarSpec
 pegjs --format commonjs -o src/grammar.out src/grammar.pegjs
 rm src/grammar.pegjs
 
-echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'peggy';\nimport * as T from './types';\nimport { OpCodes } from './opcodes';\nexport default function (): peg.Parser {const module = { exports: null };" > $grammarFile
+echo "/* eslint-disable no-constant-condition */\nimport * as peg from 'pegjs';\nimport * as T from './types';\nimport { OpCodes } from './opcodes';\nexport default function (): peg.Parser {const module = { exports: null };" > $grammarFile
 cat src/grammar.out >> $grammarFile
 rm src/grammar.out
 echo 'return module.exports as peg.Parser;}' >> $grammarFile

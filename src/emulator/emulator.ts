@@ -112,14 +112,15 @@ export class Program {
 
   ioWrite(): void {
     const pin = this.readByte();
-    const value = +this.readValue();
+    const value = Number(this.readValue());
     this.pins[pin] = value;
     this.trace('io write', pin, value);
   }
 
   delay(): void {
-    const delay = this.readValue();
+    const delay = Number(this.readValue());
     this.trace('delay', delay);
+    this.clock.delay(delay);
   }
 
   jumpTo(): void {

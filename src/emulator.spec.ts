@@ -1,4 +1,4 @@
-import { Compiler, Emulator, Program, StepClock, CaptureOutput } from './index';
+import { Compiler, Emulator, StepClock, CaptureOutput } from './index';
 
 describe('vm emulator', () => {
   const compiler = new Compiler();
@@ -13,7 +13,12 @@ describe('vm emulator', () => {
 
     const program = emulator.load(bytes, stepper);
     expect(program.counter).toBe(0);
-    expectHops(program, stepper, [1, 2]);
+
+    stepper.tick();
+    expect(program.counter).toBe(1);
+
+    stepper.tick();
+    expect(program.counter).toBe(2);
   });
 
   it('should stop program if there are no further instruction', async () => {
@@ -34,17 +39,16 @@ describe('vm emulator', () => {
     expect(program.counter).toBe(2);
   });
 
-  it('should run blinky', async () => {
+  it('should run blinky', () => {
     const emulator = new Emulator();
     const clock = new StepClock();
     const output = new CaptureOutput();
     const bytes = compiler.compile(`
-      fn begin
-        io write pin 0, 0x01
-        delay 1000
-        io write pin 0, 0x00
-        delay 1000
-        jump to begin
+      io write pin 0, 0x01
+      delay 1000
+      io write pin 0, 0x00
+      delay 1000
+      halt
     `);
 
     const program = emulator.load(bytes, clock, output);
@@ -52,23 +56,13 @@ describe('vm emulator', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    expectHops(program, clock, [4, 9, 15, 19, 25, 31, 0]);
+    clock.run();
     expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
       'io write 0 1',
-      'print on',
       'delay 1000',
       'io write 0 0',
-      'print off',
       'delay 1000',
+      'halt',
     ]);
   });
 });
-
-function expectHops(program: Program, clock: StepClock, hops: number[]) {
-  hops.forEach((hop) => {
-    clock.tick();
-    expect(program.counter).toBe(hop);
-  });
-}
-
-// const delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
