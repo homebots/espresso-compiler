@@ -1,6 +1,6 @@
 
 SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jump_if / delay / DeclareVar
+  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jump_if / delay / DeclareIdentifier
 
 delay
   = 'delay' Spaces delay:IntegerValue { return [OpCodes.Delay, ...delay]; } /
@@ -43,5 +43,8 @@ Label
 DefineLabel
   = '@' label:Label { return T.Reference.create(label); }
 
-DeclareVar
-  = 'var' Spaces t:Identifier { return T.DeclareIdentifier.create(t) }
+DeclareIdentifier =
+  'byte' Spaces t:Identifier { return T.DeclareIdentifier.createByte(t) } /
+  'int' Spaces t:Identifier { return T.DeclareIdentifier.createInteger(t) } /
+  'uint' Spaces t:Identifier { return T.DeclareIdentifier.createInteger(t) } /
+  'string' Spaces t:Identifier { return T.DeclareIdentifier.createString(t) }

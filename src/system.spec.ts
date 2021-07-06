@@ -159,4 +159,44 @@ describe('Compiler', () => {
       0x00,
     ]);
   });
+
+  it('should jump to a given label if a condition is met', () => {
+    const program = `
+      // @begin
+      int $a
+      byte $b
+      // inc $a
+      $b : $a < 10
+      // jump if $a to begin
+    `;
+
+    const output = compiler.compile(program);
+
+    expect(output).toStrictEqual([
+      // OpCodes.Declare,
+      // ValueType.Integer,
+      // 0x00,
+
+      // OpCodes.Declare,
+      // ValueType.Byte,
+      // 0x01,
+
+      // OpCodes.Inc,
+      // 0x00,
+
+      OpCodes.Lt,
+      // 0x01,
+      // ValueType.Identifier,
+      // 0x00,
+      // ValueType.Byte,
+      // 0x10,
+
+      // OpCodes.JumpIf,
+      // 0x00,
+      // 0x00,
+      // 0x00,
+      // 0x00,
+      // 0x00,
+    ]);
+  });
 });

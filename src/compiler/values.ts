@@ -1,4 +1,4 @@
-import { bytesToNumber, numberToInt32, stringToBytes } from './data-convertion';
+import { bytesToNumber, numberToInt32, numberToUnsignedInt32, stringToBytes } from './data-convertion';
 
 export enum ValueType {
   Identifier = 1,
@@ -10,17 +10,21 @@ export enum ValueType {
   String,
 }
 
+export type IdentifierType = ValueType.Byte | ValueType.Integer | ValueType.SignedInteger | ValueType.String;
+
 abstract class ValueAbstract {
   readonly type: ValueType;
 }
 
 export class IdentifierValue extends ValueAbstract {
   readonly type = ValueType.Identifier;
-  constructor(readonly value: number) {
+  id = 0;
+
+  constructor(readonly value: string) {
     super();
   }
 
-  static create(value: number): unknown {
+  static create(value: string): unknown {
     return [new IdentifierValue(value)];
   }
 }
@@ -104,16 +108,20 @@ export function serializeValue(value: Value): number[] {
 function valueToByteArray(type: Value): number[] {
   switch (type.type) {
     case ValueType.Address:
-      return numberToInt32(bytesToNumber(type.value));
+      return numberToUnsignedInt32(bytesToNumber(type.value));
 
     case ValueType.Integer:
+      return numberToUnsignedInt32(type.value);
+
     case ValueType.SignedInteger:
       return numberToInt32(type.value);
 
     case ValueType.Byte:
     case ValueType.Pin:
-    case ValueType.Identifier:
       return [type.value];
+
+    case ValueType.Identifier:
+      return [type.id];
 
     case ValueType.String:
       return stringToBytes(type.value);

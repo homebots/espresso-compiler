@@ -5,6 +5,14 @@ export function numberToInt32(number: number): number[] {
     throw new SyntaxError('number is too large');
   }
 
+  return Array.from(new Uint8Array(new Int32Array([number]).buffer));
+}
+
+export function numberToUnsignedInt32(number: number): number[] {
+  if (number > MAX_INTEGER) {
+    throw new SyntaxError('number is too large');
+  }
+
   return Array.from(new Uint8Array(new Uint32Array([number]).buffer));
 }
 

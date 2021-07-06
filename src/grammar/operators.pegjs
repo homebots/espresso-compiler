@@ -2,21 +2,25 @@
 Operator
   = xor / and / or / not / inc / dec / add / sub / mul / div / mod / gt / gte / lt / lte / equal / notequal
 
-not = 'not' Spaces target:Value Separator value:Value { return [0x13, target, value]; }
+ASSIGN = '='
 
-gte = 'gte' { return [0x0a]; }
-gt = 'gt' { return [0x09]; }
-lte = 'lte' { return [0x0c]; }
-lt = 'lt' { return [0x0b]; }
-equal = 'equal' { return [0x0d]; }
-notequal = 'notequal' { return [0x0e]; }
-xor = 'xor' { return [0x10]; }
-and = 'and' { return [0x11]; }
-or = 'or' { return [0x12]; }
-inc = 'inc' { return [0x14]; }
-dec = 'dec' { return [0x15]; }
-add = 'add' { return [0x16]; }
-sub = 'sub' { return [0x17]; }
-mul = 'mul' { return [0x18]; }
-div = 'div' { return [0x19]; }
-mod = 'mod' { return [0x1a]; }
+not = 'not' Spaces target:IdentifierValue Separator value:Value { return [0x13, ...target, ...value]; }
+inc = 'inc' Spaces id:IdentifierValue { return [OpCodes.Inc, ...id]; }
+dec = 'dec' Spaces id:IdentifierValue { return [OpCodes.Dec, ...id]; }
+
+gte =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '>=' Spaces b:Value { return [OpCodes.Gte, ...target, ...a, ...b]; }
+gt =       target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '>' Spaces b:Value { return [OpCodes.Gt, ...target, ...a, ...b]; }
+lte =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '<=' Spaces b:Value { return [OpCodes.Lte, ...target, ...a, ...b]; }
+lt =       target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '<' Spaces b:Value { return [OpCodes.Lt, ...target, ...a, ...b]; }
+equal =    target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '==' Spaces b:Value { return [OpCodes.Equal, ...target, ...a, ...b]; }
+notequal = target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '!=' Spaces b:Value { return [OpCodes.NotEqual, ...target, ...a, ...b]; }
+
+xor =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces 'xor' Spaces b:Value { return [OpCodes.Xor, ...target, ...a, ...b]; }
+and =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces 'and' Spaces b:Value { return [OpCodes.And, ...target, ...a, ...b]; }
+or =       target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces 'or' Spaces b:Value { return [OpCodes.Or, ...target, ...a, ...b]; }
+
+add =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '+' Spaces b:Value { return [OpCodes.Add, ...target, ...a, ...b]; }
+sub =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '-' Spaces b:Value { return [OpCodes.Sub, ...target, ...a, ...b]; }
+mul =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '*' Spaces b:Value { return [OpCodes.Mul, ...target, ...a, ...b]; }
+div =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '/' Spaces b:Value { return [OpCodes.Div, ...target, ...a, ...b]; }
+mod =      target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces '%' Spaces b:Value { return [OpCodes.Mod, ...target, ...a, ...b]; }
