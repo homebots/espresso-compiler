@@ -7,4 +7,5 @@ export {
 } from './data-convertion';
 export { ValueType } from './values';
 export { Compiler } from './compiler';
+export { CompilerPlugin } from './plugins';
 export { OpCodes } from './opcodes';

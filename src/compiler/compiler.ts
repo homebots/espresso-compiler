@@ -1,16 +1,18 @@
-import {
-  Reference,
-  Placeholder,
-  isReference,
-  isPlaceholder,
-  numberToInt32,
-  isValue,
-  serializeValue,
-  isIdentifier,
-} from './types';
 import parser from './parser';
+import { ByteArray, CompilerPlugin, Context } from './plugins';
+import { FindIdentifiersPlugin } from './plugins/find-identifiers.plugin';
+import { ExtractReferencesPlugin } from './plugins/remove-references.plugin';
+import { ReplaceIdentifiersPlugin } from './plugins/replace-identifiers.plugin';
+import { ReplacePlaceholdersPlugin } from './plugins/replace-placeholders.plugin';
+import { ReplaceValuesPlugin } from './plugins/replace-values.plugin';
 
-type Nodes = Array<Reference | Placeholder | number>;
+export const defaultPlugins: CompilerPlugin[] = [
+  new FindIdentifiersPlugin(),
+  new ExtractReferencesPlugin(),
+  new ReplaceIdentifiersPlugin(),
+  new ReplacePlaceholdersPlugin(),
+  new ReplaceValuesPlugin(),
+];
 
 interface ParseError {
   location: { start: { line: number; column: number } };
@@ -20,11 +22,11 @@ interface ParseError {
 export class Compiler {
   private parser = parser();
 
-  parse(code: string): Nodes {
-    return this.parser.parse(code);
+  parse(code: string): Array<unknown> {
+    return this.parser.parse(code).flat(2);
   }
 
-  compile(code: string): number[] {
+  compile<P extends CompilerPlugin[]>(code: string, plugins?: P): ByteArray {
     code = code.trim();
 
     if (!code) {
@@ -32,8 +34,8 @@ export class Compiler {
     }
 
     try {
-      const nodes = this.parse(code).flat(2);
-      const bytes = this.replaceNodes(nodes);
+      const nodes = this.parse(code);
+      const bytes = this.replaceNodes(nodes, plugins || defaultPlugins);
 
       return bytes;
     } catch (error) {
@@ -51,91 +53,10 @@ export class Compiler {
     throw error;
   }
 
-  replaceNodes(nodes: Nodes): Array<number> {
-    const references = new Map();
-    const identifiers = new Map();
-    this.declareIdentifiers(nodes, identifiers);
+  replaceNodes<P extends CompilerPlugin[]>(nodes: Array<unknown>, plugins: P): ByteArray {
+    const initialContext: Context = { bytes: nodes as ByteArray };
+    const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
 
-    nodes = this.filterReferences(nodes, references);
-    nodes = this.replaceValues(nodes);
-    nodes = this.replacePlaceholders(nodes, references);
-    nodes = this.replaceIdentifiers(nodes);
-
-    return nodes as number[];
-  }
-
-  private filterReferences(nodes: Nodes, references: Map<string, number>) {
-    return nodes.filter((item, index) => {
-      if (isReference(item)) {
-        references.set(item.name, index - references.size);
-        return false;
-      }
-
-      return true;
-    });
-  }
-
-  private declareIdentifiers(nodes: Nodes, identifiers: Map<string, number>) {
-    return nodes.forEach((item) => {
-      if (!isIdentifier(item)) {
-        return;
-      }
-
-      if (!identifiers.has(item.name)) {
-        item.id = identifiers.size;
-        identifiers.set(item.name, identifiers.size);
-        return;
-      }
-    });
-  }
-
-  private replaceIdentifiers(nodes: Nodes) {
-    return nodes.map((node) => {
-      if (isIdentifier(node)) {
-        return node.id;
-      }
-
-      return node;
-    });
-  }
-
-  private replacePlaceholders(nodes: Nodes, references: Map<string, number>) {
-    const output = [];
-
-    for (let index = 0; index < nodes.length; ) {
-      const node = nodes[index];
-
-      if (isPlaceholder(node)) {
-        output.push(...numberToInt32(references.get(node.name)));
-        index += 4;
-        continue;
-      }
-
-      output.push(node);
-      index++;
-    }
-
-    return output;
-  }
-
-  private replaceValues(nodes: Nodes) {
-    const output = [];
-
-    for (let index = 0; index < nodes.length; ) {
-      const node = nodes[index];
-
-      if (isValue(node)) {
-        const value = serializeValue(node);
-
-        output.push(...value);
-        index += value.length - 1;
-        continue;
-      }
-
-      output.push(node);
-      index++;
-    }
-
-    return output;
+    return context.bytes;
   }
 }

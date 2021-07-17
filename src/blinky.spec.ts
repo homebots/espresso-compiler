@@ -1,4 +1,4 @@
-import { Compiler, Emulator, StepClock, CaptureOutput } from './index';
+import { CaptureOutput, Compiler, Emulator, StepClock } from './index';
 
 describe('Blinky program', () => {
   const compiler = new Compiler();
@@ -7,13 +7,15 @@ describe('Blinky program', () => {
     const emulator = new Emulator();
     const clock = new StepClock();
     const output = new CaptureOutput();
-    const bytes = compiler.compile(`
+    const bytes = compiler.compile(
+      `
     io write pin 0, 0x01
     delay 1000
     io write pin 0, 0x00
     delay 1000
     halt
-  `);
+  `,
+    );
 
     const program = emulator.load(bytes, clock, output);
 
