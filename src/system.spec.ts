@@ -1,71 +1,69 @@
-import { bytesToNumber, Compiler, OpCodes, ValueType } from './index';
+import { bytesToNumber, OpCodes, ValueType, compile } from './index';
 
-describe('Compiler', () => {
-  const compiler = new Compiler();
-
+describe.skip('Compiler', () => {
   it('should parse an empty program', () => {
-    expect(compiler.compile('')).toStrictEqual([]);
+    expect(compile('')).toStrictEqual([]);
   });
 
   it('should delay execution for a given amount of time', () => {
     const program = `delay 1000`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Delay, ValueType.Integer, 0xe8, 0x03, 0x00, 0x00]);
   });
 
   it('should stop execution', () => {
     const program = `halt`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Halt]);
   });
 
   it('should restart the program', () => {
     const program = `restart`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Restart]);
   });
 
   it('should do nothing', () => {
     const program = `noop`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Noop]);
   });
 
   it('should sleep for a given amount of time', () => {
     const program = `sleep 2000`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Sleep, ValueType.Integer, 0xd0, 0x07, 0x00, 0x00]);
   });
 
   it('should jump to a given location', () => {
     const program = `jump to 0x00000001`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.JumpTo, ValueType.Address, 0x01, 0x00, 0x00, 0x00]);
   });
 
   it('should delay a given time (micro seconds)', () => {
     const program = `yield 10`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Yield, ValueType.Integer, 0x0a, 0x00, 0x00, 0x00]);
   });
 
   it('should print system information to serial output', () => {
     const program = `sysinfo`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.SystemInfo]);
   });
 
   it('should print program and execution memory details to serial output', () => {
     const program = `dump`;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Dump]);
   });
@@ -77,7 +75,7 @@ describe('Compiler', () => {
     print 5
     `;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([
       OpCodes.Print,
@@ -106,7 +104,7 @@ describe('Compiler', () => {
     noop
     debug false
     `;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([OpCodes.Debug, 0x1, OpCodes.Noop, OpCodes.Debug, 0]);
   });
@@ -125,7 +123,7 @@ describe('Compiler', () => {
       noop
       jump to middle
     `;
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([
       // begin
@@ -170,7 +168,7 @@ describe('Compiler', () => {
       // jump if $a to begin
     `;
 
-    const output = compiler.compile(program);
+    const output = compile(program);
 
     expect(output).toStrictEqual([
       // OpCodes.Declare,

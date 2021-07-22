@@ -1,12 +1,12 @@
-import { CompilerPlugin, Context } from '../plugins';
+import { CompilationContext, CompilerPlugin } from '../compiler';
 import { isReference } from '../references';
 
-export interface ContextWithReferences extends Context {
+export interface ContextWithReferences extends CompilationContext {
   references: Map<string, number>;
 }
 
 export class ExtractReferencesPlugin implements CompilerPlugin<ContextWithReferences> {
-  run(context: Context): ContextWithReferences {
+  run(context: CompilationContext): ContextWithReferences {
     const references = new Map<string, number>();
 
     const bytes = context.bytes.filter((item, index) => {

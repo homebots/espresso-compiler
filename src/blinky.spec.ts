@@ -1,20 +1,20 @@
-import { CaptureOutput, Compiler, Emulator, StepClock } from './index';
+import { CaptureOutput, compile, Emulator, StepClock } from './index';
 
 describe('Blinky program', () => {
-  const compiler = new Compiler();
-
   it('should run blinky', () => {
     const emulator = new Emulator();
     const clock = new StepClock();
     const output = new CaptureOutput();
-    const bytes = compiler.compile(
+    const bytes = compile(
       `
-    io write pin 0, 0x01
-    delay 1000
-    io write pin 0, 0x00
-    delay 1000
-    halt
-  `,
+      byte $value
+
+      io write pin 0, $value
+      delay 1000
+      not $value, $value
+      io write pin 0, $value
+      delay 1000
+      halt`,
     );
 
     const program = emulator.load(bytes, clock, output);
@@ -26,6 +26,7 @@ describe('Blinky program', () => {
     expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
       'io write 0 1',
       'delay 1000',
+      'not 0, 0',
       'io write 0 0',
       'delay 1000',
       'halt',

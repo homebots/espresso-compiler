@@ -1,17 +1,13 @@
-import { Compiler, Emulator, StepClock } from './index';
+import { Emulator, StepClock, compile } from './index';
 
 describe('vm emulator', () => {
-  const compiler = new Compiler();
-
   it('should run one instruction and halt program', async () => {
     const emulator = new Emulator();
     const stepper = new StepClock();
-    const bytes = compiler.compile(
-      `
-      noop
-      halt
-    `,
-    );
+    const bytes = compile(`
+    noop
+    halt
+    `);
 
     const program = emulator.load(bytes, stepper);
     expect(program.counter).toBe(0);
@@ -26,11 +22,9 @@ describe('vm emulator', () => {
   it('should stop program if there are no further instruction', async () => {
     const emulator = new Emulator();
     const stepper = new StepClock();
-    const bytes = compiler.compile(
-      `
-      noop
-      noop
-    `,
+    const bytes = compile(
+      `noop
+       noop`,
     );
 
     const program = emulator.load(bytes, stepper);

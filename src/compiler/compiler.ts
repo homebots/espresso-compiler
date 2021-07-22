@@ -1,18 +1,19 @@
 import parser from './parser';
-import { ByteArray, CompilerPlugin, Context } from './plugins';
-import { FindIdentifiersPlugin } from './plugins/find-identifiers.plugin';
-import { ExtractReferencesPlugin } from './plugins/remove-references.plugin';
-import { ReplaceIdentifiersPlugin } from './plugins/replace-identifiers.plugin';
-import { ReplacePlaceholdersPlugin } from './plugins/replace-placeholders.plugin';
-import { ReplaceValuesPlugin } from './plugins/replace-values.plugin';
+import { InstructionNode } from './types';
 
-export const defaultPlugins: CompilerPlugin[] = [
-  new FindIdentifiersPlugin(),
-  new ExtractReferencesPlugin(),
-  new ReplaceIdentifiersPlugin(),
-  new ReplacePlaceholdersPlugin(),
-  new ReplaceValuesPlugin(),
-];
+export type ByteArray = Array<number>;
+
+export interface CompilationContext {
+  nodes: InstructionNode[];
+  bytes: ByteArray;
+}
+
+export interface CompilerPlugin<
+  OutputContext extends CompilationContext = CompilationContext,
+  InputContext extends CompilationContext = CompilationContext,
+> {
+  run(context: InputContext): OutputContext;
+}
 
 interface ParseError {
   location: { start: { line: number; column: number } };
@@ -22,7 +23,7 @@ interface ParseError {
 export class Compiler {
   private parser = parser();
 
-  parse(code: string): Array<unknown> {
+  parse(code: string): Array<InstructionNode> {
     return this.parser.parse(code).flat(2);
   }
 
@@ -35,7 +36,7 @@ export class Compiler {
 
     try {
       const nodes = this.parse(code);
-      const bytes = this.replaceNodes(nodes, plugins || defaultPlugins);
+      const bytes = this.runPlugins(nodes, plugins);
 
       return bytes;
     } catch (error) {
@@ -43,7 +44,7 @@ export class Compiler {
     }
   }
 
-  handleError<T>(error: ParseError | T): void {
+  protected handleError<T>(error: ParseError | T): void {
     if ('location' in error) {
       throw new SyntaxError(
         'At ' + error.location.start.line + ',' + error.location.start.column + ': ' + error.message,
@@ -53,10 +54,14 @@ export class Compiler {
     throw error;
   }
 
-  replaceNodes<P extends CompilerPlugin[]>(nodes: Array<unknown>, plugins: P): ByteArray {
-    const initialContext: Context = { bytes: nodes as ByteArray };
+  protected runPlugins<P extends CompilerPlugin[]>(nodes: Array<InstructionNode>, plugins: P): ByteArray {
+    const initialContext: CompilationContext = { bytes: [], nodes };
     const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
+    const stream = context.nodes.map((node) => InstructionNode.serialize(node)).flat();
 
-    return context.bytes;
+    console.log(context.nodes);
+    console.log(stream);
+
+    return stream;
   }
 }

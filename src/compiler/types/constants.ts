@@ -37,7 +37,7 @@ export const OpCodes = {
   // memory/io instructions
   MemGet: 0x40,
   MemSet: 0x41,
-  Copy: 0x42,
+  MemCopy: 0x42,
   IoWrite: 0x43,
   IoRead: 0x44,
   IoMode: 0x45,

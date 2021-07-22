@@ -1,50 +1,23 @@
 
-SystemInstruction 'system instruction'
-  = halt / restart / sysinfo / debug / dump / noop / yield / print / jump_to / jump_if / delay / DeclareIdentifier
+SystemInstruction 'system instruction' = halt / restart / sysinfo / debug / dump / noop / print / jump_to / jump_if / delay
 
-delay
-  = 'delay' Spaces delay:IntegerValue { return [OpCodes.Delay, ...delay]; } /
-    'sleep' Spaces delay:IntegerValue { return [OpCodes.Sleep, ...delay]; }
+halt = 'halt' { return InstructionNode.create('halt') }
+restart = 'restart' { return InstructionNode.create('restart') }
+noop = 'noop' { return InstructionNode.create('noop') }
+sysinfo = 'sysinfo' { return InstructionNode.create('sys_info') }
+dump = 'dump' { return InstructionNode.create('dump') }
+debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
+print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
 
-halt
-  = 'halt' { return [OpCodes.Halt]; }
-
-restart
-  = 'restart' { return [OpCodes.Restart]; }
-
-noop
-  = 'noop' { return [OpCodes.Noop]; }
+delay =
+  'delay' Spaces value:IntegerValue { return InstructionNode.create('delay', { value }) } /
+  'sleep' Spaces value:IntegerValue { return InstructionNode.create('sleep', { value }) } /
+  'yield' Spaces value:IntegerValue { return InstructionNode.create('yield', { value }) }
 
 jump_to =
-  'jump' Spaces 'to' Spaces address:AddressValue { return [OpCodes.JumpTo, ...address]; } /
-  'jump' Spaces 'to' Spaces label:Label { return [OpCodes.JumpTo, T.Placeholder.create(label), 0, 0, 0] }
+  'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jump_to', { address }) } /
+  'jump' Spaces 'to' Spaces label:Label { return InstructionNode.create('jump_to', { label }) }
 
 jump_if =
-  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return [OpCodes.JumpIf, ...condition, T.Placeholder.create(label), 0, 0, 0] }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return InstructionNode.create('jump_if', { condition, label }) }
 
-yield
-  = 'yield' Spaces delay:IntegerValue { return [OpCodes.Yield, ...delay]; }
-
-sysinfo
-  = 'sysinfo' { return [OpCodes.SystemInfo]; }
-
-debug
-  = 'debug' Spaces byte:Boolean { return [OpCodes.Debug, byte]; }
-
-dump
-  = 'dump' { return [OpCodes.Dump]; }
-
-print
-  = 'print' Spaces value:Value { return [OpCodes.Print, ...value]; }
-
-Label
-  = [a-zA-Z]+ [a-zA-Z0-9_]* { return text() }
-
-DefineLabel
-  = '@' label:Label { return T.Reference.create(label); }
-
-DeclareIdentifier =
-  'byte' Spaces t:Identifier { return T.DeclareIdentifier.createByte(t) } /
-  'int' Spaces t:Identifier { return T.DeclareIdentifier.createInteger(t) } /
-  'uint' Spaces t:Identifier { return T.DeclareIdentifier.createInteger(t) } /
-  'string' Spaces t:Identifier { return T.DeclareIdentifier.createString(t) }

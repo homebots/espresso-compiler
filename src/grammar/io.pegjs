@@ -1,11 +1,11 @@
 
 IoInstruction
-  = iowrite / ioread / iomode / iotype / ioallout
+  = IoWrite / IoRead / IoMode / IoType / IoAllOut
 
-iowrite = 'io write' Spaces pin:Pin Separator value:IoValue { return [OpCodes.IoWrite, pin, ...value]; }
-ioread = 'io read' Spaces pin:Pin Separator value:IoValue { return [OpCodes.IoRead, pin, ...value]; }
-iomode = 'io mode' Spaces pin:Pin Separator mode:PinMode { return [OpCodes.IoMode, pin, mode]; }
-iotype = 'io type' Spaces pin:Pin Separator type:Digit { return [OpCodes.IoType, pin, type]; }
-ioallout = 'io allout' { return [OpCodes.IoAllOut]; }
+IoWrite = 'io write' Spaces pin:Pin Separator value:IoValue { return InstructionNode.create('ioWrite', { pin, value }) }
+IoRead = 'io read' Spaces target:IdentifierValue Separator pin:Pin { return InstructionNode.create('ioRead', { pin, target }) }
+IoMode = 'io mode' Spaces pin:Pin Separator mode:PinMode { return InstructionNode.create('ioMode', { pin, mode }) }
+IoType = 'io type' Spaces pin:Pin Separator pinType:Digit { return InstructionNode.create('ioType', { pin, pinType }) }
+IoAllOut = 'io allout' { return InstructionNode.create('ioAllOut') }
 
 IoValue = ByteValue / IdentifierValue / BooleanValue

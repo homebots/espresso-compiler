@@ -1,12 +1,6 @@
 
-MemoryInstruction
-  = memget / memset / copy
-  // push_b / push_i
+MemoryInstruction = MemoryGet / MemorySet / MemoryCopy
 
-memget = 'memget' Spaces IdentifierValue Separator Value { return [0x05]; }
-memset = 'memset' Spaces MemoryWriteValue Separator Value { return [0x06]; }
-// push_b = 'push_b' { return [0x07]; }
-// push_i = 'push_i' { return [0x08]; }
-copy = 'copy' IdentifierValue Value { return [0x1b]; }
-
-MemoryWriteValue = AddressValue / PinValue
+MemoryCopy = 'copy' Spaces target:AddressValue Separator address:AddressValue { return InstructionNode.create('memoryCopy', { target, address }); }
+MemoryGet = 'get' Spaces target:IdentifierValue Separator address:AddressValue { return InstructionNode.create('memoryGet', { target, address }); }
+MemorySet = 'set' Spaces target:AddressValue Separator value:Value { return InstructionNode.create('memorySet', { target, value }); }

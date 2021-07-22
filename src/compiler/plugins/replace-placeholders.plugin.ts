@@ -1,7 +1,7 @@
-import { CompilerPlugin } from '../plugins';
-import { numberToInt32 } from '../data-convertion';
+import { numberToInt32 } from '../types/data-convertion';
 import { isPlaceholder } from '../references';
 import { ContextWithReferences } from './remove-references.plugin';
+import { CompilerPlugin } from '../compiler';
 
 export class ReplacePlaceholdersPlugin implements CompilerPlugin<ContextWithReferences, ContextWithReferences> {
   run(context: ContextWithReferences): ContextWithReferences {

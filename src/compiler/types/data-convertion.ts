@@ -20,8 +20,11 @@ export function bytesToNumber(int32bytes: number[]): number {
   return Array.from(new Uint32Array(new Uint8Array(int32bytes).buffer))[0];
 }
 
-export function stringToBytes(string: string[]): number[] {
-  return string.map((c) => c.charCodeAt(0)).concat([0]);
+export function stringToBytes(string: string): number[] {
+  return string
+    .split('')
+    .map((c) => c.charCodeAt(0))
+    .concat([0]);
 }
 
 export function stringToHexBytes(string: string): string {
