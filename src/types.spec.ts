@@ -1,4 +1,4 @@
-import { stringToHexBytes, bytesToNumber, numberToInt32 } from './index';
+import { stringToHexBytes, bytesToNumber, numberToInt32, compile } from './index';
 
 describe('data helpers', () => {
   describe('numberToInt32', () => {
@@ -16,6 +16,27 @@ describe('data helpers', () => {
   describe('stringToHexBytes', () => {
     it('should convert a string into hex bytes', () => {
       expect(stringToHexBytes('0001ff00')).toBe('00 01 ff 00');
+    });
+  });
+
+  describe('identifiers', () => {
+    it('should throw error if an identifier is redeclared', () => {
+      expect(() =>
+        compile(`
+        byte $a
+        byte $a
+      `),
+      ).toThrowError('Cannot redeclare identifier: $a');
+    });
+
+    it('should throw error if too many identifiers are declared', () => {
+      const nodes = Array(256)
+        .fill(0)
+        .map((_, i) => 'byte $v' + i);
+
+      const source = nodes.join('\n');
+
+      expect(() => compile(source)).toThrowError('Too many identifiers');
     });
   });
 });

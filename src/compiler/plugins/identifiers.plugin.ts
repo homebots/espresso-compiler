@@ -20,7 +20,6 @@ export class FindIdentifiersPlugin<C extends CompilationContext> implements Comp
     nodes.forEach((node) => {
       if (InstructionNode.isOfType(node, 'declareIdentifier')) {
         this.declareIdentifier(identifiers, identifierTypes, node);
-        return;
       }
     });
 

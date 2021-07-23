@@ -1,23 +1,23 @@
 
-SystemInstruction 'system instruction' = halt / restart / sysinfo / debug / dump / noop / print / jump_to / jump_if / delay
+SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
-halt = 'halt' { return InstructionNode.create('halt') }
-restart = 'restart' { return InstructionNode.create('restart') }
-noop = 'noop' { return InstructionNode.create('noop') }
-sysinfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
-dump = 'dump' { return InstructionNode.create('dump') }
-debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
-print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
+Halt = 'halt' { return InstructionNode.create('halt') }
+Restart = 'restart' { return InstructionNode.create('restart') }
+Noop = 'noop' { return InstructionNode.create('noop') }
+SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
+Dump = 'dump' { return InstructionNode.create('dump') }
+Debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
+Print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
 
-delay =
+Delay =
   'delay' Spaces value:IntegerValue { return InstructionNode.create('delay', { value }) } /
   'sleep' Spaces value:IntegerValue { return InstructionNode.create('sleep', { value }) } /
   'yield' Spaces value:IntegerValue { return InstructionNode.create('yield', { value }) }
 
-jump_to =
+JumpTo =
   'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jumpTo', { address }) } /
   'jump' Spaces 'to' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
 
-jump_if =
+JumpIf =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return InstructionNode.create('jumpIf', { condition, label }) }
 

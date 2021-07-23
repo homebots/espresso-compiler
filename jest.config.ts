@@ -4,7 +4,7 @@ export default {
   clearMocks: true,
   collectCoverage: true,
   coverageProvider: 'v8',
-  coveragePathIgnorePatterns: ['/node_modules/', 'src/grammar.ts'],
+  coveragePathIgnorePatterns: ['/node_modules/', 'src/grammar.ts', 'src/compiler/parser.ts'],
   coverageThreshold: {
     global: {
       branches: 100,

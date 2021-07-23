@@ -1,6 +1,6 @@
 import { bytesToNumber, OpCodes, ValueType, compile } from './index';
 
-describe.skip('Compiler', () => {
+describe('Compiler', () => {
   it('should parse an empty program', () => {
     expect(compile('')).toStrictEqual([]);
   });

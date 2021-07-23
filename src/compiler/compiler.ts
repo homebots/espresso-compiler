@@ -58,8 +58,8 @@ export class Compiler {
     const initialContext: CompilationContext = { bytes: [], nodes };
     const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
 
-    console.log(context.nodes);
-    console.log(context.bytes);
+    // console.log(context.nodes);
+    // console.log(context.bytes);
 
     return context.bytes;
   }

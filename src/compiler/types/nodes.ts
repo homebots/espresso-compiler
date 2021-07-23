@@ -21,15 +21,15 @@ interface NodeTypeToNodeMap {
   halt: InstructionNode;
   restart: InstructionNode;
   noop: InstructionNode;
-  sys_info: InstructionNode;
+  systemInfo: InstructionNode;
   dump: InstructionNode;
   debug: NodeWithSingleValue<ValueNode<number>>;
   print: NodeWithSingleValue<ValueNode>;
   delay: NodeWithSingleValue<ValueNode<number>>;
   sleep: NodeWithSingleValue<number>;
   yield: NodeWithSingleValue<number>;
-  jump_to: SystemJumpToNode;
-  jump_if: SystemJumpIfNode;
+  jumpTo: SystemJumpToNode;
+  jumpIf: SystemJumpIfNode;
   placeholder: InstructionNode;
 
   // operators
@@ -207,18 +207,22 @@ export function serializeValue(value: ValueNode): number[] {
   return [value.dataType].concat(valueToByteArray(value));
 }
 
-factories.declareIdentifier = (properties) => ({
-  id: 0,
-  ...properties,
-});
+serializers.declareIdentifier = (node) => [OpCodes.Declare, node.id, node.dataType];
 
-serializers.declareIdentifier = (node) => [OpCodes.Declare, ValueType.Identifier, node.id, node.dataType];
-
-serializers.noop = () => [OpCodes.Noop];
 serializers.halt = () => [OpCodes.Halt];
 serializers.restart = () => [OpCodes.Restart];
+serializers.noop = () => [OpCodes.Noop];
+serializers.systemInfo = () => [OpCodes.SystemInfo];
 serializers.dump = () => [OpCodes.Dump];
+serializers.debug = (node) => [OpCodes.Debug, ...serializeValue(node.value)];
+serializers.print = (node) => [OpCodes.Print, ...serializeValue(node.value)];
 serializers.delay = (node) => [OpCodes.Delay, ...serializeValue(node.value)];
+serializers.jumpTo = (node) => [OpCodes.JumpTo, ...numberToUnsignedInt32(node.address)];
+serializers.jumpIf = (node) => [
+  OpCodes.JumpIf,
+  ...serializeValue(node.condition),
+  ...numberToUnsignedInt32(node.address),
+];
 
 serializers.ioWrite = (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)];
 
