@@ -4,7 +4,7 @@ SystemInstruction 'system instruction' = halt / restart / sysinfo / debug / dump
 halt = 'halt' { return InstructionNode.create('halt') }
 restart = 'restart' { return InstructionNode.create('restart') }
 noop = 'noop' { return InstructionNode.create('noop') }
-sysinfo = 'sysinfo' { return InstructionNode.create('sys_info') }
+sysinfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 dump = 'dump' { return InstructionNode.create('dump') }
 debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
 print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
@@ -15,9 +15,9 @@ delay =
   'yield' Spaces value:IntegerValue { return InstructionNode.create('yield', { value }) }
 
 jump_to =
-  'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jump_to', { address }) } /
-  'jump' Spaces 'to' Spaces label:Label { return InstructionNode.create('jump_to', { label }) }
+  'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jumpTo', { address }) } /
+  'jump' Spaces 'to' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
 
 jump_if =
-  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return InstructionNode.create('jump_if', { condition, label }) }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return InstructionNode.create('jumpIf', { condition, label }) }
 

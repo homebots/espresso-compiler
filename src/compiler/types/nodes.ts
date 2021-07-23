@@ -51,14 +51,13 @@ const serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToN
 
 export class InstructionNode {
   type: keyof NodeTypeToNodeMap;
-  bytes?: number[];
 
-  static serialize(node: InstructionNode): number[] {
+  static serialize(node: InstructionNode): number[] | null {
     if (serializers[node.type]) {
       return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
     }
 
-    return node.bytes;
+    return null;
   }
 
   static isOfType<K extends keyof NodeTypeToNodeMap>(item: InstructionNode, type: K): item is NodeTypeToNodeMap[K] {
@@ -122,7 +121,7 @@ export type StringValueNode = ValueNode<string>;
 
 export interface IoWriteNode extends InstructionNode {
   pin: number;
-  value: number;
+  value: ValueNode;
 }
 
 export interface IoModeNode extends InstructionNode {
@@ -214,8 +213,13 @@ factories.declareIdentifier = (properties) => ({
 });
 
 serializers.declareIdentifier = (node) => [OpCodes.Declare, ValueType.Identifier, node.id, node.dataType];
-serializers.value = (node) => serializeValue(node);
+
 serializers.noop = () => [OpCodes.Noop];
 serializers.halt = () => [OpCodes.Halt];
 serializers.restart = () => [OpCodes.Restart];
 serializers.dump = () => [OpCodes.Dump];
+serializers.delay = (node) => [OpCodes.Delay, ...serializeValue(node.value)];
+
+serializers.ioWrite = (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)];
+
+serializers.not = (node) => [OpCodes.Not, ...serializeValue(node.target), ...serializeValue(node.value)];

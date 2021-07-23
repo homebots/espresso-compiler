@@ -57,11 +57,10 @@ export class Compiler {
   protected runPlugins<P extends CompilerPlugin[]>(nodes: Array<InstructionNode>, plugins: P): ByteArray {
     const initialContext: CompilationContext = { bytes: [], nodes };
     const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
-    const stream = context.nodes.map((node) => InstructionNode.serialize(node)).flat();
 
     console.log(context.nodes);
-    console.log(stream);
+    console.log(context.bytes);
 
-    return stream;
+    return context.bytes;
   }
 }

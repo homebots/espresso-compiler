@@ -48,13 +48,22 @@ export class FindIdentifiersPlugin<C extends CompilationContext> implements Comp
 }
 
 export class ReplaceIdentifiersPlugin implements CompilerPlugin {
-  run(context: CompilationContext): CompilationContext {
-    context.nodes.forEach((node) => {
-      if (InstructionNode.isOfType(node, 'declareIdentifier')) {
-        // node.bytes = [node.id];
+  run(context: ContextWithIdentifiers): ContextWithIdentifiers {
+    const bytes = context.bytes.map((byte) => {
+      if (typeof byte === 'number') {
+        return byte;
       }
+
+      const node = byte as InstructionNode;
+
+      if (InstructionNode.isOfType(node, 'useIdentifier')) {
+        const id = context.identifiers.get(node.name);
+        return id;
+      }
+
+      return byte;
     });
 
-    return context;
+    return { ...context, bytes };
   }
 }
