@@ -16,8 +16,8 @@ Delay =
 
 JumpTo =
   'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jumpTo', { address }) } /
-  'jump' Spaces 'to' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
+  'jump' Spaces 'to' Spaces 'label' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
 
 JumpIf =
-  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces label:Label { return InstructionNode.create('jumpIf', { condition, label }) }
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces 'label' Spaces label:Label { return InstructionNode.create('jumpIf', { condition, label }) }
 

@@ -61,6 +61,6 @@ export class Compiler {
     // console.log(context.nodes);
     // console.log(context.bytes);
 
-    return context.bytes;
+    return context.bytes as ByteArray;
   }
 }

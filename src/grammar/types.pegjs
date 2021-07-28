@@ -1,7 +1,7 @@
 
 HexDigit "hexadecimal" = [0-9A-Fa-f]
 HexByte "byte hex" = HexDigit HexDigit { return text() }
-Byte "Byte" = '0x' HexDigit HexDigit { return parseInt(text(), 16) }
+Byte "Byte" = HexDigit HexDigit 'h' { return parseInt(text(), 16) }
 Space = [ \t]
 Spaces "space" = Space*
 NewLine "new line" = [\n]+
@@ -17,10 +17,11 @@ Boolean = True / False
 Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
 SignedInteger = '-' int:Integer { return -1 * int }
 String "string" = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
-Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return [d, c, b, a] }
+Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
+// Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return [d, c, b, a] }
 Pin "pin" = 'pin ' pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
 LabelText = [a-z] [a-zA-Z0-9_]* { return text() }
-DefineLabel = '@' label:LabelText { return InstructionNode.create('label', { label }) }
+DefineLabel = '@' label:LabelText { return InstructionNode.create('defineLabel', { label }) }
 Label = label:LabelText { return InstructionNode.create('label', { label }) }
 Identifier "identifier" = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 IdentifierChar = Alphanumeric / "$" / "_"

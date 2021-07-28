@@ -113,15 +113,15 @@ describe('Compiler', () => {
     const program = `
     @begin
       noop
-      jump to end
+      jump to label end
 
     @middle
       noop
-      jump to begin
+      jump to label begin
 
     @end
       noop
-      jump to middle
+      jump to label middle
     `;
     const output = compile(program);
 
@@ -131,6 +131,7 @@ describe('Compiler', () => {
 
       // jump to end (12)
       OpCodes.JumpTo,
+      ValueType.Address,
       0x0c,
       0x00,
       0x00,
@@ -141,6 +142,7 @@ describe('Compiler', () => {
 
       // jump to begin (0)
       OpCodes.JumpTo,
+      ValueType.Address,
       0x00,
       0x00,
       0x00,
@@ -151,6 +153,7 @@ describe('Compiler', () => {
 
       // jump to middle (6)
       OpCodes.JumpTo,
+      ValueType.Address,
       0x06,
       0x00,
       0x00,
@@ -160,41 +163,24 @@ describe('Compiler', () => {
 
   it('should jump to a given label if a condition is met', () => {
     const program = `
-      // @begin
-      int $a
-      byte $b
-      // inc $a
-      $b : $a < 10
-      // jump if $a to begin
+    @begin
+    if 1 then jump to label begin
     `;
 
     const output = compile(program);
 
     expect(output).toStrictEqual([
-      // OpCodes.Declare,
-      // ValueType.Integer,
-      // 0x00,
-
-      // OpCodes.Declare,
-      // ValueType.Byte,
-      // 0x01,
-
-      // OpCodes.Inc,
-      // 0x00,
-
-      OpCodes.Lt,
-      // 0x01,
-      // ValueType.Identifier,
-      // 0x00,
-      // ValueType.Byte,
-      // 0x10,
-
-      // OpCodes.JumpIf,
-      // 0x00,
-      // 0x00,
-      // 0x00,
-      // 0x00,
-      // 0x00,
+      OpCodes.JumpIf,
+      ValueType.Integer,
+      0x01,
+      0,
+      0,
+      0,
+      ValueType.Address,
+      0x00,
+      0x00,
+      0x00,
+      0x00,
     ]);
   });
 });

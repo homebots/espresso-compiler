@@ -23,8 +23,6 @@ describe('Blinky program', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    console.log(bytes);
-
     clock.run();
     expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
       'declare 0, 2',

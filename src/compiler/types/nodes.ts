@@ -1,14 +1,15 @@
 import { OpCodes } from './constants';
-import { bytesToNumber, numberToInt32, numberToUnsignedInt32, stringToBytes } from './data-convertion';
+import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion';
 
 interface NodeTypeToNodeMap {
   comment: InstructionNode;
   declareIdentifier: DeclareIdentifierNode;
   useIdentifier: UseIdentifierNode;
+  defineLabel: LabelNode;
 
   // values
   label: LabelNode;
-  value: ValueNode<number>;
+  value: ByteValueNode | NumberValueNode | StringValueNode;
 
   // io
   ioWrite: IoWriteNode;
@@ -26,8 +27,8 @@ interface NodeTypeToNodeMap {
   debug: NodeWithSingleValue<ValueNode<number>>;
   print: NodeWithSingleValue<ValueNode>;
   delay: NodeWithSingleValue<ValueNode<number>>;
-  sleep: NodeWithSingleValue<number>;
-  yield: NodeWithSingleValue<number>;
+  sleep: NodeWithSingleValue<ValueNode<number>>;
+  yield: NodeWithSingleValue<ValueNode<number>>;
   jumpTo: SystemJumpToNode;
   jumpIf: SystemJumpIfNode;
   placeholder: InstructionNode;
@@ -43,7 +44,7 @@ interface NodeTypeToNodeMap {
   memorySet: MemorySetNode;
 }
 
-type NodeSerializer<T extends InstructionNode> = (node: T) => number[];
+type NodeSerializer<T extends InstructionNode> = (node: T) => Array<number | InstructionNode>;
 type NodeFactory<T extends InstructionNode> = (properties?: T) => T;
 
 const factories: { [K in keyof NodeTypeToNodeMap]?: NodeFactory<NodeTypeToNodeMap[K]> } = {};
@@ -52,7 +53,7 @@ const serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToN
 export class InstructionNode {
   type: keyof NodeTypeToNodeMap;
 
-  static serialize(node: InstructionNode): number[] | null {
+  static serialize(node: InstructionNode): Array<number | InstructionNode> | null {
     if (serializers[node.type]) {
       return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
     }
@@ -95,10 +96,9 @@ export interface NodeWithSingleValue<T> extends InstructionNode {
 }
 
 export type IdentifierType = ValueType.Byte | ValueType.Integer | ValueType.SignedInteger | ValueType.String;
-type ValueNodePrimities = number | number[] | string;
+type ValueNodePrimities = number | number[] | string[];
 
-export interface DeclareIdentifierNode<T extends number | number[] | string = ValueNodePrimities>
-  extends InstructionNode {
+export interface DeclareIdentifierNode<T extends ValueNodePrimities = ValueNodePrimities> extends InstructionNode {
   dataType: IdentifierType;
   value: ValueNode<T>;
   name: string;
@@ -117,7 +117,7 @@ export interface ValueNode<T extends ValueNodePrimities = ValueNodePrimities> ex
 
 export type ByteValueNode = ValueNode<number>;
 export type NumberValueNode = ValueNode<[number, number, number, number]>;
-export type StringValueNode = ValueNode<string>;
+export type StringValueNode = ValueNode<string[]>;
 
 export interface IoWriteNode extends InstructionNode {
   pin: number;
@@ -144,8 +144,8 @@ export interface LabelNode extends InstructionNode {
 }
 
 export interface SystemJumpToNode extends InstructionNode {
-  address?: number;
-  label?: string;
+  address?: NumberValueNode;
+  label?: LabelNode;
 }
 
 export interface SystemJumpIfNode extends SystemJumpToNode {
@@ -183,8 +183,6 @@ export interface NotOperationNode extends InstructionNode {
 export function valueToByteArray(type: ValueNode): number[] {
   switch (type.dataType) {
     case ValueType.Address:
-      return numberToUnsignedInt32(bytesToNumber(type.value as unknown as number[]));
-
     case ValueType.Integer:
       return numberToUnsignedInt32(type.value as number);
 
@@ -199,7 +197,7 @@ export function valueToByteArray(type: ValueNode): number[] {
       return [type.value as number];
 
     case ValueType.String:
-      return stringToBytes(type.value as unknown as string);
+      return charArrayToBytes(type.value as unknown as string[]);
   }
 }
 
@@ -208,20 +206,28 @@ export function serializeValue(value: ValueNode): number[] {
 }
 
 serializers.declareIdentifier = (node) => [OpCodes.Declare, node.id, node.dataType];
+serializers.label = () => null;
 
 serializers.halt = () => [OpCodes.Halt];
 serializers.restart = () => [OpCodes.Restart];
 serializers.noop = () => [OpCodes.Noop];
 serializers.systemInfo = () => [OpCodes.SystemInfo];
 serializers.dump = () => [OpCodes.Dump];
-serializers.debug = (node) => [OpCodes.Debug, ...serializeValue(node.value)];
-serializers.print = (node) => [OpCodes.Print, ...serializeValue(node.value)];
+serializers.debug = (node) => [OpCodes.Debug, node.value];
 serializers.delay = (node) => [OpCodes.Delay, ...serializeValue(node.value)];
-serializers.jumpTo = (node) => [OpCodes.JumpTo, ...numberToUnsignedInt32(node.address)];
+serializers.print = (node) => [OpCodes.Print, ...serializeValue(node.value)];
+serializers.sleep = (node) => [OpCodes.Sleep, ...serializeValue(node.value)];
+serializers.yield = (node) => [OpCodes.Yield, ...serializeValue(node.value)];
+
+serializers.jumpTo = (node) => [
+  OpCodes.JumpTo,
+  ...((node.address ? serializeValue(node.address) : [node, 0, 0, 0, 0]) as number[]),
+];
+
 serializers.jumpIf = (node) => [
   OpCodes.JumpIf,
   ...serializeValue(node.condition),
-  ...numberToUnsignedInt32(node.address),
+  ...((node.address ? serializeValue(node.address) : [node, 0, 0, 0, 0]) as number[]),
 ];
 
 serializers.ioWrite = (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)];

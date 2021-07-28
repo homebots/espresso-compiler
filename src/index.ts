@@ -5,5 +5,5 @@ export * from './compiler';
 export * from './emulator';
 
 export function compile(source: string): ByteArray {
-  return new Compiler().compile(source, defaultPlugins);
+  return new Compiler().compile(source || '', defaultPlugins);
 }

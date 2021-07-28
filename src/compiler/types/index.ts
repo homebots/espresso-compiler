@@ -6,4 +6,5 @@ export {
   numberToUnsignedInt32,
   stringToBytes,
   stringToHexBytes,
+  charArrayToBytes,
 } from './data-convertion';
