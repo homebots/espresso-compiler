@@ -1,9 +1,25 @@
-import { stringToHexBytes, bytesToNumber, numberToInt32, compile } from './index';
+import {
+  stringToHexBytes,
+  bytesToNumber,
+  numberToInt32,
+  compile,
+  stringToBytes,
+  numberToUnsignedInt32,
+  charArrayToBytes,
+} from './index';
 
 describe('data helpers', () => {
   describe('numberToInt32', () => {
     it('should convert a number to four bytes', () => {
       expect(numberToInt32(1000)).toEqual([232, 3, 0, 0]);
+      expect(numberToInt32(-1000)).toEqual([24, 252, 255, 255]);
+    });
+  });
+
+  describe('numberToUnsignedInt32', () => {
+    it('should convert a number to four bytes', () => {
+      expect(numberToUnsignedInt32(1000)).toEqual([232, 3, 0, 0]);
+      expect(() => numberToUnsignedInt32(-1000)).toThrowError('Negative value not allowed');
     });
   });
 
@@ -37,6 +53,18 @@ describe('data helpers', () => {
       const source = nodes.join('\n');
 
       expect(() => compile(source)).toThrowError('Too many identifiers');
+    });
+  });
+
+  describe('stringToBytes', () => {
+    it('should convert a string into bytes', () => {
+      expect(stringToBytes('foo')).toEqual([102, 111, 111, 0]);
+    });
+  });
+
+  describe('charArrayToBytes', () => {
+    it('should convert a string into bytes', () => {
+      expect(charArrayToBytes(['f', 'o', 'o'])).toEqual([102, 111, 111, 0]);
     });
   });
 });

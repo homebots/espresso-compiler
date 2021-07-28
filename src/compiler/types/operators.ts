@@ -1,6 +1,6 @@
 import { OpCodes } from './constants';
 
-const binaryOperatorMap = {
+export const binaryOperatorMap = {
   '>=': OpCodes.Gte,
   '>': OpCodes.Gt,
   '<=': OpCodes.Lte,
@@ -17,7 +17,7 @@ const binaryOperatorMap = {
   '%': OpCodes.Mod,
 };
 
-const unaryOperatorMap = {
+export const unaryOperatorMap = {
   not: OpCodes.Not,
   inc: OpCodes.Inc,
   dec: OpCodes.Dec,

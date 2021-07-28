@@ -5,6 +5,10 @@ describe('Compiler', () => {
     expect(compile('')).toStrictEqual([]);
   });
 
+  it('should throw an error for invalid syntax', () => {
+    expect(() => compile('not valid')).toThrowError('At 1,1: Expected end of input or statement but "n" found.');
+  });
+
   it('should delay execution for a given amount of time', () => {
     const program = `delay 1000`;
     const output = compile(program);

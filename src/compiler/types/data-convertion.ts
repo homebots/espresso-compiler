@@ -13,6 +13,10 @@ export function numberToUnsignedInt32(number: number): [number, number, number, 
     throw new SyntaxError('number is too large');
   }
 
+  if (number < 0) {
+    throw new Error('Negative value not allowed');
+  }
+
   return Array.from(new Uint8Array(new Uint32Array([number]).buffer)) as [number, number, number, number];
 }
 

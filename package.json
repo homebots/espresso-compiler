@@ -11,7 +11,7 @@
     "types": "tsc --declaration -p tsconfig.build.json",
     "package": "ncc build src/index.ts --minify --no-cache --target es2020",
     "tdd": "jest --watchAll",
-    "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/grammar.ts",
+    "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/compiler/parser.ts",
     "all": "npm run build && npm run lint && npm run test"
   },
   "repository": {

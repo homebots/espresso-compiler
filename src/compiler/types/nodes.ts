@@ -206,7 +206,6 @@ export function serializeValue(value: ValueNode): number[] {
 }
 
 serializers.declareIdentifier = (node) => [OpCodes.Declare, node.id, node.dataType];
-serializers.label = () => null;
 
 serializers.halt = () => [OpCodes.Halt];
 serializers.restart = () => [OpCodes.Restart];
