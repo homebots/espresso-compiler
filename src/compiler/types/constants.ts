@@ -33,6 +33,7 @@ export const OpCodes = {
   Not: 0x2e,
   Inc: 0x2f,
   Dec: 0x30,
+  Assign: 0x31,
 
   // memory/io instructions
   MemGet: 0x40,

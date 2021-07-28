@@ -2,8 +2,32 @@ import { bytesToNumber, OpCodes, ValueType } from '../compiler';
 import { Clock, TimerClock } from './clock';
 import { NullOutput, ProgramOutput } from './output';
 
+const binaryOperatorTable: Record<number, (a: string | number, b: string | number) => unknown> = {
+  [OpCodes.Gte]: (a, b) => a >= b,
+  [OpCodes.Gt]: (a, b) => a > b,
+  [OpCodes.Lte]: (a, b) => a <= b,
+  [OpCodes.Lt]: (a, b) => a < b,
+  [OpCodes.Equal]: (a, b) => a === b,
+  [OpCodes.NotEqual]: (a, b) => a !== b,
+  [OpCodes.Add]: (a, b) => (typeof a === 'string' ? a + b : Number(a) + Number(b)),
+  [OpCodes.Sub]: (a: number, b: number) => a - b,
+  [OpCodes.Mul]: (a: number, b: number) => a * b,
+  [OpCodes.Div]: (a: number, b: number) => a / b,
+  [OpCodes.Mod]: (a: number, b: number) => a % b,
+  [OpCodes.Xor]: (a: number, b: number) => a ^ b,
+  [OpCodes.And]: (a: number, b: number) => a & b,
+  [OpCodes.Or]: (a: number, b: number) => a | b,
+};
 class Value {
   constructor(public dataType: ValueType, public value: string | number, public id?: number) {}
+
+  isString() {
+    return this.dataType === ValueType.String;
+  }
+
+  isNumeric() {
+    return !isNaN(this.toNumber());
+  }
 
   toString() {
     return String(this.value);
@@ -64,8 +88,30 @@ export class Program {
         break;
 
       case OpCodes.Not:
-        this.notOperator();
+      case OpCodes.Inc:
+      case OpCodes.Dec:
+        this.unaryOperator(next);
         break;
+
+      case OpCodes.Gte:
+      case OpCodes.Gt:
+      case OpCodes.Lte:
+      case OpCodes.Lt:
+      case OpCodes.Equal:
+      case OpCodes.NotEqual:
+      case OpCodes.Add:
+      case OpCodes.Sub:
+      case OpCodes.Mul:
+      case OpCodes.Div:
+      case OpCodes.Mod:
+      case OpCodes.Xor:
+      case OpCodes.And:
+      case OpCodes.Or:
+        this.binaryOperator(next);
+        break;
+
+      default:
+        throw new Error('Invalid opcode: ' + next);
     }
 
     if (this.counter >= this.endOfTheProgram) {
@@ -151,7 +197,7 @@ export class Program {
     const value = this.readValue();
 
     this.pins[pin] = value.toNumber();
-    this.trace(`io write ${pin}, ${value}`);
+    this.trace(`io write pin ${pin}, ${value}`);
   }
 
   delay(): void {
@@ -162,7 +208,8 @@ export class Program {
   }
 
   jumpTo(): void {
-    const position = this.readNumber();
+    const position = this.readValue().toNumber();
+    this.trace(`jump to ${position}`);
     this.counter = position;
   }
 
@@ -178,8 +225,47 @@ export class Program {
     const target = this.readValue();
     const value = this.readValue();
 
-    this.trace(`not ${target.id}, ${value.id}`);
+    this.trace(`#${target.id} = not #${value.id}`);
     target.value = Number(!value.toBoolean());
+  }
+
+  unaryOperator(operator: number): void {
+    if (operator == OpCodes.Not) {
+      return this.notOperator();
+    }
+
+    if (operator == OpCodes.Inc) {
+      return this.incOperator();
+    }
+
+    if (operator == OpCodes.Dec) {
+      return this.decOperator();
+    }
+  }
+
+  binaryOperator(operator: number): void {
+    const fn = binaryOperatorTable[operator];
+    const target = this.readValue();
+    const a = this.readValue();
+    const b = this.readValue();
+
+    const valueOfA = a.isString() ? a.toString() : a.toNumber();
+    const valueOfB = a.isString() ? b.toString() : b.toNumber();
+
+    target.value = fn(valueOfA, valueOfB) as string | number;
+    this.trace(`#${target.id} = #${a.id} ${operator} #${b.id}`);
+  }
+
+  incOperator(): void {
+    const value = this.readValue();
+    value.value = Number(value.value) + 1;
+    this.trace('inc #' + value.id);
+  }
+
+  decOperator(): void {
+    const value = this.readValue();
+    value.value = Number(value.value) - 1;
+    this.trace('dec #' + value.id);
   }
 }
 

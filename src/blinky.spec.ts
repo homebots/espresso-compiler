@@ -7,12 +7,15 @@ describe('Blinky program', () => {
     const output = new CaptureOutput();
     const bytes = compile(
       `
+      // blinks a pin and loops back to zero
+      // using tick() instead of run() to avoid infinite loop
       @begin
       io write pin 0, 0
       delay 1000
       io write pin 0, 1
       delay 1000
-      jump to label begin`,
+      jump to label begin
+      `,
     );
 
     const program = emulator.load(bytes, clock, output);
@@ -20,11 +23,12 @@ describe('Blinky program', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    clock.run();
+    clock.tick(5);
+
     expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
-      'io write 0, 0',
+      'io write pin 0, 0',
       'delay 1000',
-      'io write 0, 1',
+      'io write pin 0, 1',
       'delay 1000',
       'jump to 0',
     ]);

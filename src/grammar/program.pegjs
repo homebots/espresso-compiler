@@ -28,4 +28,4 @@ Comment
  // / I2cInstruction
 
 
-Comment "comment" = ('//' [^\n]+) { return InstructionNode.create('comment') }
+Comment "comment" = ('//' [^\n]+) { return [] }

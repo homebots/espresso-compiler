@@ -26,13 +26,11 @@ export class StepClock implements Clock {
     this.fn = fn;
   }
 
-  tick(): void {
-    if (this.paused) {
-      return;
+  tick(times = 1): void {
+    while (times-- && !this.paused) {
+      this.fn();
+      this.steps++;
     }
-
-    this.fn();
-    this.steps++;
   }
 
   delay(_: number): void {
@@ -41,7 +39,7 @@ export class StepClock implements Clock {
 
   run(): void {
     while (!this.paused) {
-      this.tick();
+      this.tick(9999);
     }
   }
 }

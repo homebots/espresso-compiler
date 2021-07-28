@@ -3,8 +3,9 @@ Operator = unary_operation / binary_operation / declare_identifier
 
 ASSIGN = '='
 
-unary_operation = not / step
-not = 'not' Spaces target:IdentifierValue Separator value:Value { return InstructionNode.create('not', { target, value }) }
+unary_operation = not / step / assign
+not = target:IdentifierValue Spaces ASSIGN Spaces 'not' Spaces value:Value { return InstructionNode.create('not', { target, value }) }
+assign = target:IdentifierValue Spaces ASSIGN Spaces value:Value { return InstructionNode.create('assign', { target, value }) }
 step = operator:('inc' / 'dec') Spaces target:IdentifierValue { return InstructionNode.create('unaryOperation', { operator, target }) }
 
 binary_operation = target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces operator:binary_operator Spaces b:Value { return InstructionNode.create('binaryOperation', { operator, target, a, b }) }

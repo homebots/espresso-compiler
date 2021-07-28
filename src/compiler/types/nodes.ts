@@ -1,5 +1,6 @@
 import { OpCodes } from './constants';
 import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion';
+import { binaryOperatorMap, unaryOperatorMap } from './operators';
 
 interface NodeTypeToNodeMap {
   comment: InstructionNode;
@@ -206,6 +207,7 @@ export function serializeValue(value: ValueNode): number[] {
 }
 
 serializers.declareIdentifier = (node) => [OpCodes.Declare, node.id, node.dataType];
+serializers.comment = () => [];
 
 serializers.halt = () => [OpCodes.Halt];
 serializers.restart = () => [OpCodes.Restart];
@@ -217,6 +219,13 @@ serializers.delay = (node) => [OpCodes.Delay, ...serializeValue(node.value)];
 serializers.print = (node) => [OpCodes.Print, ...serializeValue(node.value)];
 serializers.sleep = (node) => [OpCodes.Sleep, ...serializeValue(node.value)];
 serializers.yield = (node) => [OpCodes.Yield, ...serializeValue(node.value)];
+serializers.unaryOperation = (node) => [unaryOperatorMap[node.operator], ...serializeValue(node.target)];
+serializers.binaryOperation = (node) => [
+  binaryOperatorMap[node.operator],
+  ...serializeValue(node.target),
+  ...serializeValue(node.a),
+  ...serializeValue(node.b),
+];
 
 serializers.jumpTo = (node) => [
   OpCodes.JumpTo,
