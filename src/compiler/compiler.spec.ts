@@ -1,12 +1,32 @@
-import { bytesToNumber, OpCodes, ValueType, compile } from './index';
+import { bytesToNumber, OpCodes, ValueType, compile } from '../index';
 
 describe('Compiler', () => {
   it('should parse an empty program', () => {
     expect(compile('')).toStrictEqual([]);
   });
 
+  it('should ignore comments', () => {
+    expect(compile('// nothing')).toStrictEqual([]);
+  });
+
   it('should throw an error for invalid syntax', () => {
-    expect(() => compile('not valid')).toThrowError('At 1,1: Expected end of input or statement but "n" found.');
+    expect(() => compile('not valid')).toThrowError(
+      '1:1: Expected end of input or statement but "n" found.\nnot valid\n^',
+    );
+  });
+
+  it('should not allow values that are incompatible when declaring a variable', () => {
+    expect(() => compile(`uint $a = 'foo'`)).toThrow('Invalid value. Expected Integer but found String');
+  });
+
+  it('should not allow values that are incompatible when assigning a value', () => {
+    expect(() =>
+      compile(
+        `uint $a = 1
+         $a = 'foo'
+        `,
+      ),
+    ).toThrow('Invalid value for $a. Expected Integer but found String');
   });
 
   it('should delay execution for a given amount of time', () => {
@@ -44,7 +64,7 @@ describe('Compiler', () => {
     expect(output).toStrictEqual([OpCodes.Sleep, ValueType.Integer, 0xd0, 0x07, 0x00, 0x00]);
   });
 
-  it('should jump to a given location', () => {
+  it('should jump to a given address', () => {
     const program = `jump to 0x00000001`;
     const output = compile(program);
 
@@ -77,6 +97,7 @@ describe('Compiler', () => {
     print 1048576
     print 'foo'
     print 5
+    print -128
     `;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compile(program);
@@ -98,6 +119,12 @@ describe('Compiler', () => {
       0,
       0,
       0,
+      OpCodes.Print,
+      ValueType.SignedInteger,
+      128,
+      255,
+      255,
+      255,
     ]);
     expect(bytesToNumber([0, 0, 16, 0])).toBe(1048576);
   });
@@ -167,24 +194,58 @@ describe('Compiler', () => {
 
   it('should jump to a given label if a condition is met', () => {
     const program = `
+    byte $a = ffh
     @begin
-    if 1 then jump to label begin
+    if 0 then jump to label begin
+    if $a then jump to 0x00000005
     `;
 
     const output = compile(program);
 
     expect(output).toStrictEqual([
+      OpCodes.Declare,
+      0,
+      ValueType.Byte,
+      0xff,
       OpCodes.JumpIf,
       ValueType.Integer,
-      0x01,
+      0,
       0,
       0,
       0,
       ValueType.Address,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
+      0x04,
+      0,
+      0,
+      0,
+      OpCodes.JumpIf,
+      ValueType.Identifier,
+      0,
+      ValueType.Address,
+      0x05,
+      0,
+      0,
+      0,
     ]);
   });
+
+  // it('should calculate the program size correctly', () => {
+  //   const program = `
+  //   @begin
+  //   byte $a = ffh
+  //   byte $b = 01h
+
+  //   io all out
+  //   io mode pin 0, 1
+  //   io type pin 0, 1
+  //   io read $a, pin 0
+  //   byte $c = 0
+  //   $c = $a + $b
+  //   jump to label begin
+
+  //   `;
+
+  //   const bytes = compile(program);
+  //   expect(bytes).toHaveLength(34);
+  // });
 });

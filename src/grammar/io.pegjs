@@ -6,6 +6,6 @@ IoWrite = 'io write' Spaces pin:Pin Separator value:IoValue { return Instruction
 IoRead = 'io read' Spaces target:IdentifierValue Separator pin:Pin { return InstructionNode.create('ioRead', { pin, target }) }
 IoMode = 'io mode' Spaces pin:Pin Separator mode:PinMode { return InstructionNode.create('ioMode', { pin, mode }) }
 IoType = 'io type' Spaces pin:Pin Separator pinType:Digit { return InstructionNode.create('ioType', { pin, pinType }) }
-IoAllOut = 'io allout' { return InstructionNode.create('ioAllOut') }
+IoAllOut = 'io all out' { return InstructionNode.create('ioAllOut') }
 
 IoValue = ByteValue / IdentifierValue / BooleanValue

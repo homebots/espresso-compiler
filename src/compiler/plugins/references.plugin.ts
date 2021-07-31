@@ -1,21 +1,20 @@
 import { CompilationContext, CompilerPlugin } from '../compiler';
-import { InstructionNode, numberToInt32, SystemJumpToNode, ValueType } from '../types';
+import { InstructionNode, NumberValueNode, ValueType } from '../types';
 
-export interface ContextWithLabels extends CompilationContext {
-  labelAddresses?: Map<string, number>;
-}
-
-export class FindLabelsPlugin implements CompilerPlugin<ContextWithLabels> {
-  run(context: CompilationContext): ContextWithLabels {
+export class FindLabelsPlugin implements CompilerPlugin {
+  run(context: CompilationContext): CompilationContext {
     const labelAddresses = new Map<string, number>();
+    let byteAccumulator = 0;
 
-    const nodes = context.nodes.filter((node, index) => {
+    const nodes = context.nodes.filter((node) => {
       if (InstructionNode.isOfType(node, 'defineLabel')) {
-        // add 4 bytes for int32, remove 1 for filtered out label
-        const position = index - labelAddresses.size + labelAddresses.size * 4;
+        const position = byteAccumulator - labelAddresses.size;
         labelAddresses.set(node.label, position);
+
         return false;
       }
+
+      byteAccumulator += InstructionNode.sizeOf(node);
 
       return true;
     });
@@ -29,33 +28,27 @@ export class FindLabelsPlugin implements CompilerPlugin<ContextWithLabels> {
 }
 
 export class ReplaceLabelReferencesPlugin implements CompilerPlugin {
-  run(context: ContextWithLabels): ContextWithLabels {
-    const bytes = [];
-    const length = context.bytes.length;
+  run(context: CompilationContext): CompilationContext {
+    context.nodes.forEach((node) => {
+      if (InstructionNode.isOfType(node, 'jumpTo') || InstructionNode.isOfType(node, 'jumpIf')) {
+        if (node.address) {
+          return;
+        }
 
-    for (let i = 0; i < length; ) {
-      const byte = context.bytes[i];
+        const label = node.label.label;
 
-      if (
-        typeof byte === 'object' &&
-        (InstructionNode.isOfType(byte, 'jumpTo') || InstructionNode.isOfType(byte, 'jumpIf'))
-      ) {
-        const node = byte as SystemJumpToNode;
-        const address = context.labelAddresses.get(node.label.label);
+        // if (!context.labelAddresses.has(label)) {
+        //   throw new Error(`Label ${label} not found`);
+        // }
 
-        bytes.push(ValueType.Address, ...numberToInt32(address));
-        i += 5;
-
-        continue;
+        const address = context.labelAddresses.get(label);
+        node.address = InstructionNode.create('value', {
+          dataType: ValueType.Address,
+          value: address,
+        }) as NumberValueNode;
       }
+    });
 
-      bytes.push(byte);
-      i++;
-    }
-
-    return {
-      ...context,
-      bytes,
-    };
+    return context;
   }
 }

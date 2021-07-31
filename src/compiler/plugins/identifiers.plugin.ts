@@ -1,21 +1,9 @@
 import { CompilationContext, CompilerPlugin } from '../compiler';
 import { DeclareIdentifierNode, InstructionNode, ValueType } from '../types';
 
-export interface ContextWithIdentifiers extends CompilationContext {
-  identifiers: Map<string, number>;
-  identifierTypes: Map<string, ValueType>;
-}
-
-export class FindIdentifiersPlugin<C extends CompilationContext> implements CompilerPlugin<ContextWithIdentifiers> {
-  run(context: C): C & ContextWithIdentifiers {
-    const { identifiers, identifierTypes } = this.declareIdentifiers(context.nodes);
-
-    return { ...context, identifiers, identifierTypes };
-  }
-
-  private declareIdentifiers(nodes: InstructionNode[]) {
-    const identifiers = new Map<string, number>();
-    const identifierTypes = new Map<string, ValueType>();
+export class FindIdentifiersPlugin implements CompilerPlugin {
+  run(context: CompilationContext): CompilationContext {
+    const { nodes, identifiers, identifierTypes } = context;
 
     nodes.forEach((node) => {
       if (InstructionNode.isOfType(node, 'declareIdentifier')) {
@@ -23,7 +11,7 @@ export class FindIdentifiersPlugin<C extends CompilationContext> implements Comp
       }
     });
 
-    return { identifiers, identifierTypes };
+    return context;
   }
 
   private declareIdentifier(
@@ -47,17 +35,12 @@ export class FindIdentifiersPlugin<C extends CompilationContext> implements Comp
 }
 
 export class ReplaceIdentifiersPlugin implements CompilerPlugin {
-  run(context: ContextWithIdentifiers): ContextWithIdentifiers {
+  run(context: CompilationContext): CompilationContext {
     const bytes = context.bytes.map((byte) => {
-      if (typeof byte === 'number') {
-        return byte;
-      }
+      const node = byte as unknown as InstructionNode;
 
-      const node = byte as InstructionNode;
-
-      if (InstructionNode.isOfType(node, 'useIdentifier')) {
-        const id = context.identifiers.get(node.name);
-        return id;
+      if (node && typeof node === 'object' && InstructionNode.isOfType(node, 'useIdentifier')) {
+        return context.identifiers.get(node.name);
       }
 
       return byte;

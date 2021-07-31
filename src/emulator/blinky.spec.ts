@@ -1,4 +1,4 @@
-import { CaptureOutput, compile, Emulator, StepClock } from './index';
+import { CaptureOutput, compile, Emulator, StepClock } from '../index';
 
 describe('Blinky program', () => {
   it('should run blinky', () => {

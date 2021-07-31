@@ -1,6 +1,5 @@
-import { OpCodes } from './constants';
+import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants';
 import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion';
-import { binaryOperatorMap, unaryOperatorMap } from './operators';
 
 interface NodeTypeToNodeMap {
   comment: InstructionNode;
@@ -11,6 +10,7 @@ interface NodeTypeToNodeMap {
   // values
   label: LabelNode;
   value: ByteValueNode | NumberValueNode | StringValueNode;
+  identifierValue: IdentifierValueNode;
 
   // io
   ioWrite: IoWriteNode;
@@ -32,9 +32,9 @@ interface NodeTypeToNodeMap {
   yield: NodeWithSingleValue<ValueNode<number>>;
   jumpTo: SystemJumpToNode;
   jumpIf: SystemJumpIfNode;
-  placeholder: InstructionNode;
 
   // operators
+  assign: AssignOperationNode;
   unaryOperation: UnaryOperationNode;
   binaryOperation: BinaryOperationNode;
   not: NotOperationNode;
@@ -45,21 +45,31 @@ interface NodeTypeToNodeMap {
   memorySet: MemorySetNode;
 }
 
-type NodeSerializer<T extends InstructionNode> = (node: T) => Array<number | InstructionNode>;
-type NodeFactory<T extends InstructionNode> = (properties?: T) => T;
+// type NodeFactory<T extends InstructionNode> = (properties?: T) => T;
+// const factories: { [K in keyof NodeTypeToNodeMap]?: NodeFactory<NodeTypeToNodeMap[K]> } = {};
 
-const factories: { [K in keyof NodeTypeToNodeMap]?: NodeFactory<NodeTypeToNodeMap[K]> } = {};
+type NodeSerializer<T extends InstructionNode> = (node: T) => Array<number | InstructionNode>;
 const serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToNodeMap[K]> } = {};
+
+type NodeSizeOf<T extends InstructionNode> = (node: T) => number;
+const sizeOf: { [K in keyof NodeTypeToNodeMap]?: NodeSizeOf<NodeTypeToNodeMap[K]> } = {};
 
 export class InstructionNode {
   type: keyof NodeTypeToNodeMap;
 
   static serialize(node: InstructionNode): Array<number | InstructionNode> | null {
-    if (serializers[node.type]) {
-      return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
+    return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
+    // if (serializers[node.type]) {
+    // }
+    //   return null;
+  }
+
+  static sizeOf(node: InstructionNode): number {
+    if (sizeOf[node.type]) {
+      return (sizeOf[node.type] as NodeSizeOf<InstructionNode>)(node);
     }
 
-    return null;
+    return 1;
   }
 
   static isOfType<K extends keyof NodeTypeToNodeMap>(item: InstructionNode, type: K): item is NodeTypeToNodeMap[K] {
@@ -72,10 +82,10 @@ export class InstructionNode {
   ): NodeTypeToNodeMap[K] {
     properties = properties || ({} as NodeTypeToNodeMap[K]);
 
-    if (factories[type]) {
-      const factory = factories[type];
-      properties = factory(properties as never) as NodeTypeToNodeMap[K];
-    }
+    // if (factories[type]) {
+    //   const factory = factories[type];
+    //   properties = factory(properties as never) as NodeTypeToNodeMap[K];
+    // }
 
     return { ...properties, type } as NodeTypeToNodeMap[K];
   }
@@ -111,7 +121,7 @@ export interface UseIdentifierNode extends InstructionNode {
   id?: number;
 }
 
-export interface ValueNode<T extends ValueNodePrimities = ValueNodePrimities> extends InstructionNode {
+export interface ValueNode<T = ValueNodePrimities | UseIdentifierNode> extends InstructionNode {
   dataType: ValueType;
   value: T;
 }
@@ -119,6 +129,7 @@ export interface ValueNode<T extends ValueNodePrimities = ValueNodePrimities> ex
 export type ByteValueNode = ValueNode<number>;
 export type NumberValueNode = ValueNode<[number, number, number, number]>;
 export type StringValueNode = ValueNode<string[]>;
+export type IdentifierValueNode = ValueNode<UseIdentifierNode>;
 
 export interface IoWriteNode extends InstructionNode {
   pin: number;
@@ -180,6 +191,11 @@ export interface NotOperationNode extends InstructionNode {
   value: ValueNode;
 }
 
+export interface AssignOperationNode extends InstructionNode {
+  target: IdentifierValueNode;
+  value: ValueNode;
+}
+
 //////
 export function valueToByteArray(type: ValueNode): number[] {
   switch (type.dataType) {
@@ -206,38 +222,66 @@ export function serializeValue(value: ValueNode): number[] {
   return [value.dataType].concat(valueToByteArray(value));
 }
 
-serializers.declareIdentifier = (node) => [OpCodes.Declare, node.id, node.dataType];
-serializers.comment = () => [];
+Object.assign(serializers, <typeof serializers>{
+  declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
+  halt: () => [OpCodes.Halt],
+  restart: () => [OpCodes.Restart],
+  noop: () => [OpCodes.Noop],
+  systemInfo: () => [OpCodes.SystemInfo],
+  dump: () => [OpCodes.Dump],
+  debug: (node) => [OpCodes.Debug, node.value],
+  delay: (node) => [OpCodes.Delay, ...serializeValue(node.value)],
+  print: (node) => [OpCodes.Print, ...serializeValue(node.value)],
+  sleep: (node) => [OpCodes.Sleep, ...serializeValue(node.value)],
+  yield: (node) => [OpCodes.Yield, ...serializeValue(node.value)],
+  assign: (node) => [OpCodes.Assign, ...serializeValue(node.target), ...serializeValue(node.value)],
+  not: (node) => [OpCodes.Not, ...serializeValue(node.target), ...serializeValue(node.value)],
+  unaryOperation: (node) => [unaryOperatorMap[node.operator], ...serializeValue(node.target)],
+  binaryOperation: (node) => [
+    binaryOperatorMap[node.operator],
+    ...serializeValue(node.target),
+    ...serializeValue(node.a),
+    ...serializeValue(node.b),
+  ],
+  jumpTo: (node) => [OpCodes.JumpTo, ...serializeValue(node.address)],
+  jumpIf: (node) => [OpCodes.JumpIf, ...serializeValue(node.condition), ...serializeValue(node.address)],
+  ioWrite: (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)],
+});
 
-serializers.halt = () => [OpCodes.Halt];
-serializers.restart = () => [OpCodes.Restart];
-serializers.noop = () => [OpCodes.Noop];
-serializers.systemInfo = () => [OpCodes.SystemInfo];
-serializers.dump = () => [OpCodes.Dump];
-serializers.debug = (node) => [OpCodes.Debug, node.value];
-serializers.delay = (node) => [OpCodes.Delay, ...serializeValue(node.value)];
-serializers.print = (node) => [OpCodes.Print, ...serializeValue(node.value)];
-serializers.sleep = (node) => [OpCodes.Sleep, ...serializeValue(node.value)];
-serializers.yield = (node) => [OpCodes.Yield, ...serializeValue(node.value)];
-serializers.unaryOperation = (node) => [unaryOperatorMap[node.operator], ...serializeValue(node.target)];
-serializers.binaryOperation = (node) => [
-  binaryOperatorMap[node.operator],
-  ...serializeValue(node.target),
-  ...serializeValue(node.a),
-  ...serializeValue(node.b),
-];
+Object.assign(sizeOf, <typeof sizeOf>{
+  // comment: () => 0,
+  declareIdentifier: (node) => 2 + serializeValue(node.value).length,
+  // useIdentifier: () => 1,
+  // defineLabel: () => 0,
 
-serializers.jumpTo = (node) => [
-  OpCodes.JumpTo,
-  ...((node.address ? serializeValue(node.address) : [node, 0, 0, 0, 0]) as number[]),
-];
+  // values
+  // label: () => 0,
+  // value: (node) => serializeValue(node).length,
 
-serializers.jumpIf = (node) => [
-  OpCodes.JumpIf,
-  ...serializeValue(node.condition),
-  ...((node.address ? serializeValue(node.address) : [node, 0, 0, 0, 0]) as number[]),
-];
+  // io
+  ioWrite: (node) => 2 + serializeValue(node.value).length,
+  // ioRead: () => 1,
+  // ioMode: () => 1,
+  // ioType: () => 1,
 
-serializers.ioWrite = (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)];
+  // system
+  systemInfo: () => 1,
+  debug: () => 1,
+  print: () => 1,
+  delay: () => 1,
+  sleep: () => 1,
+  yield: () => 1,
+  jumpTo: () => 6,
+  jumpIf: (node) => 6 + serializeValue(node.condition).length,
 
-serializers.not = (node) => [OpCodes.Not, ...serializeValue(node.target), ...serializeValue(node.value)];
+  // operators
+  assign: (node) => 1 + serializeValue(node.target).length + serializeValue(node.value).length,
+  unaryOperation: (node) => 1 + serializeValue(node.target).length,
+  binaryOperation: () => 1,
+  not: () => 1,
+
+  // memory
+  // memoryCopy: () => 1,
+  // memoryGet: () => 1,
+  // memorySet: () => 1,
+});

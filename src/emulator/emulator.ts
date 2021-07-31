@@ -3,12 +3,12 @@ import { Clock, TimerClock } from './clock';
 import { NullOutput, ProgramOutput } from './output';
 
 const binaryOperatorTable: Record<number, (a: string | number, b: string | number) => unknown> = {
-  [OpCodes.Gte]: (a, b) => a >= b,
-  [OpCodes.Gt]: (a, b) => a > b,
-  [OpCodes.Lte]: (a, b) => a <= b,
-  [OpCodes.Lt]: (a, b) => a < b,
-  [OpCodes.Equal]: (a, b) => a === b,
-  [OpCodes.NotEqual]: (a, b) => a !== b,
+  [OpCodes.Gte]: (a, b) => Number(a >= b),
+  [OpCodes.Gt]: (a, b) => Number(a > b),
+  [OpCodes.Lte]: (a, b) => Number(a <= b),
+  [OpCodes.Lt]: (a, b) => Number(a < b),
+  [OpCodes.Equal]: (a, b) => Number(a === b),
+  [OpCodes.NotEqual]: (a, b) => Number(a !== b),
   [OpCodes.Add]: (a, b) => (typeof a === 'string' ? a + b : Number(a) + Number(b)),
   [OpCodes.Sub]: (a: number, b: number) => a - b,
   [OpCodes.Mul]: (a: number, b: number) => a * b,
@@ -25,9 +25,9 @@ class Value {
     return this.dataType === ValueType.String;
   }
 
-  isNumeric() {
-    return !isNaN(this.toNumber());
-  }
+  // isNumeric() {
+  //   return !isNaN(this.toNumber());
+  // }
 
   toString() {
     return String(this.value);
@@ -49,7 +49,6 @@ export class Program {
   }
 
   counter = 0;
-  paused = false;
   pins: number[] = Array(16).fill(0);
   variables: Value[] = Array(0xff);
 
@@ -93,6 +92,10 @@ export class Program {
         this.unaryOperator(next);
         break;
 
+      case OpCodes.Assign:
+        this.assignOperator();
+        break;
+
       case OpCodes.Gte:
       case OpCodes.Gt:
       case OpCodes.Lte:
@@ -111,11 +114,11 @@ export class Program {
         break;
 
       default:
-        throw new Error('Invalid opcode: ' + next);
+        throw new Error(`Invalid opcode: ${next}`);
     }
 
     if (this.counter >= this.endOfTheProgram) {
-      this.clock.stop();
+      this.halt();
     }
   }
 
@@ -215,10 +218,11 @@ export class Program {
 
   declareIdentifier(): void {
     const id = this.readByte();
-    const type = this.readByte();
+    const value = this.readValue();
 
-    this.trace(`declare ${id}, ${type}`);
-    this.variables[id] = new Value(type, 0, id);
+    value.id = id;
+    this.variables[id] = value;
+    this.trace(`declare ${value.id}, ${value.dataType}, ${value.toString()}`);
   }
 
   notOperator(): void {
@@ -229,17 +233,24 @@ export class Program {
     target.value = Number(!value.toBoolean());
   }
 
+  assignOperator(): void {
+    const target = this.readValue();
+    const value = this.readValue();
+
+    this.trace(`#${target.id} = ${value.toString()}`);
+    target.value = value.value;
+  }
+
   unaryOperator(operator: number): void {
-    if (operator == OpCodes.Not) {
-      return this.notOperator();
-    }
+    switch (operator) {
+      case OpCodes.Not:
+        return this.notOperator();
 
-    if (operator == OpCodes.Inc) {
-      return this.incOperator();
-    }
+      case OpCodes.Inc:
+        return this.incOperator();
 
-    if (operator == OpCodes.Dec) {
-      return this.decOperator();
+      case OpCodes.Dec:
+        return this.decOperator();
     }
   }
 

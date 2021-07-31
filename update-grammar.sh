@@ -6,11 +6,9 @@ echo '' > $grammarSpec
 cat src/grammar/program.pegjs >> $grammarSpec
 cat src/grammar/system.pegjs >> $grammarSpec
 cat src/grammar/memory.pegjs >> $grammarSpec
-cat src/grammar/operators.pegjs >> $grammarSpec
 cat src/grammar/io.pegjs >> $grammarSpec
 # cat src/grammar/wifi.pegjs >> $grammarSpec
 # cat src/grammar/i2c.pegjs >> $grammarSpec
-cat src/grammar/values.pegjs >> $grammarSpec
 cat src/grammar/types.pegjs >> $grammarSpec
 
 pegjs --format commonjs -o src/grammar.out src/grammar.pegjs

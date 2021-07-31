@@ -1,7 +1,7 @@
 
-HexDigit "hexadecimal" = [0-9A-Fa-f]
+HexDigit "hexadecimal" = [0-9a-f]
 HexByte "byte hex" = HexDigit HexDigit { return text() }
-Byte "Byte" = HexDigit HexDigit 'h' { return parseInt(text(), 16) }
+Byte "Byte" = a:HexDigit b:HexDigit? 'h' { return parseInt(a + b, 16) }
 Space = [ \t]
 Spaces "space" = Space*
 NewLine "new line" = [\n]+
@@ -15,7 +15,7 @@ True = ('true' / '1') { return 1 }
 False = ('false' / '0') { return 0 }
 Boolean = True / False
 Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
-SignedInteger = '-' int:Integer { return -1 * int }
+SignedInteger = signal:('-'/'+') int:Integer { return int * (signal === '-' ? -1 : 1) }
 String "string" = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
 // Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return [d, c, b, a] }

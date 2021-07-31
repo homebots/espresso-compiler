@@ -1,4 +1,33 @@
 
+
+// operators
+Operator = BinaryOperation / UnaryOperation / DeclareIdentifier
+
+ASSIGN = '='
+
+UnaryOperation = assign / not / step
+assign = target:IdentifierValue Spaces ASSIGN Spaces value:Value { return InstructionNode.create('assign', { target, value }) }
+not = target:IdentifierValue Spaces ASSIGN Spaces 'not' Spaces value:Value { return InstructionNode.create('not', { target, value }) }
+step = operator:('inc' / 'dec') Spaces target:IdentifierValue { return InstructionNode.create('unaryOperation', { operator, target }) }
+
+BinaryOperation = target:IdentifierValue Spaces ASSIGN Spaces a:Value Spaces operator:BinaryOperator Spaces b:Value { return InstructionNode.create('binaryOperation', { operator, target, a, b }) }
+BinaryOperator = '>=' / '>' / '<=' / '<' / '==' / '!=' / 'xor' / 'and' / 'or' / '+' / '-' / '*' / '/' / '%'
+
+DeclareIdentifier = dataType:ValueTypeMap Spaces name:Identifier Spaces ASSIGN Spaces value:Value { return InstructionNode.create('declareIdentifier', { name, dataType, value }) }
+
+// values
+IdentifierValue = value:UseIdentifier { return InstructionNode.create('identifierValue', { value, dataType: ValueType.Identifier }) }
+PinValue =  value:Pin { return InstructionNode.create('value', { value, dataType: ValueType.Pin }) }
+BooleanValue = value:Boolean { return InstructionNode.create('value', { value, dataType: ValueType.Byte }) }
+ByteValue = value:Byte { return InstructionNode.create('value', { value, dataType: ValueType.Byte }) }
+AddressValue = value:Address { return InstructionNode.create('value', { value, dataType: ValueType.Address }) }
+IntegerValue = value:Integer { return InstructionNode.create('value', { value, dataType: ValueType.Integer }) }
+SignedIntegerValue = value:SignedInteger { return InstructionNode.create('value', { value, dataType: ValueType.SignedInteger }) }
+StringValue = value:String { return InstructionNode.create('value', { value, dataType: ValueType.String }) }
+NullValue = 'null' { return InstructionNode.create('value', { value: 0, dataType: ValueType.Null }) }
+NumberValue = IntegerValue / SignedIntegerValue
+Value "value" = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue / BooleanValue / NullValue
+
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
 Halt = 'halt' { return InstructionNode.create('halt') }
@@ -19,5 +48,6 @@ JumpTo =
   'jump' Spaces 'to' Spaces 'label' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
 
 JumpIf =
+  'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces address:AddressValue { return InstructionNode.create('jumpIf', { condition, address }) } /
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces 'label' Spaces label:Label { return InstructionNode.create('jumpIf', { condition, label }) }
 

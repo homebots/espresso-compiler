@@ -7,9 +7,12 @@ export interface Clock {
 }
 
 export class StepClock implements Clock {
-  steps = 0;
-  paused = false;
-  delayedBy = 0;
+  steps: number;
+  paused: boolean;
+
+  constructor() {
+    this.start();
+  }
 
   start(): void {
     this.steps = 0;
@@ -56,11 +59,13 @@ export class TimerClock implements Clock {
 
   start(): void {
     this.timer = setTimeout(() => this.tick(), 1);
+    this.paused = false;
   }
 
   stop(): void {
     clearTimeout(this.timer as number);
     this.timer = 0;
+    this.paused = true;
   }
 
   delay(delay: number): void {

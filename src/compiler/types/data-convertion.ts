@@ -2,7 +2,7 @@ const MAX_INTEGER = 4294967295;
 
 export function numberToInt32(number: number): number[] {
   if (number > MAX_INTEGER) {
-    throw new SyntaxError('number is too large');
+    throw new SyntaxError('Number is too large');
   }
 
   return Array.from(new Uint8Array(new Int32Array([number]).buffer));
@@ -10,7 +10,7 @@ export function numberToInt32(number: number): number[] {
 
 export function numberToUnsignedInt32(number: number): [number, number, number, number] {
   if (number > MAX_INTEGER) {
-    throw new SyntaxError('number is too large');
+    throw new SyntaxError('Number is too large');
   }
 
   if (number < 0) {
