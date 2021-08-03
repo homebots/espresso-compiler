@@ -1,16 +1,39 @@
 import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants';
 import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion';
 
-interface NodeTypeToNodeMap {
+export interface NodeTypeToNodeMap {
   comment: InstructionNode;
+
+  // values
   declareIdentifier: DeclareIdentifierNode;
   useIdentifier: UseIdentifierNode;
   defineLabel: LabelNode;
-
-  // values
   label: LabelNode;
-  value: ByteValueNode | NumberValueNode | StringValueNode;
+
+  byteValue: ByteValueNode;
+  numberValue: NumberValueNode;
+  stringValue: StringValueNode;
   identifierValue: IdentifierValueNode;
+
+  // operators
+  assign: AssignOperationNode;
+  unaryOperation: UnaryOperationNode;
+  binaryOperation: BinaryOperationNode;
+  not: NotOperationNode;
+
+  // system
+  halt: InstructionNode;
+  restart: InstructionNode;
+  noop: InstructionNode;
+  systemInfo: InstructionNode;
+  dump: InstructionNode;
+  print: NodeWithSingleValue<ValueNode<ValueNodePrimities>>;
+  debug: NodeWithSingleValue<number>;
+  delay: NodeWithSingleValue<ValueNode<number>>;
+  sleep: NodeWithSingleValue<ValueNode<number>>;
+  yield: NodeWithSingleValue<ValueNode<number>>;
+  jumpTo: SystemJumpToNode;
+  jumpIf: SystemJumpIfNode;
 
   // io
   ioWrite: IoWriteNode;
@@ -19,28 +42,8 @@ interface NodeTypeToNodeMap {
   ioType: IoTypeNode;
   ioAllOut: InstructionNode;
 
-  // system
-  halt: InstructionNode;
-  restart: InstructionNode;
-  noop: InstructionNode;
-  systemInfo: InstructionNode;
-  dump: InstructionNode;
-  debug: NodeWithSingleValue<ValueNode<number>>;
-  print: NodeWithSingleValue<ValueNode>;
-  delay: NodeWithSingleValue<ValueNode<number>>;
-  sleep: NodeWithSingleValue<ValueNode<number>>;
-  yield: NodeWithSingleValue<ValueNode<number>>;
-  jumpTo: SystemJumpToNode;
-  jumpIf: SystemJumpIfNode;
-
-  // operators
-  assign: AssignOperationNode;
-  unaryOperation: UnaryOperationNode;
-  binaryOperation: BinaryOperationNode;
-  not: NotOperationNode;
-
   // memory
-  memoryCopy: MemoryGetNode;
+  memoryCopy: MemoryCopyNode;
   memoryGet: MemoryGetNode;
   memorySet: MemorySetNode;
 }
@@ -59,17 +62,10 @@ export class InstructionNode {
 
   static serialize(node: InstructionNode): Array<number | InstructionNode> | null {
     return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
-    // if (serializers[node.type]) {
-    // }
-    //   return null;
   }
 
   static sizeOf(node: InstructionNode): number {
-    if (sizeOf[node.type]) {
-      return (sizeOf[node.type] as NodeSizeOf<InstructionNode>)(node);
-    }
-
-    return 1;
+    return (sizeOf[node.type] as NodeSizeOf<InstructionNode>)(node);
   }
 
   static isOfType<K extends keyof NodeTypeToNodeMap>(item: InstructionNode, type: K): item is NodeTypeToNodeMap[K] {
@@ -107,7 +103,7 @@ export interface NodeWithSingleValue<T> extends InstructionNode {
 }
 
 export type IdentifierType = ValueType.Byte | ValueType.Integer | ValueType.SignedInteger | ValueType.String;
-type ValueNodePrimities = number | number[] | string[];
+export type ValueNodePrimities = number | string[];
 
 export interface DeclareIdentifierNode<T extends ValueNodePrimities = ValueNodePrimities> extends InstructionNode {
   dataType: IdentifierType;
@@ -127,7 +123,7 @@ export interface ValueNode<T = ValueNodePrimities | UseIdentifierNode> extends I
 }
 
 export type ByteValueNode = ValueNode<number>;
-export type NumberValueNode = ValueNode<[number, number, number, number]>;
+export type NumberValueNode = ValueNode<number>;
 export type StringValueNode = ValueNode<string[]>;
 export type IdentifierValueNode = ValueNode<UseIdentifierNode>;
 
@@ -148,7 +144,7 @@ export interface IoTypeNode extends InstructionNode {
 
 export interface IoReadNode extends InstructionNode {
   pin: number;
-  target: number;
+  target: IdentifierValueNode;
 }
 
 export interface LabelNode extends InstructionNode {
@@ -165,29 +161,34 @@ export interface SystemJumpIfNode extends SystemJumpToNode {
 }
 
 export interface MemorySetNode extends InstructionNode {
-  target: number;
+  target: NumberValueNode;
   value: ValueNode;
 }
 
 export interface MemoryGetNode extends InstructionNode {
-  target: number;
-  address: ValueNode<number>;
+  target: IdentifierValueNode;
+  address: NumberValueNode;
+}
+
+export interface MemoryCopyNode extends InstructionNode {
+  destination: NumberValueNode;
+  source: NumberValueNode;
 }
 
 export interface UnaryOperationNode extends InstructionNode {
-  operator: string;
-  target: ValueNode;
+  operator: 'inc' | 'dec';
+  target: IdentifierValueNode;
 }
 
 export interface BinaryOperationNode extends InstructionNode {
   operator: string;
-  target: ValueNode;
+  target: IdentifierValueNode;
   a: ValueNode;
   b: ValueNode;
 }
 
 export interface NotOperationNode extends InstructionNode {
-  target: ValueNode<number>;
+  target: IdentifierValueNode;
   value: ValueNode;
 }
 
@@ -211,7 +212,7 @@ export function valueToByteArray(type: ValueNode): number[] {
       return [type.value as number];
 
     case ValueType.Identifier:
-      return [type.value as number];
+      return [(type.value as UseIdentifierNode).id];
 
     case ValueType.String:
       return charArrayToBytes(type.value as unknown as string[]);
@@ -223,6 +224,7 @@ export function serializeValue(value: ValueNode): number[] {
 }
 
 Object.assign(serializers, <typeof serializers>{
+  comment: () => [],
   declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
   halt: () => [OpCodes.Halt],
   restart: () => [OpCodes.Restart],
@@ -245,43 +247,60 @@ Object.assign(serializers, <typeof serializers>{
   ],
   jumpTo: (node) => [OpCodes.JumpTo, ...serializeValue(node.address)],
   jumpIf: (node) => [OpCodes.JumpIf, ...serializeValue(node.condition), ...serializeValue(node.address)],
+  ioMode: (node) => [OpCodes.IoMode, node.pin, node.mode],
+  ioType: (node) => [OpCodes.IoType, node.pin, node.pinType],
+  ioAllOut: () => [OpCodes.IoAllOut],
   ioWrite: (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)],
+  ioRead: (node) => [OpCodes.IoRead, node.pin, ...serializeValue(node.target)],
+  memoryGet: (node) => [OpCodes.MemGet, ...serializeValue(node.target), ...serializeValue(node.address)],
+  memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
+  memoryCopy: (node) => [OpCodes.MemCopy, ...serializeValue(node.source), ...serializeValue(node.destination)],
 });
 
 Object.assign(sizeOf, <typeof sizeOf>{
-  // comment: () => 0,
-  declareIdentifier: (node) => 2 + serializeValue(node.value).length,
-  // useIdentifier: () => 1,
-  // defineLabel: () => 0,
+  comment: () => 0,
 
   // values
-  // label: () => 0,
-  // value: (node) => serializeValue(node).length,
+  declareIdentifier: (node) => 2 + serializeValue(node.value).length,
+  useIdentifier: () => 0,
+  defineLabel: () => 0,
+  label: () => 0,
+  stringValue: (node) => serializeValue(node).length,
+  byteValue: (node) => serializeValue(node).length,
+  numberValue: (node) => serializeValue(node).length,
+  identifierValue: (node) => serializeValue(node).length,
 
   // io
   ioWrite: (node) => 2 + serializeValue(node.value).length,
-  // ioRead: () => 1,
-  // ioMode: () => 1,
-  // ioType: () => 1,
+  ioRead: (node) => 2 + serializeValue(node.target).length,
+  ioMode: () => 3,
+  ioType: () => 3,
+  ioAllOut: () => 1,
 
   // system
+  halt: () => 1,
+  restart: () => 1,
+  noop: () => 1,
   systemInfo: () => 1,
-  debug: () => 1,
-  print: () => 1,
-  delay: () => 1,
-  sleep: () => 1,
-  yield: () => 1,
+  dump: () => 1,
+  debug: () => 2,
+  print: (node) => 1 + serializeValue(node.value).length,
+  delay: (node) => 1 + serializeValue(node.value).length,
+  sleep: (node) => 1 + serializeValue(node.value).length,
+  yield: (node) => 1 + serializeValue(node.value).length,
+
   jumpTo: () => 6,
   jumpIf: (node) => 6 + serializeValue(node.condition).length,
 
   // operators
   assign: (node) => 1 + serializeValue(node.target).length + serializeValue(node.value).length,
   unaryOperation: (node) => 1 + serializeValue(node.target).length,
-  binaryOperation: () => 1,
+  binaryOperation: (node) =>
+    1 + serializeValue(node.target).length + serializeValue(node.a).length + serializeValue(node.b).length,
   not: () => 1,
 
   // memory
-  // memoryCopy: () => 1,
-  // memoryGet: () => 1,
-  // memorySet: () => 1,
+  memoryGet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.address).length,
+  memorySet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.value).length,
+  memoryCopy: () => 11,
 });

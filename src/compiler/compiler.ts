@@ -24,23 +24,25 @@ export class Compiler {
   private parser = parser();
 
   parse(code: string): Array<InstructionNode> {
-    return this.parser.parse(code).flat(2);
-  }
-
-  compile<P extends CompilerPlugin[]>(code: string, plugins?: P): ByteArray {
     code = code.trim();
 
     if (!code) {
       return [];
     }
 
+    return this.parser.parse(code).flat(2);
+  }
+
+  compile<P extends CompilerPlugin[]>(code: Array<InstructionNode>, plugins?: P): ByteArray;
+  compile<P extends CompilerPlugin[]>(code: string, plugins?: P): ByteArray;
+  compile<P extends CompilerPlugin[]>(code: string | Array<InstructionNode>, plugins?: P): ByteArray {
     try {
-      const nodes = this.parse(code);
+      const nodes: Array<InstructionNode> = typeof code === 'string' ? this.parse(code) : code;
       const bytes = this.runPlugins(nodes, plugins);
 
       return bytes;
     } catch (error) {
-      this.handleError(error, code);
+      this.handleError(error, String(code));
     }
   }
 
@@ -69,7 +71,7 @@ export class Compiler {
     const initialContext = this.createCompilationContext(nodes);
     const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
 
-    // console.log(context.nodes);
+    // console.log(JSON.stringify(context.nodes, null, 2));
     // console.log(context.bytes);
 
     return context.bytes as ByteArray;

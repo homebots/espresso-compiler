@@ -11,6 +11,6 @@ describe('prints back to serial output', () => {
     emulator.load(bytes, stepper, output);
     stepper.run();
 
-    expect(output.lines).toEqual([['print', 'hello world!'], ['halt']]);
+    expect(output.lines).toEqual(['print hello world!', 'halt']);
   });
 });

@@ -42,7 +42,7 @@ export class ReplaceLabelReferencesPlugin implements CompilerPlugin {
         // }
 
         const address = context.labelAddresses.get(label);
-        node.address = InstructionNode.create('value', {
+        node.address = InstructionNode.create('numberValue', {
           dataType: ValueType.Address,
           value: address,
         }) as NumberValueNode;

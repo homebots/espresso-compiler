@@ -7,10 +7,10 @@ import { SerializePlugin } from './serialize.plugin';
 export const defaultPlugins: CompilerPlugin[] = [
   new FindIdentifiersPlugin(),
   new FindLabelsPlugin(),
-  new ReplaceLabelReferencesPlugin(),
   new CheckTypesPlugin(),
-  new SerializePlugin(),
+  new ReplaceLabelReferencesPlugin(),
   new ReplaceIdentifiersPlugin(),
+  new SerializePlugin(),
 ];
 
 export { CheckTypesPlugin, FindIdentifiersPlugin, FindLabelsPlugin, SerializePlugin };

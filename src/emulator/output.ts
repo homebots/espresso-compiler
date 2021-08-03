@@ -15,9 +15,13 @@ export class LogOutput implements ProgramOutput {
 }
 
 export class CaptureOutput implements ProgramOutput {
-  readonly lines: string[][] = [];
+  readonly logs: string[][] = [];
+  readonly lines: string[] = [];
 
   trace(...args: unknown[]): void {
-    this.lines.push(args.map(String));
+    const line = args.map(String);
+
+    this.logs.push(line);
+    this.lines.push(line.join(' '));
   }
 }

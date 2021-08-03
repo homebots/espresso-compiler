@@ -1,12 +1,13 @@
 
 
 // operators
-Operator = BinaryOperation / UnaryOperation / DeclareIdentifier
+Operator = BinaryOperation / UnaryOperation / DeclareIdentifier / Assign
 
 ASSIGN = '='
 
-UnaryOperation = assign / not / step
-assign = target:IdentifierValue Spaces ASSIGN Spaces value:Value { return InstructionNode.create('assign', { target, value }) }
+Assign = target:IdentifierValue Spaces ASSIGN Spaces value:Value { return InstructionNode.create('assign', { target, value }) }
+
+UnaryOperation = not / step
 not = target:IdentifierValue Spaces ASSIGN Spaces 'not' Spaces value:Value { return InstructionNode.create('not', { target, value }) }
 step = operator:('inc' / 'dec') Spaces target:IdentifierValue { return InstructionNode.create('unaryOperation', { operator, target }) }
 
@@ -17,14 +18,14 @@ DeclareIdentifier = dataType:ValueTypeMap Spaces name:Identifier Spaces ASSIGN S
 
 // values
 IdentifierValue = value:UseIdentifier { return InstructionNode.create('identifierValue', { value, dataType: ValueType.Identifier }) }
-PinValue =  value:Pin { return InstructionNode.create('value', { value, dataType: ValueType.Pin }) }
-BooleanValue = value:Boolean { return InstructionNode.create('value', { value, dataType: ValueType.Byte }) }
-ByteValue = value:Byte { return InstructionNode.create('value', { value, dataType: ValueType.Byte }) }
-AddressValue = value:Address { return InstructionNode.create('value', { value, dataType: ValueType.Address }) }
-IntegerValue = value:Integer { return InstructionNode.create('value', { value, dataType: ValueType.Integer }) }
-SignedIntegerValue = value:SignedInteger { return InstructionNode.create('value', { value, dataType: ValueType.SignedInteger }) }
-StringValue = value:String { return InstructionNode.create('value', { value, dataType: ValueType.String }) }
-NullValue = 'null' { return InstructionNode.create('value', { value: 0, dataType: ValueType.Null }) }
+PinValue =  value:Pin { return InstructionNode.create('byteValue', { value, dataType: ValueType.Pin }) }
+BooleanValue = value:Boolean { return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte }) }
+ByteValue = value:Byte { return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte }) }
+AddressValue = value:Address { return InstructionNode.create('numberValue', { value, dataType: ValueType.Address }) }
+IntegerValue = value:Integer { return InstructionNode.create('numberValue', { value, dataType: ValueType.Integer }) }
+SignedIntegerValue = value:SignedInteger { return InstructionNode.create('numberValue', { value, dataType: ValueType.SignedInteger }) }
+StringValue = value:String { return InstructionNode.create('stringValue', { value, dataType: ValueType.String }) }
+NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null }) }
 NumberValue = IntegerValue / SignedIntegerValue
 Value "value" = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue / BooleanValue / NullValue
 

@@ -18,7 +18,6 @@ Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return par
 SignedInteger = signal:('-'/'+') int:Integer { return int * (signal === '-' ? -1 : 1) }
 String "string" = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
-// Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return [d, c, b, a] }
 Pin "pin" = 'pin ' pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
 LabelText = [a-z] [a-zA-Z0-9_]* { return text() }
 DefineLabel = '@' label:LabelText { return InstructionNode.create('defineLabel', { label }) }
@@ -33,4 +32,3 @@ ValueTypeMap =
   'uint' { return  ValueType.Integer } /
   'int' { return ValueType.SignedInteger } /
   'string' { return ValueType.String }
-

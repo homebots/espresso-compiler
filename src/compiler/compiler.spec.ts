@@ -1,4 +1,6 @@
 import { bytesToNumber, OpCodes, ValueType, compile } from '../index';
+import { Compiler } from './compiler';
+import { defaultPlugins } from './plugins';
 
 describe('Compiler', () => {
   it('should parse an empty program', () => {
@@ -27,6 +29,14 @@ describe('Compiler', () => {
         `,
       ),
     ).toThrow('Invalid value for $a. Expected Integer but found String');
+  });
+
+  it('should compile a list of nodes', () => {
+    const compiler = new Compiler();
+    const nodes = compiler.parse('halt');
+    const program = compiler.compile(nodes, defaultPlugins);
+
+    expect(program).toEqual([OpCodes.Halt]);
   });
 
   it('should delay execution for a given amount of time', () => {
@@ -228,24 +238,4 @@ describe('Compiler', () => {
       0,
     ]);
   });
-
-  // it('should calculate the program size correctly', () => {
-  //   const program = `
-  //   @begin
-  //   byte $a = ffh
-  //   byte $b = 01h
-
-  //   io all out
-  //   io mode pin 0, 1
-  //   io type pin 0, 1
-  //   io read $a, pin 0
-  //   byte $c = 0
-  //   $c = $a + $b
-  //   jump to label begin
-
-  //   `;
-
-  //   const bytes = compile(program);
-  //   expect(bytes).toHaveLength(34);
-  // });
 });

@@ -41,13 +41,13 @@ describe('operators', () => {
 
     const next = (expectedLine: string, expectedValue: unknown) => {
       clock.tick();
-      const line = output.lines.shift();
+      const line = output.lines.shift() as string;
 
       if (!line) {
         throw new Error(`Expected ${expectedLine} but got nothing`);
       }
 
-      expect(line?.join(' ')).toBe(expectedLine);
+      expect(line).toBe(expectedLine);
       expect(program.variables[0].value).toBe(expectedValue);
     };
 
@@ -85,7 +85,7 @@ describe('operators', () => {
 
     const program = emulator.load(bytes, clock, output);
 
-    clock.tick(2);
+    clock.tick(3);
     expect(program.variables[0].value).toBe('hello world');
   });
 });

@@ -1,5 +1,5 @@
 import { CompilationContext, CompilerPlugin } from '../compiler';
-import { DeclareIdentifierNode, InstructionNode, ValueType } from '../types';
+import { DeclareIdentifierNode, InstructionNode, UseIdentifierNode, ValueType } from '../types';
 
 export class FindIdentifiersPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
@@ -36,16 +36,25 @@ export class FindIdentifiersPlugin implements CompilerPlugin {
 
 export class ReplaceIdentifiersPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
-    const bytes = context.bytes.map((byte) => {
-      const node = byte as unknown as InstructionNode;
+    context.nodes.forEach((node) => this.walkNode(context, node));
 
-      if (node && typeof node === 'object' && InstructionNode.isOfType(node, 'useIdentifier')) {
-        return context.identifiers.get(node.name);
+    return context;
+  }
+
+  private walkNode(context: CompilationContext, node: InstructionNode): void {
+    if (InstructionNode.isOfType(node, 'useIdentifier')) {
+      this.replaceIdentifier(context, node);
+      return;
+    }
+
+    Object.keys(node).forEach((key) => {
+      if (typeof node[key] === 'object' && node[key] !== null) {
+        this.walkNode(context, node[key]);
       }
-
-      return byte;
     });
+  }
 
-    return { ...context, bytes };
+  private replaceIdentifier(context: CompilationContext, node: UseIdentifierNode) {
+    node.id = context.identifiers.get(node.name);
   }
 }

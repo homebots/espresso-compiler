@@ -25,12 +25,6 @@ describe('Blinky program', () => {
 
     clock.tick(5);
 
-    expect(output.lines.map((i: unknown[]) => i.join(' '))).toEqual([
-      'io write pin 0, 0',
-      'delay 1000',
-      'io write pin 0, 1',
-      'delay 1000',
-      'jump to 0',
-    ]);
+    expect(output.lines).toEqual(['io write pin 0, 0', 'delay 1000', 'io write pin 0, 1', 'delay 1000', 'jump to 0']);
   });
 });
