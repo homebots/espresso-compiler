@@ -1,8 +1,19 @@
 export default {
   cache: false,
+  maxWorkers: 1,
   clearMocks: true,
   collectCoverage: true,
-  coverageProvider: 'v8',
+  coverageProvider: 'babel',
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    'src/grammar.ts',
+    'src/compiler/parser.ts',
+    'src/index.ts',
+    'src/compiler/index.ts',
+    'src/compiler/plugins/index.ts',
+    'src/compiler/types/index.ts',
+    'src/emulator/index.ts',
+  ],
   coverageThreshold: {
     global: {
       branches: 100,
@@ -11,13 +22,16 @@ export default {
       statements: 100,
     },
   },
-  maxWorkers: 1,
   moduleFileExtensions: ['js', 'ts'],
   slowTestThreshold: 1,
   testEnvironment: 'node',
-  testMatch: ['**/*.spec.ts'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  verbose: true,
+  verbose: false,
+  globals: {
+    'ts-jest': {
+      tsConfig: '<rootDir>/tsconfig.build.json',
+    },
+  },
 };

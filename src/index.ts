@@ -1,3 +1,13 @@
-export function add(a: number, b: number) {
-  return a + b;
-}
+export * from './compiler';
+
+export {
+  Emulator,
+  Program,
+  Clock,
+  StepClock,
+  TimerClock,
+  CaptureOutput,
+  LogOutput,
+  NullOutput,
+  ProgramOutput,
+} from './emulator';

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules/**/*.ts", "src/**/*.spec.ts", "jest.config.ts"]
+}

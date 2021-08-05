@@ -1,12 +1,18 @@
 {
-  "name": "typescript-template",
-  "version": "1.0.0",
-  "description": "A template for Typescript projects",
-  "main": "index.js",
+  "name": "@homebots/espresso-compiler",
+  "version": "0.0.0",
+  "description": "Translate a program into bytecode for Homebots VM",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "lint": "eslint src/**/*.ts",
-    "ci": "npm ci && npm run lint && npm run test"
+    "ci": "npm ci && npm run lint && npm run test",
+    "build": "rm -rf dist/ && sh update-grammar.sh && npm run types && npm run package",
+    "types": "tsc --declaration -p tsconfig.build.json",
+    "package": "ncc build src/index.ts --minify --no-cache --target es2020",
+    "tdd": "jest --watchAll",
+    "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/compiler/parser.ts",
+    "all": "npm run build && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -23,9 +29,18 @@
   "homepage": "https://github.com/homebots/typescript-template#readme",
   "devDependencies": {
     "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "@vercel/ncc": "^0.28.6",
+    "eslint": "^7.28.0",
     "jest": "^27.0.4",
+    "prettier": "^2.3.2",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "@types/pegjs": "^0.10.2",
+    "pegjs": "^0.10.0"
   }
 }
