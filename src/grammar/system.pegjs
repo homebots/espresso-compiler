@@ -27,7 +27,7 @@ SignedIntegerValue = value:SignedInteger { return InstructionNode.create('number
 StringValue = value:String { return InstructionNode.create('stringValue', { value, dataType: ValueType.String }) }
 NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null }) }
 NumberValue = IntegerValue / SignedIntegerValue
-Value "value" = IdentifierValue / NumberValue / AddressValue / StringValue / ByteValue / BooleanValue / NullValue
+Value "value" = IdentifierValue / ByteValue / NumberValue / AddressValue / StringValue / BooleanValue / NullValue
 
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 

@@ -2349,13 +2349,13 @@ function peg$parse(input: string, options?: IParseOptions) {
     peg$silentFails++;
     s0 = peg$parseIdentifierValue();
     if ((s0 as any) === peg$FAILED) {
-      s0 = peg$parseNumberValue();
+      s0 = peg$parseByteValue();
       if ((s0 as any) === peg$FAILED) {
-        s0 = peg$parseAddressValue();
+        s0 = peg$parseNumberValue();
         if ((s0 as any) === peg$FAILED) {
-          s0 = peg$parseStringValue();
+          s0 = peg$parseAddressValue();
           if ((s0 as any) === peg$FAILED) {
-            s0 = peg$parseByteValue();
+            s0 = peg$parseStringValue();
             if ((s0 as any) === peg$FAILED) {
               s0 = peg$parseBooleanValue();
               if ((s0 as any) === peg$FAILED) {
