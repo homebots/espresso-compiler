@@ -516,24 +516,26 @@ function peg$parse(input: string, options?: IParseOptions) {
   const peg$c218 = function (): any {
     return ValueType.Byte;
   };
-  const peg$c219 = 'address';
-  const peg$c220 = peg$literalExpectation('address', false);
-  const peg$c221 = function (): any {
+  const peg$c219 = 'boolean';
+  const peg$c220 = peg$literalExpectation('boolean', false);
+  const peg$c221 = 'address';
+  const peg$c222 = peg$literalExpectation('address', false);
+  const peg$c223 = function (): any {
     return ValueType.Address;
   };
-  const peg$c222 = 'uint';
-  const peg$c223 = peg$literalExpectation('uint', false);
-  const peg$c224 = function (): any {
+  const peg$c224 = 'uint';
+  const peg$c225 = peg$literalExpectation('uint', false);
+  const peg$c226 = function (): any {
     return ValueType.Integer;
   };
-  const peg$c225 = 'int';
-  const peg$c226 = peg$literalExpectation('int', false);
-  const peg$c227 = function (): any {
+  const peg$c227 = 'int';
+  const peg$c228 = peg$literalExpectation('int', false);
+  const peg$c229 = function (): any {
     return ValueType.SignedInteger;
   };
-  const peg$c228 = 'string';
-  const peg$c229 = peg$literalExpectation('string', false);
-  const peg$c230 = function (): any {
+  const peg$c230 = 'string';
+  const peg$c231 = peg$literalExpectation('string', false);
+  const peg$c232 = function (): any {
     return ValueType.String;
   };
 
@@ -4651,57 +4653,74 @@ function peg$parse(input: string, options?: IParseOptions) {
       }
       if ((s1 as any) !== peg$FAILED) {
         peg$savedPos = s0;
-        s1 = peg$c221();
+        s1 = peg$c218();
       }
       s0 = s1;
       if ((s0 as any) === peg$FAILED) {
         s0 = peg$currPos;
-        if (input.substr(peg$currPos, 4) === peg$c222) {
-          s1 = peg$c222;
-          peg$currPos += 4;
+        if (input.substr(peg$currPos, 7) === peg$c221) {
+          s1 = peg$c221;
+          peg$currPos += 7;
         } else {
           s1 = peg$FAILED;
           if (peg$silentFails === 0) {
-            peg$fail(peg$c223);
+            peg$fail(peg$c222);
           }
         }
         if ((s1 as any) !== peg$FAILED) {
           peg$savedPos = s0;
-          s1 = peg$c224();
+          s1 = peg$c223();
         }
         s0 = s1;
         if ((s0 as any) === peg$FAILED) {
           s0 = peg$currPos;
-          if (input.substr(peg$currPos, 3) === peg$c225) {
-            s1 = peg$c225;
-            peg$currPos += 3;
+          if (input.substr(peg$currPos, 4) === peg$c224) {
+            s1 = peg$c224;
+            peg$currPos += 4;
           } else {
             s1 = peg$FAILED;
             if (peg$silentFails === 0) {
-              peg$fail(peg$c226);
+              peg$fail(peg$c225);
             }
           }
           if ((s1 as any) !== peg$FAILED) {
             peg$savedPos = s0;
-            s1 = peg$c227();
+            s1 = peg$c226();
           }
           s0 = s1;
           if ((s0 as any) === peg$FAILED) {
             s0 = peg$currPos;
-            if (input.substr(peg$currPos, 6) === peg$c228) {
-              s1 = peg$c228;
-              peg$currPos += 6;
+            if (input.substr(peg$currPos, 3) === peg$c227) {
+              s1 = peg$c227;
+              peg$currPos += 3;
             } else {
               s1 = peg$FAILED;
               if (peg$silentFails === 0) {
-                peg$fail(peg$c229);
+                peg$fail(peg$c228);
               }
             }
             if ((s1 as any) !== peg$FAILED) {
               peg$savedPos = s0;
-              s1 = peg$c230();
+              s1 = peg$c229();
             }
             s0 = s1;
+            if ((s0 as any) === peg$FAILED) {
+              s0 = peg$currPos;
+              if (input.substr(peg$currPos, 6) === peg$c230) {
+                s1 = peg$c230;
+                peg$currPos += 6;
+              } else {
+                s1 = peg$FAILED;
+                if (peg$silentFails === 0) {
+                  peg$fail(peg$c231);
+                }
+              }
+              if ((s1 as any) !== peg$FAILED) {
+                peg$savedPos = s0;
+                s1 = peg$c232();
+              }
+              s0 = s1;
+            }
           }
         }
       }
