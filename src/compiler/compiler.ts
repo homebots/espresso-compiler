@@ -1,4 +1,4 @@
-import parser from './parser';
+import { parse } from './parser';
 import { InstructionNode, ValueType } from './types';
 
 export type ByteArray = Array<number>;
@@ -21,8 +21,6 @@ interface ParseError {
 }
 
 export class Compiler {
-  private parser = parser();
-
   parse(code: string): Array<InstructionNode> {
     code = code.trim();
 
@@ -30,7 +28,7 @@ export class Compiler {
       return [];
     }
 
-    return this.parser.parse(code).flat(2);
+    return parse(code).flat(2);
   }
 
   compile<P extends CompilerPlugin[]>(code: Array<InstructionNode>, plugins?: P): ByteArray;

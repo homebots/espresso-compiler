@@ -1,6 +1,7 @@
 node_modules/
 coverage/
 .vscode/
+tmp/
 dist/
 grammar.out
 grammar.pegjs
