@@ -1,22 +1,21 @@
 {
   "name": "@homebots/espresso-compiler",
   "version": "0.0.0",
-  "description": "Translate a program into bytecode for Homebots VM",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Compiler from Espresso language to bytecode used by Homebots VM",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "ci": "npm ci && npm run lint && npm run test",
+    "ci": "npm ci && npm run build && npm run lint && npm run test",
     "build": "rm -rf dist/ && sh update-grammar.sh && npm run types && npm run package",
     "types": "tsc --declaration -p tsconfig.build.json",
     "package": "ncc build src/index.ts --minify --no-cache --target es2020",
-    "tdd": "jest --watchAll",
     "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/compiler/parser.ts",
-    "all": "npm run build && npm run lint && npm run test"
+    "tdd": "jest --watchAll"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/homebots/typescript-template.git"
+    "url": "https://github.com/homebots/espresso-compiler.git"
   },
   "keywords": [
     "homebots"
@@ -24,9 +23,9 @@
   "author": "Darlan Alves <me@darlanalv.es>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/homebots/typescript-template/issues"
+    "url": "https://github.com/homebots/espresso-compiler/issues"
   },
-  "homepage": "https://github.com/homebots/typescript-template#readme",
+  "homepage": "https://github.com/homebots/espresso-compiler#readme",
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
@@ -39,8 +38,5 @@
     "ts-node": "^10.0.0",
     "ts-pegjs": "^1.1.1",
     "typescript": "^4.3.2"
-  },
-  "dependencies": {
-    "@types/pegjs": "^0.10.2"
   }
 }
