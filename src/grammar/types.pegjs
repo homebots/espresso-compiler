@@ -10,7 +10,6 @@ Digit "0..9" = [0-9]
 NonZeroDigit "1..9" = [1-9]
 Alpha "a-z" = [a-z]i
 Alphanumeric "a-z or 0-9" = [a-z0-9]i
-PinMode "pin mode" = mode:[0-3] { return Number(mode) }
 True = ('true' / '1') { return 1 }
 False = ('false' / '0') { return 0 }
 Boolean = True / False
@@ -25,6 +24,13 @@ Label = label:LabelText { return InstructionNode.create('label', { label }) }
 Identifier "identifier" = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 IdentifierChar = Alphanumeric / "$" / "_"
 UseIdentifier = name:Identifier { return InstructionNode.create('useIdentifier', { name }) }
+
+PinMode "pin mode" = PinModeInputPullUp / PinModeOpenDrain / PinModeInput / PinModeOutput
+
+PinModeInput = ('input' / '0') { return 0 }
+PinModeOutput = ('output' / '1' ) { return 1 }
+PinModeOpenDrain = ('open-drain' / '2') { return 2 }
+PinModeInputPullUp = ('input pull-up' / '3') { return 3 }
 
 ValueTypeMap =
   'byte' { return ValueType.Byte } /

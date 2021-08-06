@@ -53,6 +53,8 @@ export class Program {
 
   counter = 0;
   pins: number[] = Array(16).fill(0);
+  pinModes: number[] = Array(16).fill(0);
+  pinTypes: number[] = Array(16).fill(0);
   variables: Value[] = Array(0xff);
 
   private endOfTheProgram = 0;
@@ -87,6 +89,10 @@ export class Program {
 
       case OpCodes.IoWrite:
         this.ioWrite();
+        break;
+
+      case OpCodes.IoMode:
+        this.ioMode();
         break;
 
       case OpCodes.Not:
@@ -214,6 +220,14 @@ export class Program {
 
     this.pins[pin] = value.toNumber();
     this.trace(`io write pin ${pin}, ${value}`);
+  }
+
+  ioMode(): void {
+    const pin = this.readByte();
+    const value = this.readByte();
+
+    this.pinModes[pin] = value;
+    this.trace(`io mode pin ${pin}, ${value}`);
   }
 
   delay(): void {

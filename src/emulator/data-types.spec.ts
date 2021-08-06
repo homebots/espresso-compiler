@@ -40,4 +40,40 @@ describe('data types', () => {
       'halt',
     ]);
   });
+
+  it('should support pin modes as string or number', () => {
+    const program = `
+    io mode pin 1, input
+    io mode pin 1, output
+    io mode pin 1, open-drain
+    io mode pin 1, input pull-up
+
+    io mode pin 1, 0
+    io mode pin 1, 1
+    io mode pin 1, 2
+    io mode pin 1, 3
+    `;
+
+    const output = new CaptureOutput();
+    const emulator = new Emulator();
+    const stepper = new StepClock();
+    const bytes = compile(program);
+
+    emulator.load(bytes, stepper, output);
+
+    stepper.run();
+
+    expect(output.lines).toEqual([
+      'io mode pin 1, 0',
+      'io mode pin 1, 1',
+      'io mode pin 1, 2',
+      'io mode pin 1, 3',
+
+      'io mode pin 1, 0',
+      'io mode pin 1, 1',
+      'io mode pin 1, 2',
+      'io mode pin 1, 3',
+      'halt',
+    ]);
+  });
 });
