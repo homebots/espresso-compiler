@@ -1,0 +1,10 @@
+.github/
+src/
+coverage/
+.gitignore
+.eslintrc.js
+.prettierrc
+jest*
+peg-config.json
+tsconfig*
+update-grammar.sh
