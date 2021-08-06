@@ -40,7 +40,7 @@ export class Compiler {
 
       return bytes;
     } catch (error) {
-      this.handleError(error, String(code));
+      this.handleError(error, String(code).trim());
     }
   }
 

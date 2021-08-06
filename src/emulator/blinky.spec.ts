@@ -1,7 +1,7 @@
 import { CaptureOutput, compile, Emulator, StepClock } from '../index';
 
 describe('Blinky program', () => {
-  it('should run blinky', () => {
+  it.only('should run blinky', () => {
     const emulator = new Emulator();
     const clock = new StepClock();
     const output = new CaptureOutput();
@@ -10,9 +10,11 @@ describe('Blinky program', () => {
       // blinks a pin and loops back to zero
       // using tick() instead of run() to avoid infinite loop
       @begin
-      io write pin 0, 0
+      byte $value = 0h
+      io write pin 0, $value
       delay 1000
-      io write pin 0, 1
+      $value = not $value
+      io write pin 0, $value
       delay 1000
       jump to label begin
       `,
@@ -23,8 +25,16 @@ describe('Blinky program', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    clock.tick(5);
+    clock.tick(7);
 
-    expect(output.lines).toEqual(['io write pin 0, 0', 'delay 1000', 'io write pin 0, 1', 'delay 1000', 'jump to 0']);
+    expect(output.lines).toEqual([
+      'declare #0, 2, 0',
+      'io write pin 0, 0',
+      'delay 1000',
+      '#0 = not #0',
+      'io write pin 0, 1',
+      'delay 1000',
+      'jump to 0',
+    ]);
   });
 });

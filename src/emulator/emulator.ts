@@ -222,7 +222,7 @@ export class Program {
 
     value.id = id;
     this.variables[id] = value;
-    this.trace(`declare ${value.id}, ${value.dataType}, ${value.toString()}`);
+    this.trace(`declare #${value.id}, ${value.dataType}, ${value.toString()}`);
   }
 
   notOperator(): void {
