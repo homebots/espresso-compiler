@@ -51,9 +51,9 @@ describe('operators', () => {
       expect(program.variables[0].value).toBe(expectedValue);
     };
 
-    next('declare #0, 5, 1', 1);
-    next('declare #1, 5, 2', 1);
-    next('declare #2, 5, 4', 1);
+    next('declare #0, Integer, 1', 1);
+    next('declare #1, Integer, 2', 1);
+    next('declare #2, Integer, 4', 1);
     next(`#0 = #1 ${OpCodes.Add} #2`, 6);
     next(`#0 = #1 ${OpCodes.Sub} #2`, -2);
     next(`#0 = #1 ${OpCodes.Mul} #2`, 8);

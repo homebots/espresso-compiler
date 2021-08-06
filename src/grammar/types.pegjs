@@ -28,6 +28,7 @@ UseIdentifier = name:Identifier { return InstructionNode.create('useIdentifier',
 
 ValueTypeMap =
   'byte' { return ValueType.Byte } /
+  'boolean' { return ValueType.Byte } /
   'address' { return ValueType.Address } /
   'uint' { return  ValueType.Integer } /
   'int' { return ValueType.SignedInteger } /

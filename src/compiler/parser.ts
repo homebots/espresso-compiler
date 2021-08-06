@@ -2351,9 +2351,9 @@ function peg$parse(input: string, options?: IParseOptions) {
     if ((s0 as any) === peg$FAILED) {
       s0 = peg$parseByteValue();
       if ((s0 as any) === peg$FAILED) {
-        s0 = peg$parseNumberValue();
+        s0 = peg$parseAddressValue();
         if ((s0 as any) === peg$FAILED) {
-          s0 = peg$parseAddressValue();
+          s0 = peg$parseNumberValue();
           if ((s0 as any) === peg$FAILED) {
             s0 = peg$parseStringValue();
             if ((s0 as any) === peg$FAILED) {

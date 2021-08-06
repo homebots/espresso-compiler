@@ -2,6 +2,9 @@ import { bytesToNumber, OpCodes, ValueType } from '../compiler';
 import { Clock, TimerClock } from './clock';
 import { NullOutput, ProgramOutput } from './output';
 
+const maximumSignedInteger = 2147483647;
+const maximumUnsignedInteger = 4294967296;
+
 const binaryOperatorTable: Record<number, (a: string | number, b: string | number) => unknown> = {
   [OpCodes.Gte]: (a, b) => Number(a >= b),
   [OpCodes.Gt]: (a, b) => Number(a > b),
@@ -114,7 +117,7 @@ export class Program {
         break;
 
       default:
-        throw new Error(`Invalid opcode: ${next}`);
+        throw new Error(`${this.counter}: Invalid opcode: ${next}`);
     }
 
     if (this.counter >= this.endOfTheProgram) {
@@ -173,6 +176,16 @@ export class Program {
         value = this.readNumber();
         break;
 
+      case ValueType.SignedInteger:
+        // [-2147483648 to 2147483647]
+        value = this.readNumber();
+
+        if (value > maximumSignedInteger) {
+          value = (maximumUnsignedInteger - value) * -1;
+        }
+
+        break;
+
       case ValueType.String:
         value = this.readString();
         break;
@@ -222,7 +235,7 @@ export class Program {
 
     value.id = id;
     this.variables[id] = value;
-    this.trace(`declare #${value.id}, ${value.dataType}, ${value.toString()}`);
+    this.trace(`declare #${value.id}, ${ValueType[value.dataType]}, ${value.toString()}`);
   }
 
   notOperator(): void {
