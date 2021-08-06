@@ -197,7 +197,7 @@ function peg$parse(input: string, options?: IParseOptions) {
   const peg$c9 = 'io type';
   const peg$c10 = peg$literalExpectation('io type', false);
   const peg$c11 = function (pin: any, pinType: any): any {
-    return InstructionNode.create('ioType', { pin, pinType });
+    return InstructionNode.create('ioType', { pin, pinType: Number(pinType) });
   };
   const peg$c12 = 'io all out';
   const peg$c13 = peg$literalExpectation('io all out', false);
