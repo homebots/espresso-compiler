@@ -31,6 +31,28 @@ describe('Compiler', () => {
     ).toThrow('Invalid value for $a. Expected Integer but found String');
   });
 
+  it('should not allow assigning one variable to another if types do not match', () => {
+    expect(() =>
+      compile(
+        `uint $a = 1
+         byte $b = 0h
+
+         $a = $b
+        `,
+      ),
+    ).toThrow('Invalid value for $a. Expected Integer but found Byte');
+  });
+
+  it('should not allow using identifiers that were not declared', () => {
+    expect(() =>
+      compile(
+        `uint $a = 123
+         print $b
+        `,
+      ),
+    ).toThrow('Identifier not found: $b');
+  });
+
   it('should compile a list of nodes', () => {
     const compiler = new Compiler();
     const nodes = compiler.parse('halt');

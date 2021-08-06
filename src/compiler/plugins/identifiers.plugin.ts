@@ -55,6 +55,10 @@ export class ReplaceIdentifiersPlugin implements CompilerPlugin {
   }
 
   private replaceIdentifier(context: CompilationContext, node: UseIdentifierNode) {
+    if (!context.identifiers.has(node.name)) {
+      throw new Error(`Identifier not found: ${node.name}`);
+    }
+
     node.id = context.identifiers.get(node.name);
   }
 }
