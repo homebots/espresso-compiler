@@ -15,6 +15,10 @@ export interface NodeTypeToNodeMap {
   stringValue: StringValueNode;
   identifierValue: IdentifierValueNode;
 
+  // functions
+  function: FunctionNode;
+  call: FunctionCallNode;
+
   // operators
   assign: AssignOperationNode;
   unaryOperation: UnaryOperationNode;
@@ -110,6 +114,24 @@ export interface DeclareIdentifierNode<T extends ValueNodePrimities = ValueNodeP
   value: ValueNode<T>;
   name: string;
   id?: number;
+}
+
+export interface FunctionNode extends InstructionNode {
+  dataType: IdentifierType;
+  name: string;
+  args: FunctionArgumentNode[];
+  id?: number;
+}
+
+export interface FunctionCallNode extends InstructionNode {
+  name: string;
+  inputs: FunctionArgumentNode[];
+}
+
+export interface FunctionArgumentNode {
+  dataType: IdentifierType;
+  name: string;
+  value?: ValueNode;
 }
 
 export interface UseIdentifierNode extends InstructionNode {

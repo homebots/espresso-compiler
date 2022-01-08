@@ -43,15 +43,15 @@ describe('data types', () => {
 
   it('should support pin modes as string or number', () => {
     const program = `
-    io mode pin 1, input
-    io mode pin 1, output
-    io mode pin 1, open-drain
-    io mode pin 1, input pull-up
+    io mode !1, input
+    io mode !1, output
+    io mode !1, open-drain
+    io mode !1, input pull-up
 
-    io mode pin 1, 0
-    io mode pin 1, 1
-    io mode pin 1, 2
-    io mode pin 1, 3
+    io mode !1, 0
+    io mode !1, 1
+    io mode !1, 2
+    io mode !1, 3
     `;
 
     const output = new CaptureOutput();

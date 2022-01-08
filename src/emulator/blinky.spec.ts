@@ -11,10 +11,10 @@ describe('Blinky program', () => {
       // using tick() instead of run() to avoid infinite loop
       @begin
       byte $value = 0h
-      io write pin 0, $value
+      io write !0, $value
       delay 1000
       $value = not $value
-      io write pin 0, $value
+      io write !0, $value
       delay 1000
       jump to label begin
       `,
