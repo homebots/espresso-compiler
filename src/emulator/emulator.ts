@@ -1,6 +1,6 @@
-import { bytesToNumber, OpCodes, ValueType } from '../compiler';
-import { Clock, TimerClock } from './clock';
-import { NullOutput, ProgramOutput } from './output';
+import { bytesToNumber, OpCodes, ValueType } from '../compiler/index.js';
+import { Clock, TimerClock } from './clock.js';
+import { NullOutput, ProgramOutput } from './output.js';
 
 const maximumSignedInteger = 2147483647;
 const maximumUnsignedInteger = 4294967296;

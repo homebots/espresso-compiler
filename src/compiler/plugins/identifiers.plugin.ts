@@ -1,5 +1,5 @@
-import { CompilationContext, CompilerPlugin } from '../compiler';
-import { DeclareIdentifierNode, InstructionNode, UseIdentifierNode, ValueType } from '../types';
+import { CompilationContext, CompilerPlugin } from '../compiler.js';
+import { DeclareIdentifierNode, InstructionNode, UseIdentifierNode, ValueType } from '../types/index.js';
 
 export class FindIdentifiersPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {

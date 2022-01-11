@@ -1,0 +1,10 @@
+// blinks a pin and loops back to zero
+// using tick() instead of run() to avoid infinite loop
+@begin
+byte $value = 0h
+io write !0, $value
+delay 1000
+$value = not $value
+io write !0, $value
+delay 1000
+jump to label begin
