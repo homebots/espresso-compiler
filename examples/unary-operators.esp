@@ -1,0 +1,11 @@
+int $number = 0
+boolean $bool = false;
+
+$number++
+print $number
+
+$number--
+print $number
+
+$bool = !$number
+print $bool

@@ -1,5 +1,5 @@
-import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants.js';
-import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion.js';
+import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants';
+import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-conversion';
 
 export interface NodeTypeToNodeMap {
   comment: InstructionNode;
@@ -31,7 +31,7 @@ export interface NodeTypeToNodeMap {
   noop: InstructionNode;
   systemInfo: InstructionNode;
   dump: InstructionNode;
-  print: NodeWithSingleValue<ValueNode<ValueNodePrimities>>;
+  print: PrintNode;
   debug: NodeWithSingleValue<number>;
   delay: NodeWithSingleValue<ValueNode<number>>;
   sleep: NodeWithSingleValue<ValueNode<number>>;
@@ -104,6 +104,10 @@ export enum ValueType {
 
 export interface NodeWithSingleValue<T> extends InstructionNode {
   value: T;
+}
+
+export interface PrintNode extends InstructionNode {
+  values: ValueNode<ValueNodePrimities>[];
 }
 
 export type IdentifierType = ValueType.Byte | ValueType.Integer | ValueType.SignedInteger | ValueType.String;
@@ -255,7 +259,7 @@ Object.assign(serializers, <typeof serializers>{
   dump: () => [OpCodes.Dump],
   debug: (node) => [OpCodes.Debug, node.value],
   delay: (node) => [OpCodes.Delay, ...serializeValue(node.value)],
-  print: (node) => [OpCodes.Print, ...serializeValue(node.value)],
+  print: (node) => node.values.map((v) => [OpCodes.Print, ...serializeValue(v)]).flat(2),
   sleep: (node) => [OpCodes.Sleep, ...serializeValue(node.value)],
   yield: (node) => [OpCodes.Yield, ...serializeValue(node.value)],
   assign: (node) => [OpCodes.Assign, ...serializeValue(node.target), ...serializeValue(node.value)],
@@ -306,7 +310,7 @@ Object.assign(sizeOf, <typeof sizeOf>{
   systemInfo: () => 1,
   dump: () => 1,
   debug: () => 2,
-  print: (node) => 1 + serializeValue(node.value).length,
+  print: (node) => node.values.reduce((a, v) => a + 1 + serializeValue(v).length, 1),
   delay: (node) => 1 + serializeValue(node.value).length,
   sleep: (node) => 1 + serializeValue(node.value).length,
   yield: (node) => 1 + serializeValue(node.value).length,

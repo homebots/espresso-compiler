@@ -1,5 +1,5 @@
-import { CompilationContext, CompilerPlugin } from '../compiler.js';
-import { InstructionNode, ValueType } from '../types/index.js';
+import { CompilationContext, CompilerPlugin } from '../compiler';
+import { InstructionNode, ValueType } from '../types/index';
 
 export class CheckTypesPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {

@@ -1,18 +1,18 @@
 export default {
-  cache: false,
-  maxWorkers: 1,
+  // cache: false,
+  maxWorkers: 4,
   clearMocks: true,
   collectCoverage: true,
   coverageProvider: 'babel',
   coveragePathIgnorePatterns: [
     '/node_modules/',
-    'src/grammar.ts',
-    'src/compiler/parser.ts',
-    'src/index.ts',
-    'src/compiler/index.ts',
-    'src/compiler/plugins/index.ts',
-    'src/compiler/types/index.ts',
-    'src/emulator/index.ts',
+    'tests/grammar.ts',
+    'tests/compiler/parser.ts',
+    'tests/index.ts',
+    'tests/compiler/index.ts',
+    'tests/compiler/plugins/index.ts',
+    'tests/compiler/types/index.ts',
+    'tests/emulator/index.ts',
   ],
   coverageThreshold: {
     global: {
@@ -23,15 +23,21 @@ export default {
     },
   },
   moduleFileExtensions: ['js', 'ts'],
-  slowTestThreshold: 1,
+  slowTestThreshold: 2,
   testEnvironment: 'node',
+  verbose: false,
+
+  // preset: 'ts-jest/presets/default-esm',
   transform: {
+    // '^.+\\.js$': 'babel-jest',
     '^.+\\.ts$': 'ts-jest',
   },
-  verbose: false,
+  // transformIgnorePatterns: ['node_modules/(?!((jest-)?react-native|@react-native(-community)?)/)'],
+  extensionsToTreatAsEsm: ['.ts'],
   globals: {
     'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.build.json',
+      // useESM: true,
+      // tsConfig: '<rootDir>/tsconfig.test.json',
     },
   },
 };

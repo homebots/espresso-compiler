@@ -1,4 +1,4 @@
-import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types';
+import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types/index';
 
 describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
   const createIdentifier = (id: number) =>
@@ -143,10 +143,10 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('print', () => {
       const node = InstructionNode.create('print', {
-        value: InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Integer }),
+        values: [InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Integer })],
       });
 
-      expect(InstructionNode.sizeOf(node)).toBe(6);
+      expect(InstructionNode.sizeOf(node)).toBe(7);
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.Print, ValueType.Integer, 0xe8, 0x03, 0, 0]);
     });
 

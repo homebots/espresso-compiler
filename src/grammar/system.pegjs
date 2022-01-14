@@ -28,6 +28,7 @@ StringValue = value:String { return InstructionNode.create('stringValue', { valu
 NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null }) }
 NumberValue = IntegerValue / SignedIntegerValue
 Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue  / StringValue / BooleanValue / NullValue
+ValueArray "values" = head:Value tail:("," Space* @Value Space*)* { return [head, ...tail.map(v => v[2])] }
 
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
@@ -37,7 +38,8 @@ Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 Dump = 'dump' { return InstructionNode.create('dump') }
 Debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
-Print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
+Print = 'print' Spaces values:ValueArray { return InstructionNode.create('print', { values }) }
+
 
 Delay =
   'delay' Spaces value:IntegerValue { return InstructionNode.create('delay', { value }) } /

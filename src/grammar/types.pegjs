@@ -2,9 +2,9 @@
 HexDigit "hexadecimal" = [0-9a-f]
 HexByte "byte hex" = HexDigit HexDigit { return text() }
 Byte "Byte" = a:HexDigit b:HexDigit? 'h' { return parseInt(a + b, 16) }
+NewLine "new line" = [\n]
+Spaces = Space*
 Space = [ \t]
-Spaces "space" = Space*
-NewLine "new line" = [\n]+
 Separator "separator" = ',' Spaces
 Digit "0..9" = [0-9]
 NonZeroDigit "1..9" = [1-9]
@@ -15,9 +15,9 @@ False = ('false' / '0') { return 0 }
 Boolean = True / False
 Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
 SignedInteger = signal:('-'/'+') int:Integer { return int * (signal === '-' ? -1 : 1) }
-String "string" = "'" string:(!"'" .)* "'" { return text().slice(1, -1).split('') }
+String "string" = "'" string:(!"'" .)* "'" { return text().slice(1, -1).replaceAll(/\\n/g, '\n').split('') }
 Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
-Pin "pin" = '!' pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
+Pin "pin" = '!' pin:('0' / '1' / '2' / '3') { return Number(pin) }
 LabelText = [a-z] [a-zA-Z0-9_]* { return text() }
 DefineLabel = '@' label:LabelText { return InstructionNode.create('defineLabel', { label }) }
 Label = label:LabelText { return InstructionNode.create('label', { label }) }
@@ -33,9 +33,11 @@ PinModeOpenDrain = ('open-drain' / '2') { return 2 }
 PinModeInputPullUp = ('input pull-up' / '3') { return 3 }
 
 ValueTypeMap =
+  ('null' / 'void' / 'none') { return ValueType.Null } /
+  'pin' { return ValueType.Pin } /
   'byte' { return ValueType.Byte } /
   'boolean' { return ValueType.Byte } /
   'address' { return ValueType.Address } /
   'uint' { return  ValueType.Integer } /
   'int' { return ValueType.SignedInteger } /
-  'string' { return ValueType.String }
+  ('string'/'text') { return ValueType.String }

@@ -4,7 +4,7 @@ FP =
   e:(DeclareIdentifier / Assign / FunctionCall)* space? { return e.flat(2) }
 
 DefineFunction =
-  'fn' space+ name:FunctionName space+ args:FunctionArguments space+ ':' space+ dataType:ValueTypeMap { return InstructionNode.create('function', { name, dataType, args }) }
+  ('def'/'fn') space+ name:FunctionName space+ args:FunctionArguments space+ ':' space+ dataType:ValueTypeMap NewLine body:Program NewLine 'end' NewLine { return InstructionNode.create('function', { name, dataType, args }) }
 
 FunctionName =
   head:[a-zA-Z] tail:[a-z0-9_A-Z]* { return text() }

@@ -1,5 +1,6 @@
-export * from './nodes.js';
-export * from './constants.js';
+export * from './nodes';
+export * from './constants';
+
 export {
   bytesToNumber,
   numberToInt32,
@@ -7,4 +8,4 @@ export {
   stringToBytes,
   stringToHexBytes,
   charArrayToBytes,
-} from './data-convertion.js';
+} from './data-conversion';

@@ -1,8 +1,8 @@
-import { CompilerPlugin } from '../compiler.js';
-import { CheckTypesPlugin } from './check-types.plugin.js';
-import { FindIdentifiersPlugin, ReplaceIdentifiersPlugin } from './identifiers.plugin.js';
-import { FindLabelsPlugin, ReplaceLabelReferencesPlugin } from './references.plugin.js';
-import { SerializePlugin } from './serialize.plugin.js';
+import { CompilerPlugin } from '../compiler';
+import { CheckTypesPlugin } from './check-types.plugin';
+import { FindIdentifiersPlugin, ReplaceIdentifiersPlugin } from './identifiers.plugin';
+import { FindLabelsPlugin, ReplaceLabelReferencesPlugin } from './references.plugin';
+import { SerializePlugin } from './serialize.plugin';
 
 export const defaultPlugins: CompilerPlugin[] = [
   new FindIdentifiersPlugin(),

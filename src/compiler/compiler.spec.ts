@@ -1,6 +1,6 @@
 import { bytesToNumber, OpCodes, ValueType, compile } from '../index';
 import { Compiler } from './compiler';
-import { defaultPlugins } from './plugins';
+import { defaultPlugins } from './plugins/index';
 
 describe('Compiler', () => {
   it('should parse an empty program', () => {
@@ -127,9 +127,7 @@ describe('Compiler', () => {
   it('should print values to serial output', () => {
     const program = `
     print 1048576
-    print 'foo'
-    print 5
-    print -128
+    print 'foo', 5, -128
     `;
     const characters = 'foo'.split('').map((c) => c.charCodeAt(0));
     const output = compile(program);
