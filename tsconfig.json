@@ -1,16 +1,8 @@
 {
+  "extends": "./node_modules/@homebots/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
     "rootDir": "./src/",
-    "outDir": "./dist/",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "target": "esnext",
-    "lib": ["ESNext", "DOM"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "outDir": "./dist/"
   },
   "include": ["src/**/*.ts"]
 }

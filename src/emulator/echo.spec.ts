@@ -1,11 +1,11 @@
-import { compile, StepClock, Emulator, CaptureOutput } from '../index';
+import { compile, StepperClock, Emulator, CaptureOutput } from '../index';
 
 describe('prints back to serial output', () => {
   it('should print a string', () => {
     const program = `print 'hello world!'`;
     const output = new CaptureOutput();
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = compile(program);
 
     emulator.load(bytes, stepper, output);

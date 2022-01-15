@@ -1,7 +1,4 @@
-import { compile } from '../compiler';
-import { StepClock } from './clock';
-import { Emulator } from './emulator';
-import { CaptureOutput } from './output';
+import { CaptureOutput, compile, Emulator, StepperClock } from '../index';
 
 describe('data types', () => {
   it('should initialise variables with different data types', () => {
@@ -19,7 +16,7 @@ describe('data types', () => {
 
     const output = new CaptureOutput();
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = compile(program);
 
     emulator.load(bytes, stepper, output);
@@ -27,15 +24,15 @@ describe('data types', () => {
     stepper.run();
 
     expect(output.lines).toEqual([
-      'declare #0, Byte, 1',
-      'declare #1, Byte, 1',
-      'declare #2, SignedInteger, -1',
-      'declare #3, SignedInteger, -2147483648',
-      'declare #4, SignedInteger, -2147483647',
-      'declare #5, SignedInteger, 2147483647',
-      'declare #6, Integer, 123',
-      'declare #7, String, hello',
-      'declare #8, Address, 5521153',
+      'declare #0 Byte 1',
+      'declare #1 Byte 1',
+      'declare #2 SignedInteger -1',
+      'declare #3 SignedInteger -2147483648',
+      'declare #4 SignedInteger -2147483647',
+      'declare #5 SignedInteger 2147483647',
+      'declare #6 Integer 123',
+      'declare #7 String hello',
+      'declare #8 Address 5521153',
 
       'halt',
     ]);
@@ -56,7 +53,7 @@ describe('data types', () => {
 
     const output = new CaptureOutput();
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = compile(program);
 
     emulator.load(bytes, stepper, output);

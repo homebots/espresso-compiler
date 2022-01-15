@@ -3,8 +3,8 @@ HexDigit "hexadecimal" = [0-9a-f]
 HexByte "byte hex" = HexDigit HexDigit { return text() }
 Byte "Byte" = a:HexDigit b:HexDigit? 'h' { return parseInt(a + b, 16) }
 NewLine "new line" = [\n]
-Spaces = Space*
-Space = [ \t]
+Spaces "spaces" = Space*
+Space "space" = [ \t]
 Separator "separator" = ',' Spaces
 Digit "0..9" = [0-9]
 NonZeroDigit "1..9" = [1-9]
@@ -36,8 +36,8 @@ ValueTypeMap =
   ('null' / 'void' / 'none') { return ValueType.Null } /
   'pin' { return ValueType.Pin } /
   'byte' { return ValueType.Byte } /
-  'boolean' { return ValueType.Byte } /
+  ('boolean' / 'bool') { return ValueType.Byte } /
   'address' { return ValueType.Address } /
   'uint' { return  ValueType.Integer } /
   'int' { return ValueType.SignedInteger } /
-  ('string'/'text') { return ValueType.String }
+  ('string' / 'text') { return ValueType.String }

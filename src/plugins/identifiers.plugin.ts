@@ -1,4 +1,4 @@
-import { CompilationContext, CompilerPlugin } from '../compiler';
+import { CompilationContext, CompilerPlugin } from '../compiler/compiler';
 import { DeclareIdentifierNode, InstructionNode, UseIdentifierNode, ValueType } from '../types/index';
 
 export class FindIdentifiersPlugin implements CompilerPlugin {

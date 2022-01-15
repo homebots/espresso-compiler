@@ -1,19 +1,24 @@
 // blinks a pin and loops back
+
 print 'blinking pin 0\n'
 
 boolean $on = true
 boolean $off = false
 boolean $value = false
 
-@begin
+fn blink:
   print 'set pin 0 to ', $value, '\n'
   io write !0, $value
   delay 1000
+end
 
+fn toggle: void
+  blink()
   $value = $on
-  print 'set pin 0 to ', $value, '\n'
-  io write !0, $value
-  delay 1000
-
+  blink()
   $value = $off
+end
+
+@begin
+  toggle()
   jump to label begin

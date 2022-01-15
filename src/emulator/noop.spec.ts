@@ -1,11 +1,9 @@
-import { compile } from '../compiler';
-import { StepClock } from './clock';
-import { Emulator } from './emulator';
+import { compile, Emulator, StepperClock } from '../index';
 
 describe('noop', () => {
   it('should run one instruction and halt program', async () => {
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = compile(`
     noop
     halt
@@ -23,7 +21,7 @@ describe('noop', () => {
 
   it('should stop program if there are no further instruction', async () => {
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = compile(
       `noop
        noop`,

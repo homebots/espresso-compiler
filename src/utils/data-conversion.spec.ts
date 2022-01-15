@@ -1,12 +1,13 @@
+import { compile } from '../index';
+// import { OpCodes } from '../types';
 import {
   stringToHexBytes,
   bytesToNumber,
   numberToInt32,
-  compile,
   stringToBytes,
   numberToUnsignedInt32,
   charArrayToBytes,
-} from './index';
+} from './data-conversion';
 
 describe('data helpers', () => {
   describe('numberToInt32', () => {
@@ -56,49 +57,6 @@ describe('data helpers', () => {
   describe('charArrayToBytes', () => {
     it('should convert a string into bytes', () => {
       expect(charArrayToBytes(['f', 'o', 'o'])).toEqual([102, 111, 111, 0]);
-    });
-  });
-
-  describe('identifiers', () => {
-    it('should throw error if an identifier is redeclared', () => {
-      expect(() =>
-        compile(`
-        byte $a = 0
-        byte $a = 0
-      `),
-      ).toThrowError('Cannot redeclare identifier: $a');
-    });
-
-    it('should throw error if too many identifiers are declared', () => {
-      const nodes = Array(256)
-        .fill(0)
-        .map((_, i) => 'byte $v' + i + ' = 0');
-
-      const source = nodes.join('\n');
-
-      expect(() => compile(source)).toThrowError('Too many identifiers');
-    });
-  });
-
-  describe('types and length', () => {
-    it('should calculate the size of data types correctly', () => {
-      const program = `
-      byte $a = ffh
-      uint $b = 1
-      int $c = +1
-      string $d = 'hello'
-      `;
-
-      const bytes = compile(program);
-      expect(bytes).toHaveLength(27);
-    });
-  });
-
-  describe('variable declaration', () => {
-    it('should throw an error if a declared variable does not match the initial value', () => {
-      const program = `byte $a = 'foo'`;
-
-      expect(() => compile(program)).toThrowError('Invalid value. Expected Byte but found String');
     });
   });
 });

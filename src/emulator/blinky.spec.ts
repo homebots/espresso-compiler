@@ -1,9 +1,9 @@
-import { CaptureOutput, compile, Emulator, StepClock } from '../index';
+import { CaptureOutput, compile, Emulator, StepperClock } from '../index';
 
 describe('Blinky program', () => {
-  it.only('should run blinky', () => {
+  it('should run blinky', () => {
     const emulator = new Emulator();
-    const clock = new StepClock();
+    const clock = new StepperClock();
     const output = new CaptureOutput();
     const bytes = compile(
       `
@@ -28,7 +28,7 @@ describe('Blinky program', () => {
     clock.tick(7);
 
     expect(output.lines).toEqual([
-      'declare #0, Byte, 0',
+      'declare #0 Byte 0',
       'io write pin 0, 0',
       'delay 1000',
       '#0 = not #0',

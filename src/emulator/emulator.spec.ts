@@ -1,9 +1,9 @@
-import { LogOutput, Emulator, StepClock, compile, TimerClock } from '../index';
+import { LogOutput, Emulator, StepperClock, compile, RealTimeClock } from '../index';
 
 describe('vm emulator', () => {
   it('should throw an error for invalid instructions', async () => {
     const emulator = new Emulator();
-    const stepper = new StepClock();
+    const stepper = new StepperClock();
     const bytes = [0];
 
     emulator.load(bytes, stepper);
@@ -22,7 +22,7 @@ describe('vm emulator', () => {
 
   it('should run the program with a real clock', async () => {
     const emulator = new Emulator();
-    const clock = new TimerClock();
+    const clock = new RealTimeClock();
     const bytes = compile(
       `
       noop
@@ -50,13 +50,21 @@ describe('vm emulator', () => {
 
   it('should log steps', async () => {
     const emulator = new Emulator();
-    const stepper = new StepClock();
-    const bytes = compile(`noop`);
+    const stepper = new StepperClock();
+    const program = `
+    uint $number = 0
+    print $number
+    noop
+    `;
+    const bytes = compile(program);
     const logger = jest.spyOn(console, 'log').mockImplementation(() => 0);
 
     emulator.load(bytes, stepper, new LogOutput());
     stepper.run();
 
-    expect(logger).toHaveBeenCalledWith('noop');
+    expect(logger).toHaveBeenNthCalledWith(1, 'declare #0', 'Integer', '0');
+    expect(logger).toHaveBeenNthCalledWith(2, 'print', '0');
+    expect(logger).toHaveBeenNthCalledWith(3, 'noop');
+    expect(logger).toHaveBeenNthCalledWith(4, 'halt');
   });
 });

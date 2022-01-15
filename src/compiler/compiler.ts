@@ -1,7 +1,7 @@
-import { parse } from './parser';
-import { InstructionNode, ValueType } from './types/index';
+import { InstructionNode, ValueType } from '../types/index';
 
 export type ByteArray = Array<number>;
+export type ParserFunction = (input: string, options?: { startRule?: string }) => unknown[];
 
 export interface CompilationContext {
   nodes: InstructionNode[];
@@ -21,6 +21,7 @@ interface ParseError {
 }
 
 export class Compiler {
+  constructor(private parseFn: ParserFunction) {}
   parse(code: string): Array<InstructionNode> {
     code = code.trim();
 
@@ -28,7 +29,7 @@ export class Compiler {
       return [];
     }
 
-    return parse(code).flat(2);
+    return this.parseFn(code).flat(2) as InstructionNode[];
   }
 
   compile<P extends CompilerPlugin[]>(code: Array<InstructionNode>, plugins?: P): ByteArray;
@@ -36,7 +37,7 @@ export class Compiler {
   compile<P extends CompilerPlugin[]>(code: string | Array<InstructionNode>, plugins?: P): ByteArray {
     try {
       const nodes: Array<InstructionNode> = typeof code === 'string' ? this.parse(code) : code;
-      const bytes = this.runPlugins(nodes, plugins);
+      const bytes = this.runPlugins(nodes, plugins || []);
 
       return bytes;
     } catch (error) {

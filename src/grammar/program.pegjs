@@ -1,4 +1,4 @@
-Program = head:Statement? tail:(StatementSeparator Statement)* { return [head].concat(tail.map(t => t[1])); }
+Program = Spaces head:Statement? tail:(Spaces StatementSeparator Spaces @Statement)* { return [head, ... tail.map(t => t[3])]; }
 StatementSeparator = NewLine
 Comment "comment" = '//' [^\n]+ { return [] }
 

@@ -1,9 +1,13 @@
-import { bytesToNumber, OpCodes, ValueType } from '../compiler/index';
-import { Clock, TimerClock } from './clock';
-import { NullOutput, ProgramOutput } from './output';
+import { OpCodes, ValueType } from '../compiler/index';
+import { bytesToNumber } from '../utils';
+import { Clock, RealTimeClock } from './timers/index';
+import { NullOutput, ProgramOutput } from './outputs/index';
 
 const maximumSignedInteger = 2147483647;
 const maximumUnsignedInteger = 4294967296;
+const numberOfPins = 4;
+
+type Listener = (this: Program, ...args: unknown[]) => void;
 
 const binaryOperatorTable: Record<number, (a: string | number, b: string | number) => unknown> = {
   [OpCodes.Gte]: (a, b) => Number(a >= b),
@@ -28,10 +32,6 @@ class Value {
     return this.dataType === ValueType.String;
   }
 
-  // isNumeric() {
-  //   return !isNaN(this.toNumber());
-  // }
-
   toString() {
     return String(this.value);
   }
@@ -46,18 +46,20 @@ class Value {
 }
 
 export class Program {
-  constructor(readonly bytes: number[], readonly clock: Clock, readonly output: ProgramOutput) {
+  constructor(readonly bytes: number[], private readonly clock: Clock, private readonly output: ProgramOutput) {
     this.endOfTheProgram = bytes.length;
     clock.onTick(() => this.tick());
+    this.on(OpCodes.Halt, () => clock.stop());
   }
 
   counter = 0;
-  pins: number[] = Array(16).fill(0);
-  pinModes: number[] = Array(16).fill(0);
-  pinTypes: number[] = Array(16).fill(0);
+  pins: number[] = Array(numberOfPins).fill(0);
+  pinModes: number[] = Array(numberOfPins).fill(0);
+  pinTypes: number[] = Array(numberOfPins).fill(0);
   variables: Value[] = Array(0xff);
 
   private endOfTheProgram = 0;
+  private listeners: Record<number, Listener> = {};
 
   tick(): void {
     const next = this.readByte();
@@ -122,8 +124,21 @@ export class Program {
         this.binaryOperator(next);
         break;
 
-      default:
-        throw new Error(`${this.counter}: Invalid opcode: ${next}`);
+      default: {
+        const error = new Error(`${this.counter - 1}: Invalid opcode: ${next}`);
+        this.clock.stop();
+
+        if (this.listeners[-1]) {
+          this.listeners[-1].call(this, error);
+          return;
+        }
+
+        throw error;
+      }
+    }
+
+    if (this.listeners[next]) {
+      this.listeners[next].call(this);
     }
 
     if (this.counter >= this.endOfTheProgram) {
@@ -137,6 +152,18 @@ export class Program {
 
   trace(...args: unknown[]): void {
     this.output.trace(...args);
+  }
+
+  on(operation: number, callback: Listener): void {
+    this.listeners[operation] = callback;
+  }
+
+  onError(callback: Listener) {
+    this.listeners[-1] = callback;
+  }
+
+  getHexDump() {
+    return this.bytes.map((x) => x.toString(16)).join(' ');
   }
 
   readByte(): number {
@@ -211,7 +238,7 @@ export class Program {
 
   print(): void {
     const value = this.readValue();
-    this.trace('print', value);
+    this.trace('print', String(value));
   }
 
   ioWrite(): void {
@@ -249,7 +276,7 @@ export class Program {
 
     value.id = id;
     this.variables[id] = value;
-    this.trace(`declare #${value.id}, ${ValueType[value.dataType]}, ${value.toString()}`);
+    this.trace(`declare #${value.id}`, ValueType[value.dataType], value.toString());
   }
 
   notOperator(): void {
@@ -308,7 +335,7 @@ export class Program {
 }
 
 export class Emulator {
-  load(bytes: number[], clock: Clock = new TimerClock(), output: ProgramOutput = new NullOutput()): Program {
+  load(bytes: number[], clock: Clock = new RealTimeClock(), output: ProgramOutput = new NullOutput()): Program {
     return new Program(bytes, clock, output);
   }
 }

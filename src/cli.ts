@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { compile } from './compiler/index';
+import { compile, Emulator, LogOutput, RealTimeClock } from './index';
 import { Transform } from 'stream';
 import parseArgs from 'minimist';
 
@@ -23,6 +23,11 @@ class Compiler extends Transform {
   }
 
   encode(bytes: number[]) {
+    if (this.options.run) {
+      this.run(bytes);
+      return 'Running...\n';
+    }
+
     switch (this.options.format) {
       case 'hex':
         return Buffer.from(bytes).toString('hex') + '\n';
@@ -37,6 +42,20 @@ class Compiler extends Transform {
       default:
         return Buffer.from(bytes);
     }
+  }
+
+  run(bytes: number[]) {
+    const output = new LogOutput();
+    const emulator = new Emulator();
+    const clock = new RealTimeClock();
+    const program = emulator.load(bytes, clock, output);
+
+    program.onError(function (error: Error) {
+      console.log(this.getHexDump());
+      console.log(error);
+    });
+
+    clock.start();
   }
 }
 

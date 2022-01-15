@@ -1,4 +1,4 @@
-import { CompilationContext, CompilerPlugin } from '../compiler';
+import { CompilationContext, CompilerPlugin } from '../compiler/compiler';
 import { InstructionNode, ValueType } from '../types/index';
 
 export class CheckTypesPlugin implements CompilerPlugin {

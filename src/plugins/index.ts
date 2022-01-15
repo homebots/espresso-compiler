@@ -1,4 +1,4 @@
-import { CompilerPlugin } from '../compiler';
+import { CompilerPlugin } from '../compiler/compiler';
 import { CheckTypesPlugin } from './check-types.plugin';
 import { FindIdentifiersPlugin, ReplaceIdentifiersPlugin } from './identifiers.plugin';
 import { FindLabelsPlugin, ReplaceLabelReferencesPlugin } from './references.plugin';

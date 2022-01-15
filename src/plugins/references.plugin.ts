@@ -1,4 +1,5 @@
-import { CompilationContext, CompilerPlugin } from '../compiler';
+import { SerializePlugin } from '.';
+import { CompilationContext, CompilerPlugin } from '../compiler/compiler';
 import { InstructionNode, NumberValueNode, ValueType } from '../types/index';
 
 export class FindLabelsPlugin implements CompilerPlugin {
@@ -14,7 +15,7 @@ export class FindLabelsPlugin implements CompilerPlugin {
         return false;
       }
 
-      byteAccumulator += InstructionNode.sizeOf(node);
+      byteAccumulator += SerializePlugin.sizeOf(node);
 
       return true;
     });

@@ -1,3 +1,3 @@
 export { Emulator, Program } from './emulator';
-export { Clock, StepClock, TimerClock } from './clock';
-export { CaptureOutput, LogOutput, NullOutput, ProgramOutput } from './output';
+export { Clock, StepperClock, RealTimeClock } from './timers/index';
+export { CaptureOutput, LogOutput, NullOutput, ProgramOutput } from './outputs/index';
