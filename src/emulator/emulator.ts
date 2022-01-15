@@ -162,10 +162,6 @@ export class Program {
     this.listeners[-1] = callback;
   }
 
-  getHexDump() {
-    return this.bytes.map((x) => x.toString(16)).join(' ');
-  }
-
   readByte(): number {
     const byte = this.bytes[this.counter];
     this.move(1);

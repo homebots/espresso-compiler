@@ -427,7 +427,7 @@ function peg$parse(input: string, options?: IParseOptions) {
   const peg$c207 = "'";
   const peg$c208 = peg$literalExpectation("'", false);
   const peg$c209 = peg$anyExpectation();
-  const peg$c210 = function(string: any): any { return text().slice(1, -1).replaceAll(/\\n/g, '\n').split('') };
+  const peg$c210 = function(string: any): any { return text().slice(1, -1).replaceAll(/\\t/g, '\n').split('') };
   const peg$c211 = peg$otherExpectation("address");
   const peg$c212 = "0x";
   const peg$c213 = peg$literalExpectation("0x", false);

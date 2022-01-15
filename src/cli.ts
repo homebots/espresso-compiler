@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { compile, Emulator, LogOutput, RealTimeClock } from './index';
+import { compile, Emulator, LogOutput, Program, RealTimeClock } from './index';
 import { Transform } from 'stream';
 import parseArgs from 'minimist';
 
@@ -50,12 +50,43 @@ class Compiler extends Transform {
     const clock = new RealTimeClock();
     const program = emulator.load(bytes, clock, output);
 
-    program.onError(function (error: Error) {
-      console.log(this.getHexDump());
-      console.log(error);
+    program.onError((error: Error) => {
+      console.log(error.message);
+      console.log(this.hexDump(program));
     });
 
     clock.start();
+  }
+
+  hexDump(program: Program) {
+    const { bytes } = program;
+    const leftLength = String(bytes.length).length;
+    const leftPad = (number: number | string, length: number, char = '0') =>
+      char.repeat(length - String(number).length) + number;
+    const dump = [[]];
+    let next = dump[0];
+
+    bytes.forEach((byte, index) => {
+      if (index === 10 || (index > 1 && index % 10 === 0)) {
+        dump.push((next = []));
+      }
+
+      next.push(leftPad(byte.toString(16), 2));
+    });
+
+    const header =
+      leftPad('', leftLength, ' ') +
+      ' ' +
+      Array(10)
+        .fill(' ')
+        .map((_, i) => leftPad(i, 2, ' '))
+        .join(' ');
+
+    const rows = dump
+      .map((nextRow, index) => leftPad(index * 10, leftLength, ' ') + ' ' + nextRow.join(' '))
+      .join('\n');
+
+    return header + '\n' + rows;
   }
 }
 

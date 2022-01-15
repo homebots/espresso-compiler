@@ -38,14 +38,14 @@ describe('vm emulator', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(program.counter).toBe(7);
+    expect(program.counter).toBe(program.bytes.length);
     clock.stop();
 
     expect(clock.paused).toBe(true);
     clock.tick();
 
     expect(clock.paused).toBe(true);
-    expect(program.counter).toBe(7);
+    expect(program.counter).toBe(program.bytes.length);
   });
 
   it('should log steps', async () => {
