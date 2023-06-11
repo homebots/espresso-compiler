@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "es2020",
+    "lib": ["ESNext"],
     "rootDir": "./src/",
     "outDir": "./dist/",
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "target": "esnext",
-    "lib": ["ESNext", "DOM"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declaration": true,
+    "allowJs": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*.ts"]
 }
