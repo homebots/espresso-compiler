@@ -42,11 +42,11 @@ Print = 'print' Spaces value:Value { return InstructionNode.create('print', { va
 Delay =
   'delay' Spaces value:IntegerValue { return InstructionNode.create('delay', { value }) } /
   'sleep' Spaces value:IntegerValue { return InstructionNode.create('sleep', { value }) } /
-  'yield' Spaces value:IntegerValue { return InstructionNode.create('yield', { value }) }
+  'yield' { return InstructionNode.create('yield') }
 
 JumpTo =
   'jump' Spaces 'to' Spaces address:AddressValue { return InstructionNode.create('jumpTo', { address }) } /
-  'jump' Spaces 'to' Spaces 'label' Spaces label:Label { return InstructionNode.create('jumpTo', { label }) }
+  'jump' Spaces 'to' Spaces '@' label:Label { return InstructionNode.create('jumpTo', { label }) }
 
 JumpIf =
   'if' Spaces condition:Value Spaces 'then' Spaces 'jump' Spaces  'to' Spaces address:AddressValue { return InstructionNode.create('jumpIf', { condition, address }) } /

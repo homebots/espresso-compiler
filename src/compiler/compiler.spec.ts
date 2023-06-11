@@ -104,10 +104,10 @@ describe('Compiler', () => {
   });
 
   it('should delay a given time (micro seconds)', () => {
-    const program = `yield 10`;
+    const program = `yield`;
     const output = compile(program);
 
-    expect(output).toStrictEqual([OpCodes.Yield, ValueType.Integer, 0x0a, 0x00, 0x00, 0x00]);
+    expect(output).toStrictEqual([OpCodes.Yield]);
   });
 
   it('should print system information to serial output', () => {

@@ -44,7 +44,7 @@ export class Compiler {
     }
   }
 
-  protected handleError<T>(error: ParseError | T, source: string): void {
+  protected handleError<T extends Error>(error: ParseError | T, source: string): void {
     if ('location' in error) {
       const { line, column } = error.location.start;
       const message =
