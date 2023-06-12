@@ -167,9 +167,9 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('yield', () => {
-      const node = InstructionNode.create('yield', time);
-      expect(InstructionNode.sizeOf(node)).toBe(6);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Yield, ValueType.Integer, 0xe8, 0x03, 0, 0]);
+      const node = InstructionNode.create('yield');
+      expect(InstructionNode.sizeOf(node)).toBe(1);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Yield]);
     });
 
     it('jumpTo', () => {

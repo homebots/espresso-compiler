@@ -16,7 +16,7 @@ describe('Blinky program', () => {
       $value = not $value
       io write pin 0, $value
       delay 1000
-      jump to label begin
+      jump to @begin
       `,
     );
 

@@ -31,7 +31,7 @@ export interface NodeTypeToNodeMap {
   debug: NodeWithSingleValue<number>;
   delay: NodeWithSingleValue<ValueNode<number>>;
   sleep: NodeWithSingleValue<ValueNode<number>>;
-  yield: NodeWithSingleValue<ValueNode<number>>;
+  yield: InstructionNode;
   jumpTo: SystemJumpToNode;
   jumpIf: SystemJumpIfNode;
 
@@ -235,7 +235,7 @@ Object.assign(serializers, <typeof serializers>{
   delay: (node) => [OpCodes.Delay, ...serializeValue(node.value)],
   print: (node) => [OpCodes.Print, ...serializeValue(node.value)],
   sleep: (node) => [OpCodes.Sleep, ...serializeValue(node.value)],
-  yield: (node) => [OpCodes.Yield, ...serializeValue(node.value)],
+  yield: () => [OpCodes.Yield],
   assign: (node) => [OpCodes.Assign, ...serializeValue(node.target), ...serializeValue(node.value)],
   not: (node) => [OpCodes.Not, ...serializeValue(node.target), ...serializeValue(node.value)],
   unaryOperation: (node) => [unaryOperatorMap[node.operator], ...serializeValue(node.target)],
@@ -287,7 +287,7 @@ Object.assign(sizeOf, <typeof sizeOf>{
   print: (node) => 1 + serializeValue(node.value).length,
   delay: (node) => 1 + serializeValue(node.value).length,
   sleep: (node) => 1 + serializeValue(node.value).length,
-  yield: (node) => 1 + serializeValue(node.value).length,
+  yield: () => 1,
 
   jumpTo: () => 6,
   jumpIf: (node) => 6 + serializeValue(node.condition).length,

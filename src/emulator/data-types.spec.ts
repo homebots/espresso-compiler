@@ -46,7 +46,7 @@ describe('data types', () => {
     io mode pin 1, input
     io mode pin 1, output
     io mode pin 1, open-drain
-    io mode pin 1, input pull-up
+    io mode pin 1, pull-up
 
     io mode pin 1, 0
     io mode pin 1, 1

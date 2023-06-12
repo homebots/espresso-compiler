@@ -27,7 +27,7 @@ function compileAndPrint(source, format) {
 
   if (format === 'js') {
     console.log('export default [');
-    buffer.forEach((byte) => process.stdout.write('0x' + byte.toString(16)));
+    buffer.forEach((byte) => process.stdout.write('0x' + byte.toString(16) + ',\n'));
     console.log('];');
     return;
   }

@@ -1,11 +1,12 @@
 export default {
   cache: false,
   maxWorkers: 1,
-  clearMocks: true,
   collectCoverage: true,
-  coverageProvider: 'babel',
+  coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: [
     '/node_modules/',
+    '/__tests__/',
+    '/.spec.[jt]s$/',
     'src/grammar.ts',
     'src/compiler/parser.ts',
     'src/index.ts',
@@ -22,16 +23,17 @@ export default {
       statements: 100,
     },
   },
-  moduleFileExtensions: ['js', 'ts'],
-  slowTestThreshold: 1,
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.ts$': 'ts-jest',
+
+  // transformIgnorePatterns: [],
+  testMatch: ['**/src/**/*.spec.[jt]s'],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  verbose: false,
-  globals: {
-    'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.build.json',
-    },
+  transform: {
+    '^.+\\.m?[tj]sx?$': ['ts-jest', {
+      useESM: true,
+      tsconfig: '<rootDir>/tsconfig.build.json',
+    }],
   },
 };

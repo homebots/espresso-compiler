@@ -176,15 +176,15 @@ describe('Compiler', () => {
     const program = `
     @begin
       noop
-      jump to label end
+      jump to @end
 
     @middle
       noop
-      jump to label begin
+      jump to @begin
 
     @end
       noop
-      jump to label middle
+      jump to @middle
     `;
     const output = compile(program);
 
@@ -228,7 +228,7 @@ describe('Compiler', () => {
     const program = `
     byte $a = ffh
     @begin
-    if 0 then jump to label begin
+    if 0 then jump to @begin
     if $a then jump to 0x00000005
     `;
 
