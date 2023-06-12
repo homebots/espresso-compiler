@@ -24,7 +24,6 @@ export default {
     },
   },
 
-  // transformIgnorePatterns: [],
   testMatch: ['**/src/**/*.spec.[jt]s'],
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {

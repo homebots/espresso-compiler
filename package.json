@@ -4,7 +4,7 @@
   "description": "Compiler for Espresso language used by Homebots VM",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": "./dist/cli.js",
+  "bin": "./dist/cli.mjs",
   "type": "module",
   "scripts": {
     "test": "jest",
