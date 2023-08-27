@@ -6,7 +6,7 @@ import { Buffer } from 'node:buffer';
 function main() {
   const args = process.argv.slice(2);
 
-  if (!args[0]) {
+  if (args[0] === '-') {
     const format = args[1] || '';
     const b = [];
     process.stdin.on('data', (c) => b.push(c));
@@ -39,4 +39,5 @@ try {
   main();
 } catch (error) {
   console.error(String(error));
+  console.log('Usage: esp <file.esp|-> [format]\ncat file.esp | esp - hex\nesp path/to/file.esp js\n\nFormat: js, hex, utf8, base64. Defaults to binary')
 }
