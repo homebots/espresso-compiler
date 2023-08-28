@@ -24,13 +24,18 @@ export default {
     },
   },
 
-  testMatch: ['**/src/**/*.spec.mts'],
+  testMatch: ['**/src/**/*.spec.m[tj]s'],
   extensionsToTreatAsEsm: ['.ts', '.mts'],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.m?js$': '$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^(\\.{1,2}/.*)\\.mjs$': '$1',
   },
   transform: {
-    '^.+\\.m?[tj]sx?$': ['ts-jest', {
+    '^.+\\.m?[tj]s$': ['ts-jest', {
+      useESM: true,
+      tsconfig: '<rootDir>/tsconfig.build.json',
+    }],
+    '^.+\\.spec.mts$': ['ts-jest', {
       useESM: true,
       tsconfig: '<rootDir>/tsconfig.build.json',
     }],
