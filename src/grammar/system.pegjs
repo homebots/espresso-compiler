@@ -27,7 +27,8 @@ SignedIntegerValue = value:SignedInteger { return InstructionNode.create('number
 StringValue = value:String { return InstructionNode.create('stringValue', { value, dataType: ValueType.String }) }
 NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null }) }
 NumberValue = IntegerValue / SignedIntegerValue
-Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue  / StringValue / BooleanValue / NullValue
+Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue / BooleanValue / NullValue
+IntrinsicValue = ByteValue / NumberValue / StringValue / BooleanValue / NullValue
 
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
@@ -36,7 +37,7 @@ Restart = 'restart' { return InstructionNode.create('restart') }
 Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 Dump = 'dump' { return InstructionNode.create('dump') }
-Debug = 'debug' Spaces value:Boolean { return InstructionNode.create('debug', { value }) }
+Debug = 'debug' Spaces value:IntrinsicValue { return InstructionNode.create('debug', { value }) }
 Print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
 
 Delay =

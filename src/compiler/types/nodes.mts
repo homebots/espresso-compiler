@@ -28,7 +28,7 @@ export interface NodeTypeToNodeMap {
   systemInfo: InstructionNode;
   dump: InstructionNode;
   print: NodeWithSingleValue<ValueNode<ValueNodePrimities>>;
-  debug: NodeWithSingleValue<number>;
+  debug: NodeWithSingleValue<ValueNode<ValueNodePrimities>>;
   delay: NodeWithSingleValue<ValueNode<number>>;
   sleep: NodeWithSingleValue<ValueNode<number>>;
   yield: InstructionNode;
@@ -231,7 +231,7 @@ serializers = {
   noop: () => [OpCodes.Noop],
   systemInfo: () => [OpCodes.SystemInfo],
   dump: () => [OpCodes.Dump],
-  debug: (node) => [OpCodes.Debug, node.value],
+  debug: (node) => [OpCodes.Debug, ...serializeValue(node.value)],
   delay: (node) => [OpCodes.Delay, ...serializeValue(node.value)],
   print: (node) => [OpCodes.Print, ...serializeValue(node.value)],
   sleep: (node) => [OpCodes.Sleep, ...serializeValue(node.value)],
@@ -283,7 +283,7 @@ sizeOf = {
   noop: () => 1,
   systemInfo: () => 1,
   dump: () => 1,
-  debug: () => 2,
+  debug: (node) => 1 + serializeValue(node.value).length,
   print: (node) => 1 + serializeValue(node.value).length,
   delay: (node) => 1 + serializeValue(node.value).length,
   sleep: (node) => 1 + serializeValue(node.value).length,

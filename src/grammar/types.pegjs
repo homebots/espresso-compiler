@@ -10,8 +10,8 @@ Digit "0..9" = [0-9]
 NonZeroDigit "1..9" = [1-9]
 Alpha "a-z" = [a-z]i
 Alphanumeric "a-z or 0-9" = [a-z0-9]i
-True = ('true' / '1') { return 1 }
-False = ('false' / '0') { return 0 }
+True = ('true' / '1' / 'on') { return 1 }
+False = ('false' / '0' / 'off') { return 0 }
 Boolean = True / False
 Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
 SignedInteger = signal:('-'/'+') int:Integer { return int * (signal === '-' ? -1 : 1) }
