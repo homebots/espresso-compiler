@@ -6,6 +6,11 @@ import { compile } from "./index.mjs";
 function main() {
   try {
     const args = process.argv.slice(2);
+
+    if (!args.length) {
+      throw new Error("File input not specified");
+    }
+
     const source = args[0] === "-" ? process.stdin : createReadStream(args[0]);
     const format = args[1] || undefined;
     const parts = [];
