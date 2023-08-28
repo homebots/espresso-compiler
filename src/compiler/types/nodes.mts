@@ -52,10 +52,10 @@ export interface NodeTypeToNodeMap {
 // const factories: { [K in keyof NodeTypeToNodeMap]?: NodeFactory<NodeTypeToNodeMap[K]> } = {};
 
 type NodeSerializer<T extends InstructionNode> = (node: T) => Array<number | InstructionNode>;
-const serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToNodeMap[K]> } = {};
+let serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToNodeMap[K]> };
 
 type NodeSizeOf<T extends InstructionNode> = (node: T) => number;
-const sizeOf: { [K in keyof NodeTypeToNodeMap]?: NodeSizeOf<NodeTypeToNodeMap[K]> } = {};
+let sizeOf: { [K in keyof NodeTypeToNodeMap]?: NodeSizeOf<NodeTypeToNodeMap[K]> };
 
 export class InstructionNode {
   type: keyof NodeTypeToNodeMap;
@@ -223,7 +223,7 @@ export function serializeValue(value: ValueNode): number[] {
   return [value.dataType].concat(valueToByteArray(value));
 }
 
-Object.assign(serializers, <typeof serializers>{
+serializers = {
   comment: () => [],
   declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
   halt: () => [OpCodes.Halt],
@@ -255,9 +255,9 @@ Object.assign(serializers, <typeof serializers>{
   memoryGet: (node) => [OpCodes.MemGet, ...serializeValue(node.target), ...serializeValue(node.address)],
   memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
   memoryCopy: (node) => [OpCodes.MemCopy, ...serializeValue(node.source), ...serializeValue(node.destination)],
-});
+};
 
-Object.assign(sizeOf, <typeof sizeOf>{
+sizeOf = {
   comment: () => 0,
 
   // values
@@ -303,4 +303,4 @@ Object.assign(sizeOf, <typeof sizeOf>{
   memoryGet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.address).length,
   memorySet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.value).length,
   memoryCopy: () => 11,
-});
+};
