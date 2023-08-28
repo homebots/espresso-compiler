@@ -24,10 +24,10 @@ export default {
     },
   },
 
-  testMatch: ['**/src/**/*.spec.[jt]s'],
+  testMatch: ['**/src/**/*.spec.mts'],
   extensionsToTreatAsEsm: ['.ts', '.mts'],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^(\\.{1,2}/.*)\\.m?js$': '$1',
   },
   transform: {
     '^.+\\.m?[tj]sx?$': ['ts-jest', {
