@@ -1,6 +1,7 @@
 .github/
 src/
-*.spec.d.ts
+*.spec.d.mts
+*.spec.mjs
 coverage/
 examples/
 .gitignore

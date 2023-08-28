@@ -4,7 +4,9 @@ Compiler for Espresso language, used by [HomeBots VM](https://github.com/homebot
 
 ## Usage
 
-`npx @homebots/espresso-compiler <input> <output-format>
+```
+npx @homebots/espresso-compiler <input> <output-format>
+```
 
 `<input>`: A script file, or `-` to read from stdin
 

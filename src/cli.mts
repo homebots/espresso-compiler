@@ -1,7 +1,7 @@
-import { compile } from "./index.mjs";
 import { createReadStream } from "node:fs";
 import process from "node:process";
 import { Buffer } from "node:buffer";
+import { compile } from "./index.mjs";
 
 function main() {
   try {
