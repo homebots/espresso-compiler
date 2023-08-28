@@ -4,7 +4,7 @@
   "description": "Compiler for Espresso language used by Homebots VM",
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "bin": "./cli/index.js",
+  "bin": "./cli/index.mjs",
   "type": "module",
   "scripts": {
     "test": "jest",
@@ -13,7 +13,7 @@
     "grammar": "sh update-grammar.sh",
     "types": "tsc --declaration -p tsconfig.build.json",
     "package": "ncc build src/index.mts --minify --no-cache --target es2022",
-    "cli": "ncc build dist/cli.mjs -o cli --no-cache",
+    "cli": "ncc build dist/cli.mjs -o cli --minify --no-cache --target es2022",
     "lint": "eslint --quiet src/**/*.mts --ignore-pattern src/compiler/parser.mts",
     "tdd": "jest --watchAll"
   },
