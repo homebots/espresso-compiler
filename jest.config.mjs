@@ -7,13 +7,13 @@ export default {
     '/node_modules/',
     '/__tests__/',
     '/.spec.[jt]s$/',
-    'src/grammar.ts',
-    'src/compiler/parser.ts',
-    'src/index.ts',
-    'src/compiler/index.ts',
-    'src/compiler/plugins/index.ts',
-    'src/compiler/types/index.ts',
-    'src/emulator/index.ts',
+    'src/grammar.mts',
+    'src/compiler/parser.mts',
+    'src/index.mts',
+    'src/compiler/index.mts',
+    'src/compiler/plugins/index.mts',
+    'src/compiler/types/index.mts',
+    'src/emulator/index.mts',
   ],
   coverageThreshold: {
     global: {
@@ -25,7 +25,7 @@ export default {
   },
 
   testMatch: ['**/src/**/*.spec.[jt]s'],
-  extensionsToTreatAsEsm: ['.ts'],
+  extensionsToTreatAsEsm: ['.ts', '.mts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },

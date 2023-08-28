@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Compiler for Espresso language used by Homebots VM",
   "main": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "bin": "./dist/cli.mjs",
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
     "build": "rm -rf dist/ && npm run grammar && npm run types && npm run package",
     "grammar": "sh update-grammar.sh",
     "types": "tsc --declaration -p tsconfig.build.json",
-    "package": "ncc build src/index.ts --minify --no-cache --target es2022",
-    "lint": "eslint --quiet src/**/*.ts --ignore-pattern src/compiler/parser.ts",
+    "package": "ncc build src/index.mts --minify --no-cache --target es2022",
+    "lint": "eslint --quiet src/**/*.mts --ignore-pattern src/compiler/parser.mts",
     "tdd": "jest --watchAll"
   },
   "publishConfig": {

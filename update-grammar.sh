@@ -1,5 +1,5 @@
 grammarSpec=src/grammar.pegjs
-grammarFile=src/compiler/parser.ts
+grammarFile=src/compiler/parser.mts
 
 echo '' > $grammarSpec
 for file in `ls src/grammar/*.pegjs`; do
