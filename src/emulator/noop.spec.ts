@@ -1,6 +1,6 @@
-import { compile } from '../compiler';
-import { StepClock } from './clock';
-import { Emulator } from './emulator';
+import { compile } from '../compiler/index.mjs';
+import { StepClock } from './clock.mjs';
+import { Emulator } from './emulator.mjs';
 
 describe('noop', () => {
   it('should run one instruction and halt program', async () => {

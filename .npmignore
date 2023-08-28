@@ -1,8 +1,10 @@
 .github/
 src/
+*.spec.d.ts
 coverage/
+examples/
 .gitignore
-.eslintrc.js
+.eslintrc.cjs
 .prettierrc
 jest*
 peg-config.json

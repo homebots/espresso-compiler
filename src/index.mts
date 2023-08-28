@@ -1,4 +1,4 @@
-export * from './compiler/index.js';
+export * from './compiler/index.mjs';
 
 export {
   Emulator,
@@ -10,4 +10,4 @@ export {
   LogOutput,
   NullOutput,
   ProgramOutput,
-} from './emulator/index.js';
+} from './emulator/index.mjs';

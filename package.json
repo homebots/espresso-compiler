@@ -2,7 +2,7 @@
   "name": "@homebots/espresso-compiler",
   "version": "0.0.0",
   "description": "Compiler for Espresso language used by Homebots VM",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": "./dist/cli.mjs",
   "type": "module",

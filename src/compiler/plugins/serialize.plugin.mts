@@ -1,5 +1,5 @@
-import { ByteArray, CompilationContext, CompilerPlugin } from '../compiler';
-import { InstructionNode } from '../types';
+import { ByteArray, CompilationContext, CompilerPlugin } from '../compiler.mjs';
+import { InstructionNode } from '../types/index.mjs';
 
 export class SerializePlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {

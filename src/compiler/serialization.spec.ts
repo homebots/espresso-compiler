@@ -1,4 +1,4 @@
-import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types';
+import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types/index.mjs';
 
 describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
   const createIdentifier = (id: number) =>

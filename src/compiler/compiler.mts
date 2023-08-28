@@ -1,5 +1,5 @@
-import { parse } from './parser';
-import { InstructionNode, ValueType } from './types';
+import { parse } from './parser.mjs';
+import { InstructionNode, ValueType } from './types/index.mjs';
 
 export type ByteArray = Array<number>;
 

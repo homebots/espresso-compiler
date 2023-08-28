@@ -6,7 +6,7 @@ import {
   stringToBytes,
   numberToUnsignedInt32,
   charArrayToBytes,
-} from './index';
+} from './index.mjs';
 
 describe('data helpers', () => {
   describe('numberToInt32', () => {

@@ -1,4 +1,4 @@
-import { OpCodes, CaptureOutput, compile, Emulator, StepClock } from '../index';
+import { OpCodes, CaptureOutput, compile, Emulator, StepClock } from '../index.mjs';
 
 describe('operators', () => {
   function setup() {

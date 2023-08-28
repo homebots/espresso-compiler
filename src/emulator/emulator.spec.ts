@@ -1,4 +1,4 @@
-import { LogOutput, Emulator, StepClock, compile, TimerClock } from '../index';
+import { LogOutput, Emulator, StepClock, compile, TimerClock } from '../index.mjs';
 
 describe('vm emulator', () => {
   it('should throw an error for invalid instructions', async () => {

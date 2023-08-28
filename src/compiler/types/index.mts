@@ -1,5 +1,5 @@
-export * from './nodes';
-export * from './constants';
+export * from './nodes.mjs';
+export * from './constants.mjs';
 export {
   bytesToNumber,
   numberToInt32,
@@ -7,4 +7,4 @@ export {
   stringToBytes,
   stringToHexBytes,
   charArrayToBytes,
-} from './data-convertion';
+} from './data-convertion.mjs';

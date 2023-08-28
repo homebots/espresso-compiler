@@ -1,5 +1,5 @@
-import { CompilationContext, CompilerPlugin } from '../compiler';
-import { InstructionNode, NumberValueNode, ValueType } from '../types';
+import { CompilationContext, CompilerPlugin } from '../compiler.mjs';
+import { InstructionNode, NumberValueNode, ValueType } from '../types/index.mjs';
 
 export class FindLabelsPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {

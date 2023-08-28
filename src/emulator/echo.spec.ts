@@ -1,4 +1,4 @@
-import { compile, StepClock, Emulator, CaptureOutput } from '../index';
+import { compile, StepClock, Emulator, CaptureOutput } from '../index.mjs';
 
 describe('prints back to serial output', () => {
   it('should print a string', () => {

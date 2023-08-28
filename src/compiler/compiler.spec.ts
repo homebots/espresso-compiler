@@ -1,6 +1,6 @@
-import { bytesToNumber, OpCodes, ValueType, compile } from '../index';
-import { Compiler } from './compiler';
-import { defaultPlugins } from './plugins';
+import { bytesToNumber, OpCodes, ValueType, compile } from '../index.mjs';
+import { Compiler } from './compiler.mjs';
+import { defaultPlugins } from './plugins/index.mjs';
 
 describe('Compiler', () => {
   it('should parse an empty program', () => {

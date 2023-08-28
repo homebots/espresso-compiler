@@ -1,7 +1,7 @@
-import { compile } from '../compiler';
-import { StepClock } from './clock';
-import { Emulator } from './emulator';
-import { CaptureOutput } from './output';
+import { compile } from '../compiler/index.mjs';
+import { StepClock } from './clock.mjs';
+import { Emulator } from './emulator.mjs';
+import { CaptureOutput } from './output.mjs';
 
 describe('data types', () => {
   it('should initialise variables with different data types', () => {
