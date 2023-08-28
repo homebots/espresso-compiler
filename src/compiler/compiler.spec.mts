@@ -169,7 +169,7 @@ describe('Compiler', () => {
     `;
     const output = compile(program);
 
-    expect(output).toStrictEqual([OpCodes.Debug, ValueType.Byte, 0x1, OpCodes.Noop, ValueType.Byte, OpCodes.Debug, 0]);
+    expect(output).toStrictEqual([OpCodes.Debug, ValueType.Byte, 0x1, OpCodes.Noop, OpCodes.Debug, ValueType.Byte, 0]);
   });
 
   it('should jump to a given label', () => {
