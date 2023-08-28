@@ -33,11 +33,11 @@ export default {
   transform: {
     '^.+\\.m?[tj]s$': ['ts-jest', {
       useESM: true,
-      tsconfig: '<rootDir>/tsconfig.build.json',
+      tsconfig: '<rootDir>/tsconfig.json',
     }],
     '^.+\\.spec.mts$': ['ts-jest', {
       useESM: true,
-      tsconfig: '<rootDir>/tsconfig.build.json',
+      tsconfig: '<rootDir>/tsconfig.json',
     }],
   },
 };

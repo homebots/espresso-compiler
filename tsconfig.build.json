@@ -5,5 +5,5 @@
   },
   "extends": "./tsconfig.json",
   "include": ["src/**/*.mts"],
-  "exclude": ["node_modules/**/*.ts", "src/**/*.spec.mts", "jest.config.ts"]
+  "exclude": ["node_modules/**/*.ts", "jest.config.ts"]
 }
