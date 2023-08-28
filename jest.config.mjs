@@ -24,7 +24,7 @@ export default {
     },
   },
 
-  testMatch: ['**/src/**/*.spec.m[tj]s'],
+  testMatch: ['**/src/**/*.spec.mts'],
   extensionsToTreatAsEsm: ['.ts', '.mts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
