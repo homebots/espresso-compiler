@@ -123,7 +123,8 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('debug', () => {
-      const node = InstructionNode.create('debug', { value: InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte }) });
+      const byte = InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte });
+      const node = InstructionNode.create('debug', { value: byte });
 
       expect(InstructionNode.sizeOf(node)).toBe(3);
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.Debug, ValueType.Byte, 1]);

@@ -37,7 +37,7 @@ Restart = 'restart' { return InstructionNode.create('restart') }
 Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 Dump = 'dump' { return InstructionNode.create('dump') }
-Debug = 'debug' Spaces value:IntrinsicValue { return InstructionNode.create('debug', { value }) }
+Debug = 'debug' Spaces value:BooleanValue { return InstructionNode.create('debug', { value }) }
 Print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
 
 Delay =

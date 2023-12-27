@@ -4000,7 +4000,7 @@ const peggyParser: { parse: any; SyntaxError: any; DefaultTracer?: any } = // Ge
           // @ts-ignore
           s2 = peg$parseSpaces();
           // @ts-ignore
-          s3 = peg$parseBoolean();
+          s3 = peg$parseBooleanValue();
           // @ts-ignore
           if (s3 !== peg$FAILED) {
             // @ts-ignore

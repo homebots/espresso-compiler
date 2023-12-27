@@ -7,4 +7,4 @@ export {
   stringToBytes,
   stringToHexBytes,
   charArrayToBytes,
-} from './data-convertion.mjs';
+} from './data-conversion.mjs';

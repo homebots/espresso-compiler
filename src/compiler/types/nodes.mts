@@ -1,5 +1,5 @@
 import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants.mjs';
-import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-convertion.mjs';
+import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-conversion.mjs';
 
 export interface NodeTypeToNodeMap {
   comment: InstructionNode;
