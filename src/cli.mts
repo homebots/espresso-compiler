@@ -1,31 +1,31 @@
-import { createReadStream } from "node:fs";
-import process from "node:process";
-import { Buffer } from "node:buffer";
-import { compile } from "./index.mjs";
+import { createReadStream } from 'node:fs';
+import process from 'node:process';
+import { Buffer } from 'node:buffer';
+import { compile } from './index.mjs';
 
 function main() {
   try {
     const args = process.argv.slice(2);
 
     if (!args.length) {
-      throw new Error("File input not specified");
+      throw new Error('File input not specified');
     }
 
-    const source = args[0] === "-" ? process.stdin : createReadStream(args[0]);
+    const source = args[0] === '-' ? process.stdin : createReadStream(args[0]);
     const format = args[1] || undefined;
     const parts = [];
-    source.on("data", (c) => parts.push(c));
-    source.on("end", () => {
-      const input = Buffer.concat(parts).toString("utf8");
+    source.on('data', (c) => parts.push(c));
+    source.on('end', () => {
+      const input = Buffer.concat(parts).toString('utf8');
       compileAndPrint(input, format);
     });
   } catch (error) {
-    console.error(String(error));
+    console.error(String(error.message));
     console.log(`
 Usage: npx @homebots/espresso-compiler <file> <format>
 
 <file>      path to .esp file, or "-" for stdin.
-<format>    js, hex, utf8, base64. Defaults to binary
+<format>    js, hex, utf8, base64, binary. Defaults to binary
 
 Examples:
   npx @homebots/espresso-compiler file.esp js
@@ -35,18 +35,26 @@ Examples:
 }
 
 function compileAndPrint(source, format) {
-  const buffer = Buffer.from(compile(source));
+  const buffer = compileSource(source);
 
-  if (format === "js") {
-    console.log("export default [");
-    buffer.forEach((byte) =>
-      process.stdout.write("0x" + byte.toString(16) + ",\n")
-    );
-    console.log("];");
+  if (format === 'js') {
+    console.log('export default [');
+    buffer.forEach((byte) => process.stdout.write('0x' + byte.toString(16) + ',\n'));
+    console.log('];');
     return;
   }
 
   process.stdout.write(format ? buffer.toString(format) : buffer);
+}
+
+function compileSource(source) {
+  try {
+    const bytes = compile(source);
+    return Buffer.from(bytes);
+  } catch (error) {
+    console.error(String(error.message));
+    process.exit(1);
+  }
 }
 
 main();

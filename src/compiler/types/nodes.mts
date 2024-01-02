@@ -257,6 +257,8 @@ serializers = {
   memoryCopy: (node) => [OpCodes.MemCopy, ...serializeValue(node.source), ...serializeValue(node.destination)],
 };
 
+const oneByte = () => 1;
+
 sizeOf = {
   comment: () => 0,
 
@@ -275,19 +277,19 @@ sizeOf = {
   ioRead: (node) => 2 + serializeValue(node.target).length,
   ioMode: () => 3,
   ioType: () => 3,
-  ioAllOut: () => 1,
+  ioAllOut: oneByte,
 
   // system
-  halt: () => 1,
-  restart: () => 1,
-  noop: () => 1,
-  systemInfo: () => 1,
-  dump: () => 1,
+  halt: oneByte,
+  restart: oneByte,
+  noop: oneByte,
+  systemInfo: oneByte,
+  dump: oneByte,
   debug: (node) => 1 + serializeValue(node.value).length,
   print: (node) => 1 + serializeValue(node.value).length,
   delay: (node) => 1 + serializeValue(node.value).length,
   sleep: (node) => 1 + serializeValue(node.value).length,
-  yield: () => 1,
+  yield: oneByte,
 
   jumpTo: () => 6,
   jumpIf: (node) => 6 + serializeValue(node.condition).length,
@@ -297,7 +299,7 @@ sizeOf = {
   unaryOperation: (node) => 1 + serializeValue(node.target).length,
   binaryOperation: (node) =>
     1 + serializeValue(node.target).length + serializeValue(node.a).length + serializeValue(node.b).length,
-  not: () => 1,
+  not: oneByte,
 
   // memory
   memoryGet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.address).length,

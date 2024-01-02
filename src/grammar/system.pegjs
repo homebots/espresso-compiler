@@ -29,6 +29,9 @@ NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, data
 NumberValue = IntegerValue / SignedIntegerValue
 Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue / BooleanValue / NullValue
 IntrinsicValue = ByteValue / NumberValue / StringValue / BooleanValue / NullValue
+CommaSeparator = ',' Spaces
+ValueArg "arg" = arg:(Value CommaSeparator?) { return arg[0] }
+ValueList "values" = values:ValueArg* { return values }
 
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
@@ -38,7 +41,7 @@ Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 Dump = 'dump' { return InstructionNode.create('dump') }
 Debug = 'debug' Spaces value:BooleanValue { return InstructionNode.create('debug', { value }) }
-Print = 'print' Spaces value:Value { return InstructionNode.create('print', { value }) }
+Print = 'print' Spaces values:ValueList { return values.map(v => InstructionNode.create('print', { value:v })) }
 
 Delay =
   'delay' Spaces value:IntegerValue { return InstructionNode.create('delay', { value }) } /
