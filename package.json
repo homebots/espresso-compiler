@@ -5,7 +5,7 @@
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "bin": {
-    "espc": "./cli/index.mjs"
+    "espc": "./cli/espc.mjs"
   },
   "type": "module",
   "scripts": {
@@ -15,7 +15,7 @@
     "grammar": "sh update-grammar.sh",
     "types": "tsc --declaration -p tsconfig.build.json",
     "package": "ncc build src/index.mts --minify --no-cache --target es2022",
-    "cli": "ncc build dist/cli.mjs -o cli --minify --no-cache --target es2022",
+    "cli": "ncc build dist/cli.mjs -o cli --minify --no-cache --target es2022 && cat cli-header.txt cli/index.mjs > cli/espc.mjs && rm cli/index.mjs",
     "lint": "eslint --quiet src/**/*.mts --ignore-pattern src/compiler/parser.mts",
     "tdd": "jest --watchAll"
   },

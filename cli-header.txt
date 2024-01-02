@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+/**
+ * Compile for Homebots VM.
+ * See https://github.com/homebots/vm for more details
+ * Copyright since 2021: Darlan Alves <me@darlanalv.es>
+ * License: MIT
+ */
+
