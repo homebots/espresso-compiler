@@ -10,6 +10,7 @@ export interface NodeTypeToNodeMap {
   defineLabel: LabelNode;
   label: LabelNode;
 
+  nullValue: NullValueNode;
   byteValue: ByteValueNode;
   numberValue: NumberValueNode;
   stringValue: StringValueNode;
@@ -40,12 +41,15 @@ export interface NodeTypeToNodeMap {
   ioRead: IoReadNode;
   ioMode: IoModeNode;
   ioType: IoTypeNode;
-  ioAllOut: InstructionNode;
+  ioAllOutput: InstructionNode;
 
   // memory
-  memoryCopy: MemoryCopyNode;
   memoryGet: MemoryGetNode;
   memorySet: MemorySetNode;
+
+  // wifi
+  wifiConnect: WifiConnectNode;
+  wifiDisconnect: InstructionNode;
 }
 
 // type NodeFactory<T extends InstructionNode> = (properties?: T) => T;
@@ -103,7 +107,7 @@ export interface NodeWithSingleValue<T> extends InstructionNode {
 }
 
 export type IdentifierType = ValueType.Byte | ValueType.Integer | ValueType.SignedInteger | ValueType.String;
-export type ValueNodePrimities = number | string[];
+export type ValueNodePrimities = number | string | string[];
 
 export interface DeclareIdentifierNode<T extends ValueNodePrimities = ValueNodePrimities> extends InstructionNode {
   dataType: IdentifierType;
@@ -122,9 +126,14 @@ export interface ValueNode<T = ValueNodePrimities | UseIdentifierNode> extends I
   value: T;
 }
 
+export interface NullValueNode extends InstructionNode {
+  dataType: ValueType.Null;
+  value: 0;
+}
+
 export type ByteValueNode = ValueNode<number>;
 export type NumberValueNode = ValueNode<number>;
-export type StringValueNode = ValueNode<string[]>;
+export type StringValueNode = ValueNode<string>;
 export type IdentifierValueNode = ValueNode<UseIdentifierNode>;
 
 export interface IoWriteNode extends InstructionNode {
@@ -170,11 +179,6 @@ export interface MemoryGetNode extends InstructionNode {
   address: NumberValueNode;
 }
 
-export interface MemoryCopyNode extends InstructionNode {
-  destination: NumberValueNode;
-  source: NumberValueNode;
-}
-
 export interface UnaryOperationNode extends InstructionNode {
   operator: 'inc' | 'dec';
   target: IdentifierValueNode;
@@ -197,6 +201,11 @@ export interface AssignOperationNode extends InstructionNode {
   value: ValueNode;
 }
 
+export interface WifiConnectNode extends InstructionNode {
+  ssid: StringValueNode;
+  password: StringValueNode | NullValueNode;
+}
+
 //////
 export function valueToByteArray(type: ValueNode): number[] {
   switch (type.dataType) {
@@ -215,11 +224,14 @@ export function valueToByteArray(type: ValueNode): number[] {
       return [(type.value as UseIdentifierNode).id];
 
     case ValueType.String:
-      return charArrayToBytes(type.value as unknown as string[]);
+      return charArrayToBytes(Array.isArray(type.value) ? type.value : String(type.value).split(''));
+
+    case ValueType.Null:
+      return [0];
   }
 }
 
-export function serializeValue(value: ValueNode): number[] {
+export function serializeValue(value: ValueNode | NullValueNode): number[] {
   return [value.dataType].concat(valueToByteArray(value));
 }
 
@@ -249,12 +261,13 @@ serializers = {
   jumpIf: (node) => [OpCodes.JumpIf, ...serializeValue(node.condition), ...serializeValue(node.address)],
   ioMode: (node) => [OpCodes.IoMode, node.pin, node.mode],
   ioType: (node) => [OpCodes.IoType, node.pin, node.pinType],
-  ioAllOut: () => [OpCodes.IoAllOut],
+  ioAllOutput: () => [OpCodes.IoAllOutput],
   ioWrite: (node) => [OpCodes.IoWrite, node.pin, ...serializeValue(node.value)],
   ioRead: (node) => [OpCodes.IoRead, node.pin, ...serializeValue(node.target)],
   memoryGet: (node) => [OpCodes.MemGet, ...serializeValue(node.target), ...serializeValue(node.address)],
   memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
-  memoryCopy: (node) => [OpCodes.MemCopy, ...serializeValue(node.source), ...serializeValue(node.destination)],
+  wifiConnect: (node) => [OpCodes.WifiConnect, ...serializeValue(node.ssid), ...serializeValue(node.password)],
+  wifiDisconnect: () => [OpCodes.WifiDisconnect],
 };
 
 const oneByte = () => 1;
@@ -277,7 +290,7 @@ sizeOf = {
   ioRead: (node) => 2 + serializeValue(node.target).length,
   ioMode: () => 3,
   ioType: () => 3,
-  ioAllOut: oneByte,
+  ioAllOutput: oneByte,
 
   // system
   halt: oneByte,
@@ -304,5 +317,6 @@ sizeOf = {
   // memory
   memoryGet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.address).length,
   memorySet: (node) => 1 + serializeValue(node.target).length + serializeValue(node.value).length,
-  memoryCopy: () => 11,
+  wifiConnect: (node) => 1 + serializeValue(node.ssid).length + serializeValue(node.password).length,
+  wifiDisconnect: () => 1,
 };

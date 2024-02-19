@@ -174,17 +174,17 @@ describe('Compiler', () => {
 
   it('should jump to a given label', () => {
     const program = `
-    @begin
+    def begin
       noop
-      jump to @end
+      end()
 
-    @middle
+    def middle
       noop
-      jump to @begin
+      begin()
 
-    @end
+    def end
       noop
-      jump to @middle
+      middle()
     `;
     const output = compile(program);
 
@@ -227,8 +227,8 @@ describe('Compiler', () => {
   it('should jump to a given label if a condition is met', () => {
     const program = `
     byte $a = ffh
-    @begin
-    if 0 then jump to @begin
+    def begin
+    if 0 then jump to begin
     if $a then jump to 0x00000005
     `;
 

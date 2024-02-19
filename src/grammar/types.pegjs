@@ -19,7 +19,7 @@ String "string" = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
 Pin "pin" = ('pin ' / '#') pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
 LabelText = [a-z] [a-zA-Z0-9_]* { return text() }
-DefineLabel = '@' label:LabelText { return InstructionNode.create('defineLabel', { label }) }
+DefineLabel = 'def' Spaces label:LabelText { return InstructionNode.create('defineLabel', { label }) }
 Label = label:LabelText { return InstructionNode.create('label', { label }) }
 Identifier "identifier" = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 IdentifierChar = Alphanumeric / "$" / "_"
@@ -32,10 +32,3 @@ PinModeOutput = ('output' / '1' ) { return 1 }
 PinModeOpenDrain = ('open-drain' / '2') { return 2 }
 PinModeInputPullUp = ('pull-up' / '3') { return 3 }
 
-ValueTypeMap =
-  'byte' { return ValueType.Byte } /
-  'boolean' { return ValueType.Byte } /
-  'address' { return ValueType.Address } /
-  'uint' { return  ValueType.Integer } /
-  'int' { return ValueType.SignedInteger } /
-  'string' { return ValueType.String }

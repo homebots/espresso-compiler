@@ -12,7 +12,6 @@ export const OpCodes = {
   JumpTo: 0x0a,
   JumpIf: 0x0b,
   Sleep: 0x0c,
-  Declare: 0x0d,
 
   // operations
   Gt: 0x20,
@@ -34,16 +33,39 @@ export const OpCodes = {
   Inc: 0x2f,
   Dec: 0x30,
   Assign: 0x31,
+  Declare: 0x32,
 
   // memory/io instructions
   MemGet: 0x40,
   MemSet: 0x41,
-  MemCopy: 0x42,
   IoWrite: 0x43,
   IoRead: 0x44,
   IoMode: 0x45,
   IoType: 0x46,
-  IoAllOut: 0x47,
+  IoAllOutput: 0x47,
+
+  // --- not implemented ---
+  Iointerrupt: 0x48,
+  IointerruptToggle: 0x49,
+
+  // wifi
+  WifiStatus: 0x60,
+  WifiAp: 0x61,
+  WifiConnect: 0x62,
+  WifiDisconnect: 0x63,
+  WifiList: 0x64,
+
+  // i2c
+  I2cSetup: 0x70,
+  I2cStart: 0x71,
+  I2cStop: 0x72,
+  I2cWrite: 0x73,
+  I2cRead: 0x74,
+  I2cSetAck: 0x75,
+  I2cGetAck: 0x76,
+  I2cFind: 0x77,
+  I2cWriteAck: 0x78,
+  I2cWriteAck_b: 0x79,
 };
 
 export const binaryOperatorMap = {

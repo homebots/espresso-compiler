@@ -12,7 +12,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       const bytes = 'foo'.split('').map((c) => c.charCodeAt(0));
       const node = InstructionNode.create('assign', {
         target: createIdentifier(2),
-        value: InstructionNode.create('stringValue', { value: ['f', 'o', 'o'], dataType: ValueType.String }),
+        value: InstructionNode.create('stringValue', { value: 'foo', dataType: ValueType.String }),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(8);
@@ -95,7 +95,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('stringValue', () => {
-      const node = InstructionNode.create('stringValue', { value: 'hello'.split(''), dataType: ValueType.String });
+      const node = InstructionNode.create('stringValue', { value: 'hello', dataType: ValueType.String });
 
       expect(InstructionNode.sizeOf(node)).toBe(7);
       expect(() => InstructionNode.serialize(node)).toThrow();
@@ -236,11 +236,11 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoType, 1, 2]);
     });
 
-    it('ioAllOut', () => {
-      const node = InstructionNode.create('ioAllOut');
+    it('ioAllOutput', () => {
+      const node = InstructionNode.create('ioAllOutput');
 
       expect(InstructionNode.sizeOf(node)).toBe(1);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoAllOut]);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoAllOutput]);
     });
 
     it('memoryGet', () => {
@@ -284,26 +284,19 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       ]);
     });
 
-    it('memoryCopy', () => {
-      const node = InstructionNode.create('memoryCopy', {
-        source: InstructionNode.create('numberValue', { dataType: ValueType.Address, value: 1000 }),
-        destination: InstructionNode.create('numberValue', { dataType: ValueType.Address, value: 1001 }),
+    it('wifiConnect', () => {
+      const node = InstructionNode.create('wifiConnect', {
+        ssid: InstructionNode.create('stringValue', { dataType: ValueType.String, value: 'test' }),
+        password: InstructionNode.create('nullValue', { dataType: ValueType.Null, value: 0 }),
       });
+      expect(InstructionNode.sizeOf(node)).toBe(9);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.WifiConnect, ValueType.String, 116, 101, 115, 116, 0, 0, 0]);
+    });
 
-      expect(InstructionNode.sizeOf(node)).toBe(11);
-      expect(InstructionNode.serialize(node)).toEqual([
-        OpCodes.MemCopy,
-        ValueType.Address,
-        0xe8,
-        0x03,
-        0,
-        0,
-        ValueType.Address,
-        0xe9,
-        0x03,
-        0,
-        0,
-      ]);
+    it('wifiDisconnect', () => {
+      const node = InstructionNode.create('wifiDisconnect');
+      expect(InstructionNode.sizeOf(node)).toBe(1);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.WifiDisconnect]);
     });
   });
 });

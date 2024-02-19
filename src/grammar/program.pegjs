@@ -8,10 +8,9 @@ SystemInstruction /
 MemoryInstruction /
 Operator /
 IoInstruction /
+WifiInstruction /
 Comment
 
- // / WifiInstruction
- // / I2cInstruction
-
+// / I2cInstruction
 
 Comment "comment" = ('//' [^\n]+) { return [] }
