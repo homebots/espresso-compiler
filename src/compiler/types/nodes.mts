@@ -56,10 +56,10 @@ export interface NodeTypeToNodeMap {
 // const factories: { [K in keyof NodeTypeToNodeMap]?: NodeFactory<NodeTypeToNodeMap[K]> } = {};
 
 type NodeSerializer<T extends InstructionNode> = (node: T) => Array<number | InstructionNode>;
-let serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToNodeMap[K]> };
+let serializers: { [K in keyof NodeTypeToNodeMap]?: NodeSerializer<NodeTypeToNodeMap[K]> } = {};
 
 type NodeSizeOf<T extends InstructionNode> = (node: T) => number;
-let sizeOf: { [K in keyof NodeTypeToNodeMap]?: NodeSizeOf<NodeTypeToNodeMap[K]> };
+let sizeOf: { [K in keyof NodeTypeToNodeMap]?: NodeSizeOf<NodeTypeToNodeMap[K]> } = {};
 
 export class InstructionNode {
   type: keyof NodeTypeToNodeMap;

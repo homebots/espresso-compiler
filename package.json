@@ -16,7 +16,7 @@
     "types": "tsc --declaration -p tsconfig.build.json",
     "package": "ncc build src/index.mts --minify --no-cache --target es2022",
     "cli": "ncc build dist/cli.mjs -o cli --minify --no-cache --target es2022 && cat cli-header.txt cli/index.mjs > cli/espc.mjs && rm cli/index.mjs",
-    "lint": "eslint --quiet src/**/*.mts --ignore-pattern src/compiler/parser.mts",
+    "lint": "npx eslint 'src/**/*.mts'",
     "tdd": "jest --watchAll"
   },
   "publishConfig": {
@@ -37,15 +37,14 @@
   "homepage": "https://github.com/homebots/espresso-compiler#readme",
   "devDependencies": {
     "@types/jest": "^29.5.2",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
-    "@typescript-eslint/parser": "^7.0.2",
     "@vercel/ncc": "^0.38.1",
-    "eslint": "^8.1.0",
+    "eslint": "^8.56.0",
     "jest": "^29.5.0",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.0.0",
     "ts-pegjs": "^4.2.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^7.0.2"
   }
 }
