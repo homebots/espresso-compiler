@@ -23,16 +23,11 @@ export function valueToByteArray(type: ValueNode): number[] {
 
     case ValueType.Null:
       return [0];
-
-    default:
-      console.log(type);
-      throw new Error('Invalid value node');
   }
 }
 
 export function serializeValue(value: ValueNode | NullValueNode): number[] {
   const v = valueToByteArray(value);
-  if (v.includes(undefined)) console.log(value, v);
   return [value.dataType].concat(v);
 }
 

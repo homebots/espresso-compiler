@@ -2,7 +2,8 @@ import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types/
 
 describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
   const createIdentifier = (id: number) =>
-    InstructionNode.create('identifierValue', { value: InstructionNode.create('useIdentifier', { name: 'foo', id }),
+    InstructionNode.create('identifierValue', {
+      value: InstructionNode.create('useIdentifier', { name: 'foo', id }),
     });
 
   const createByte = (value: number) => InstructionNode.create('byteValue', { value, dataType: ValueType.Byte });
@@ -48,8 +49,8 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('unaryOperation', () => {
       const node = InstructionNode.create('unaryOperation', {
-        target: createIdentifier(0),
         operator: 'inc',
+        target: createIdentifier(0),
       });
       expect(InstructionNode.sizeOf(node)).toBe(3);
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.Inc, ValueType.Identifier, 0]);

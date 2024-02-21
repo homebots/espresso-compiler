@@ -17,7 +17,7 @@ extend(factories, {
     return { type, value: properties.value, dataType: ValueType.Byte };
   },
   addressValue(type, properties) {
-    return { type, value: properties.value, dataType: ValueType.Integer };
+    return { type, value: properties.value, dataType: ValueType.Address };
   },
   integerValue(type, properties) {
     return { type, value: properties.value, dataType: ValueType.Integer };
@@ -28,4 +28,5 @@ extend(factories, {
   stringValue(type, properties) {
     return { type, value: properties.value, dataType: ValueType.String };
   },
+
 });
