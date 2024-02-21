@@ -1,5 +1,6 @@
 .github/
 src/
+!src/grammar.pegjs
 *.spec.d.mts
 *.spec.mjs
 coverage/
@@ -11,3 +12,5 @@ jest*
 peg-config.json
 tsconfig*
 update-grammar.sh
+cli-header.txt
+eslint.cofig.js
