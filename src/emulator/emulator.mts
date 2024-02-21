@@ -41,7 +41,7 @@ class Value {
   }
 
   toNumber() {
-    return Number(this.value);
+    return Number(this.value) | 0;
   }
 
   toBoolean() {
@@ -204,9 +204,9 @@ export class Program {
         value = this.readString();
         break;
 
-      case ValueType.Null:
-        value = 0;
-        break;
+      // case ValueType.Null:
+      //   value = 0;
+      //   break;
     }
 
     if (type === ValueType.Identifier) {
