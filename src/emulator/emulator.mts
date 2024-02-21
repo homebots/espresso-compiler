@@ -41,7 +41,7 @@ class Value {
   }
 
   toNumber() {
-    return Number(this.value) | 0;
+    return Number(this.value);
   }
 
   toBoolean() {
@@ -229,9 +229,9 @@ export class Program {
   ioWrite(): void {
     const pin = this.readValue();
     const value = this.readValue();
-
-    this.pins[pin.toNumber()] = value.toNumber();
-    this.trace(`io write pin ${pin}, ${value}`);
+    const pinValue = value.toBoolean() ? 1 : 0;
+    this.pins[pin.toNumber()] = pinValue;
+    this.trace(`io write pin ${pin}, ${pinValue}`);
   }
 
   ioMode(): void {
