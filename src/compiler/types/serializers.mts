@@ -16,7 +16,7 @@ export function valueToByteArray(type: ValueNode): number[] {
       return [type.value as number];
 
     case ValueType.Identifier:
-      return [(type.value as UseIdentifierNode).id || -1];
+      return [(type.value as UseIdentifierNode).id];
 
     case ValueType.String:
       return charArrayToBytes(Array.isArray(type.value) ? type.value : String(type.value).split(''));
