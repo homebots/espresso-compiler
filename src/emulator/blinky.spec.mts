@@ -27,10 +27,8 @@ describe('Blinky program', () => {
     clock.tick(7);
 
     expect(output.lines).toEqual([
-      'declare #0, Byte, 0',
       'io write pin 0, 0',
       'delay 1000',
-      '#0 = not #0',
       'io write pin 0, 1',
       'delay 1000',
       'jump to 0',
