@@ -2,19 +2,8 @@
 IoInstruction
   = IoWrite / IoRead / IoMode / IoType / IoAllOutput
 
-IoWrite = 'io_write' __ pin:Pin Separator value:IoValue {
-  return InstructionNode.create('ioWrite', {
-    pin: InstructionNode.create('byteValue', { value: Number(pin) }),
-    value: InstructionNode.create('byteValue', { value: Number(value) })
-  })
-}
-
-IoRead = 'io_read' __ target:IdentifierValue Separator pin:Pin {
-  return InstructionNode.create('ioRead', {
-    pin: InstructionNode.create('byteValue', { value: Number(pin) }),
-    target
-  })
-}
+IoWrite = 'io_write' __ pin:PinValue Separator value:IoValue { return InstructionNode.create('ioWrite', { pin, value }) }
+IoRead = 'io_read' __ target:IdentifierValue Separator pin:PinValue { return InstructionNode.create('ioRead', { pin, target }) }
 
 IoMode = 'io_mode' __ pin:Pin Separator mode:PinMode {
   return InstructionNode.create('ioMode', {

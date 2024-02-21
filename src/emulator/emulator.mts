@@ -229,7 +229,7 @@ export class Program {
   ioWrite(): void {
     const pin = this.readValue();
     const value = this.readValue();
-    const pinValue = value.toBoolean() ? 1 : 0;
+    const pinValue = Number(value.toBoolean());
     this.pins[pin.toNumber()] = pinValue;
     this.trace(`io write pin ${pin}, ${pinValue}`);
   }
