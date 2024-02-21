@@ -1,7 +1,7 @@
 import { CaptureOutput, compile, Emulator, StepClock } from '../index.mjs';
 
 describe('Blinky program', () => {
-  it.only('should run blinky', () => {
+  it('should run blinky', () => {
     const emulator = new Emulator();
     const clock = new StepClock();
     const output = new CaptureOutput();
