@@ -9,12 +9,10 @@ describe('Blinky program', () => {
       `
       // blinks a pin and loops back to zero
       // using tick() instead of run() to avoid infinite loop
-      byte $value = 0h
       def begin
-        io_write pin 0, $value
+        io_write pin 0, 1
         delay 1000
-        $value = not $value
-        io_write pin 0, $value
+        io_write #0, 0
         delay 1000
 
       begin()
