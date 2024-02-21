@@ -23,7 +23,7 @@ extend(factories, {
     return { type, value: properties.value, dataType: ValueType.Integer };
   },
   signedIntegerValue(type, properties) {
-    return { type, value: properties.value, dataType: ValueType.Integer };
+    return { type, value: properties.value, dataType: ValueType.SignedInteger };
   },
   stringValue(type, properties) {
     return { type, value: properties.value, dataType: ValueType.String };
