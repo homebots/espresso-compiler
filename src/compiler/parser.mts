@@ -548,22 +548,42 @@ const peggyParser: { parse: any; SyntaxError: any; DefaultTracer?: any } = // Ge
 
       var peg$f0 = function (pin, value) {
         // @ts-ignore
-        return InstructionNode.create('ioWrite', { pin, value });
+        return InstructionNode.create('ioWrite', {
+          // @ts-ignore
+          pin: InstructionNode.create('byteValue', { value: Number(pin) }),
+          // @ts-ignore
+          value: InstructionNode.create('byteValue', { value: Number(value) }),
+        });
       }; // @ts-ignore
 
       var peg$f1 = function (target, pin) {
         // @ts-ignore
-        return InstructionNode.create('ioRead', { pin, target });
+        return InstructionNode.create('ioRead', {
+          // @ts-ignore
+          pin: InstructionNode.create('byteValue', { value: Number(pin) }),
+          // @ts-ignore
+          target,
+        });
       }; // @ts-ignore
 
       var peg$f2 = function (pin, mode) {
         // @ts-ignore
-        return InstructionNode.create('ioMode', { pin, mode });
+        return InstructionNode.create('ioMode', {
+          // @ts-ignore
+          pin: InstructionNode.create('byteValue', { value: Number(pin) }),
+          // @ts-ignore
+          mode: InstructionNode.create('byteValue', { value: Number(mode) }),
+        });
       }; // @ts-ignore
 
       var peg$f3 = function (pin, pinType) {
         // @ts-ignore
-        return InstructionNode.create('ioType', { pin, pinType: Number(pinType) });
+        return InstructionNode.create('ioType', {
+          // @ts-ignore
+          pin: InstructionNode.create('byteValue', { value: Number(pin) }),
+          // @ts-ignore
+          pinType: InstructionNode.create('byteValue', { value: Number(pinType) }),
+        });
       }; // @ts-ignore
 
       var peg$f4 = function () {
@@ -796,49 +816,49 @@ const peggyParser: { parse: any; SyntaxError: any; DefaultTracer?: any } = // Ge
         return 3;
       }; // @ts-ignore
 
-      var peg$f50 = function (value) {
+      var peg$f50 = function () {
         // @ts-ignore
-        return InstructionNode.create('identifierValue', { value, dataType: ValueType.Identifier });
+        return InstructionNode.create('nullValue', {});
       }; // @ts-ignore
 
       var peg$f51 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('byteValue', { value, dataType: ValueType.Pin });
+        return InstructionNode.create('identifierValue', { value });
       }; // @ts-ignore
 
       var peg$f52 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte });
+        return InstructionNode.create('pinValue', { value });
       }; // @ts-ignore
 
       var peg$f53 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte });
+        return InstructionNode.create('booleanValue', { value });
       }; // @ts-ignore
 
       var peg$f54 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('numberValue', { value, dataType: ValueType.Address });
+        return InstructionNode.create('byteValue', { value });
       }; // @ts-ignore
 
       var peg$f55 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('numberValue', { value, dataType: ValueType.Integer });
+        return InstructionNode.create('addressValue', { value });
       }; // @ts-ignore
 
       var peg$f56 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('numberValue', { value, dataType: ValueType.SignedInteger });
+        return InstructionNode.create('integerValue', { value });
       }; // @ts-ignore
 
       var peg$f57 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('stringValue', { value, dataType: ValueType.String });
+        return InstructionNode.create('signedIntegerValue', { value });
       }; // @ts-ignore
 
-      var peg$f58 = function () {
+      var peg$f58 = function (value) {
         // @ts-ignore
-        return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null });
+        return InstructionNode.create('stringValue', { value });
       }; // @ts-ignore
 
       var peg$f59 = function (arg) {
@@ -6854,340 +6874,12 @@ const peggyParser: { parse: any; SyntaxError: any; DefaultTracer?: any } = // Ge
 
       // @ts-ignore
       function // @ts-ignore
-      peg$parseIdentifierValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 65;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseUseIdentifier();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f50(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parsePinValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 66;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parsePin();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f51(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseBooleanValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 67;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseBoolean();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f52(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseByteValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 68;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseByte();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f53(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseAddressValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 69;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseAddress();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f54(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseIntegerValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 70;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseInteger();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f55(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseSignedIntegerValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 71;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseSignedInteger();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f56(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
-      peg$parseStringValue() {
-        // @ts-ignore
-        var s0, s1;
-
-        // @ts-ignore
-        var key = peg$currPos * 83 + 72;
-        // @ts-ignore
-        var cached = peg$resultsCache[key];
-
-        // @ts-ignore
-        if (cached) {
-          // @ts-ignore
-          peg$currPos = cached.nextPos;
-
-          // @ts-ignore
-          return cached.result;
-        }
-
-        // @ts-ignore
-        s0 = peg$currPos;
-        // @ts-ignore
-        s1 = peg$parseString();
-        // @ts-ignore
-        if (s1 !== peg$FAILED) {
-          // @ts-ignore
-          peg$savedPos = s0;
-          // @ts-ignore
-          s1 = peg$f57(s1);
-        }
-        // @ts-ignore
-        s0 = s1;
-
-        // @ts-ignore
-        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
-
-        // @ts-ignore
-        return s0;
-      }
-
-      // @ts-ignore
-      function // @ts-ignore
       peg$parseNullValue() {
         // @ts-ignore
         var s0, s1;
 
         // @ts-ignore
-        var key = peg$currPos * 83 + 73;
+        var key = peg$currPos * 83 + 65;
         // @ts-ignore
         var cached = peg$resultsCache[key];
 
@@ -7222,7 +6914,335 @@ const peggyParser: { parse: any; SyntaxError: any; DefaultTracer?: any } = // Ge
           // @ts-ignore
           peg$savedPos = s0;
           // @ts-ignore
-          s1 = peg$f58();
+          s1 = peg$f50();
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseIdentifierValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 66;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseUseIdentifier();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f51(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parsePinValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 67;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parsePin();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f52(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseBooleanValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 68;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseBoolean();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f53(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseByteValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 69;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseByte();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f54(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseAddressValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 70;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseAddress();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f55(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseIntegerValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 71;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseInteger();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f56(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseSignedIntegerValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 72;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseSignedInteger();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f57(s1);
+        }
+        // @ts-ignore
+        s0 = s1;
+
+        // @ts-ignore
+        peg$resultsCache[key] = { nextPos: peg$currPos, result: s0 };
+
+        // @ts-ignore
+        return s0;
+      }
+
+      // @ts-ignore
+      function // @ts-ignore
+      peg$parseStringValue() {
+        // @ts-ignore
+        var s0, s1;
+
+        // @ts-ignore
+        var key = peg$currPos * 83 + 73;
+        // @ts-ignore
+        var cached = peg$resultsCache[key];
+
+        // @ts-ignore
+        if (cached) {
+          // @ts-ignore
+          peg$currPos = cached.nextPos;
+
+          // @ts-ignore
+          return cached.result;
+        }
+
+        // @ts-ignore
+        s0 = peg$currPos;
+        // @ts-ignore
+        s1 = peg$parseString();
+        // @ts-ignore
+        if (s1 !== peg$FAILED) {
+          // @ts-ignore
+          peg$savedPos = s0;
+          // @ts-ignore
+          s1 = peg$f58(s1);
         }
         // @ts-ignore
         s0 = s1;
@@ -8110,6 +8130,7 @@ export type PinModeInput = 0;
 export type PinModeOutput = 1;
 export type PinModeOpenDrain = 2;
 export type PinModeInputPullUp = 3;
+export type NullValue = any;
 export type IdentifierValue = any;
 export type PinValue = any;
 export type BooleanValue = any;
@@ -8118,7 +8139,6 @@ export type AddressValue = any;
 export type IntegerValue = any;
 export type SignedIntegerValue = any;
 export type StringValue = any;
-export type NullValue = any;
 export type NumberValue = IntegerValue | SignedIntegerValue;
 export type Value = IdentifierValue | ByteValue | AddressValue | NumberValue | StringValue | BooleanValue | NullValue;
 export type IntrinsicValue = ByteValue | NumberValue | StringValue | BooleanValue | NullValue;

@@ -22,7 +22,11 @@ const binaryOperatorTable: Record<number, (a: string | number, b: string | numbe
   [OpCodes.Or]: (a: number, b: number) => a | b,
 };
 class Value {
-  constructor(public dataType: ValueType, public value: string | number, public id?: number) {}
+  constructor(
+    public dataType: ValueType,
+    public value: string | number,
+    public id?: number,
+  ) {}
 
   isString() {
     return this.dataType === ValueType.String;
@@ -46,7 +50,11 @@ class Value {
 }
 
 export class Program {
-  constructor(readonly bytes: number[], readonly clock: Clock, readonly output: ProgramOutput) {
+  constructor(
+    readonly bytes: number[],
+    readonly clock: Clock,
+    readonly output: ProgramOutput,
+  ) {
     this.endOfTheProgram = bytes.length;
     clock.onTick(() => this.tick());
   }
@@ -195,6 +203,10 @@ export class Program {
       case ValueType.String:
         value = this.readString();
         break;
+
+      case ValueType.Null:
+        value = 0;
+        break;
     }
 
     if (type === ValueType.Identifier) {
@@ -215,18 +227,18 @@ export class Program {
   }
 
   ioWrite(): void {
-    const pin = this.readByte();
+    const pin = this.readValue();
     const value = this.readValue();
 
-    this.pins[pin] = value.toNumber();
+    this.pins[pin.toNumber()] = value.toNumber();
     this.trace(`io write pin ${pin}, ${value}`);
   }
 
   ioMode(): void {
-    const pin = this.readByte();
-    const value = this.readByte();
+    const pin = this.readValue();
+    const value = this.readValue();
 
-    this.pinModes[pin] = value;
+    this.pinModes[pin.toNumber()] = value.toNumber();
     this.trace(`io mode pin ${pin}, ${value}`);
   }
 

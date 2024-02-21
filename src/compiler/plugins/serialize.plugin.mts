@@ -4,8 +4,7 @@ import { InstructionNode } from '../types/index.mjs';
 export class SerializePlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
     const bytes = context.nodes
-      .map((node) => InstructionNode.serialize(node))
-      .flat()
+      .flatMap((node) => InstructionNode.serialize(node))
       .filter((byte) => byte !== null) as ByteArray;
 
     return {

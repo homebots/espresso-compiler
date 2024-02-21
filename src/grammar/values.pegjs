@@ -1,14 +1,14 @@
 
 // values
-IdentifierValue = value:UseIdentifier { return InstructionNode.create('identifierValue', { value, dataType: ValueType.Identifier }) }
-PinValue =  value:Pin { return InstructionNode.create('byteValue', { value, dataType: ValueType.Pin }) }
-BooleanValue = value:Boolean { return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte }) }
-ByteValue = value:Byte { return InstructionNode.create('byteValue', { value, dataType: ValueType.Byte }) }
-AddressValue = value:Address { return InstructionNode.create('numberValue', { value, dataType: ValueType.Address }) }
-IntegerValue = value:Integer { return InstructionNode.create('numberValue', { value, dataType: ValueType.Integer }) }
-SignedIntegerValue = value:SignedInteger { return InstructionNode.create('numberValue', { value, dataType: ValueType.SignedInteger }) }
-StringValue = value:String { return InstructionNode.create('stringValue', { value, dataType: ValueType.String }) }
-NullValue = 'null' { return InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Null }) }
+NullValue = 'null' { return InstructionNode.create('nullValue', {}) }
+IdentifierValue = value:UseIdentifier { return InstructionNode.create('identifierValue', { value }) }
+PinValue =  value:Pin { return InstructionNode.create('pinValue', { value }) }
+BooleanValue = value:Boolean { return InstructionNode.create('booleanValue', { value }) }
+ByteValue = value:Byte { return InstructionNode.create('byteValue', { value }) }
+AddressValue = value:Address { return InstructionNode.create('addressValue', { value }) }
+IntegerValue = value:Integer { return InstructionNode.create('integerValue', { value }) }
+SignedIntegerValue = value:SignedInteger { return InstructionNode.create('signedIntegerValue', { value }) }
+StringValue = value:String { return InstructionNode.create('stringValue', { value }) }
 NumberValue = IntegerValue / SignedIntegerValue
 
 Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue / BooleanValue / NullValue

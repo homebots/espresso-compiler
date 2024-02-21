@@ -1,0 +1,72 @@
+import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants.mjs';
+import { NullValueNode, UseIdentifierNode, ValueNode, ValueType, extend, serializers } from './nodes.mjs';
+import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-conversion.mjs';
+
+export function valueToByteArray(type: ValueNode): number[] {
+  switch (type.dataType) {
+    case ValueType.Address:
+    case ValueType.Integer:
+      return numberToUnsignedInt32(type.value as number);
+
+    case ValueType.SignedInteger:
+      return numberToInt32(type.value as number);
+
+    case ValueType.Byte:
+    case ValueType.Pin:
+      return [type.value as number];
+
+    case ValueType.Identifier:
+      return [(type.value as UseIdentifierNode).id || -1];
+
+    case ValueType.String:
+      return charArrayToBytes(Array.isArray(type.value) ? type.value : String(type.value).split(''));
+
+    case ValueType.Null:
+      return [0];
+
+    default:
+      console.log(type);
+      throw new Error('Invalid value node');
+  }
+}
+
+export function serializeValue(value: ValueNode | NullValueNode): number[] {
+  const v = valueToByteArray(value);
+  if (v.includes(undefined)) console.log(value, v);
+  return [value.dataType].concat(v);
+}
+
+extend(serializers, {
+  comment: () => [],
+  declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
+  halt: () => [OpCodes.Halt],
+  restart: () => [OpCodes.Restart],
+  noop: () => [OpCodes.Noop],
+  systemInfo: () => [OpCodes.SystemInfo],
+  dump: () => [OpCodes.Dump],
+  debug: (node) => [OpCodes.Debug, ...serializeValue(node.value)],
+  delay: (node) => [OpCodes.Delay, ...serializeValue(node.value)],
+  print: (node) => [OpCodes.Print, ...serializeValue(node.value)],
+  sleep: (node) => [OpCodes.Sleep, ...serializeValue(node.value)],
+  yield: () => [OpCodes.Yield],
+  assign: (node) => [OpCodes.Assign, ...serializeValue(node.target), ...serializeValue(node.value)],
+  not: (node) => [OpCodes.Not, ...serializeValue(node.target), ...serializeValue(node.value)],
+  unaryOperation: (node) => [unaryOperatorMap[node.operator], ...serializeValue(node.target)],
+  binaryOperation: (node) => [
+    binaryOperatorMap[node.operator],
+    ...serializeValue(node.target),
+    ...serializeValue(node.a),
+    ...serializeValue(node.b),
+  ],
+  jumpTo: (node) => [OpCodes.JumpTo, ...serializeValue(node.address)],
+  jumpIf: (node) => [OpCodes.JumpIf, ...serializeValue(node.condition), ...serializeValue(node.address)],
+  ioMode: (node) => [OpCodes.IoMode, ...serializeValue(node.pin), ...serializeValue(node.mode)],
+  ioType: (node) => [OpCodes.IoType, ...serializeValue(node.pin), ...serializeValue(node.pinType)],
+  ioWrite: (node) => [OpCodes.IoWrite, ...serializeValue(node.pin), ...serializeValue(node.value)],
+  ioRead: (node) => [OpCodes.IoRead, ...serializeValue(node.pin), ...serializeValue(node.target)],
+  ioAllOutput: () => [OpCodes.IoAllOutput],
+  memoryGet: (node) => [OpCodes.MemGet, ...serializeValue(node.target), ...serializeValue(node.address)],
+  memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
+  wifiConnect: (node) => [OpCodes.WifiConnect, ...serializeValue(node.ssid), ...serializeValue(node.password)],
+  wifiDisconnect: () => [OpCodes.WifiDisconnect],
+});

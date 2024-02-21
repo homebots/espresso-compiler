@@ -2,17 +2,17 @@ import { InstructionNode, NodeTypeToNodeMap, OpCodes, ValueType } from './types/
 
 describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
   const createIdentifier = (id: number) =>
-    InstructionNode.create('identifierValue', {
-      value: InstructionNode.create('useIdentifier', { name: 'foo', id }),
-      dataType: ValueType.Identifier,
+    InstructionNode.create('identifierValue', { value: InstructionNode.create('useIdentifier', { name: 'foo', id }),
     });
+
+  const createByte = (value: number) => InstructionNode.create('byteValue', { value, dataType: ValueType.Byte });
 
   describe('should calculate the instruction size correctly:', () => {
     it('assign', () => {
       const bytes = 'foo'.split('').map((c) => c.charCodeAt(0));
       const node = InstructionNode.create('assign', {
         target: createIdentifier(2),
-        value: InstructionNode.create('stringValue', { value: 'foo', dataType: ValueType.String }),
+        value: InstructionNode.create('stringValue', { value: 'foo' }),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(8);
@@ -28,8 +28,8 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('binaryOperation', () => {
       const node = InstructionNode.create('binaryOperation', {
-        a: InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte }),
-        b: InstructionNode.create('byteValue', { value: 2, dataType: ValueType.Byte }),
+        a: createByte(1),
+        b: createByte(2),
         operator: '+',
         target: createIdentifier(2),
       });
@@ -66,7 +66,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
         dataType: ValueType.Byte,
         name: 'foo',
         id: 1,
-        value: InstructionNode.create('byteValue', { value: 0, dataType: ValueType.Byte }),
+        value: createByte(0),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(4);
@@ -95,21 +95,21 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('stringValue', () => {
-      const node = InstructionNode.create('stringValue', { value: 'hello', dataType: ValueType.String });
+      const node = InstructionNode.create('stringValue', { value: 'hello' });
 
       expect(InstructionNode.sizeOf(node)).toBe(7);
       expect(() => InstructionNode.serialize(node)).toThrow();
     });
 
-    it('numberValue', () => {
-      const node = InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Integer });
+    it('integerValue', () => {
+      const node = InstructionNode.create('integerValue', { value: 1000 });
 
       expect(InstructionNode.sizeOf(node)).toBe(5);
       expect(() => InstructionNode.serialize(node)).toThrow();
     });
 
     it('byteValue', () => {
-      const node = InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte });
+      const node = createByte(1);
 
       expect(InstructionNode.sizeOf(node)).toBe(2);
       expect(() => InstructionNode.serialize(node)).toThrow();
@@ -123,7 +123,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('debug', () => {
-      const byte = InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte });
+      const byte = createByte(1);
       const node = InstructionNode.create('debug', { value: byte });
 
       expect(InstructionNode.sizeOf(node)).toBe(3);
@@ -144,7 +144,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('print', () => {
       const node = InstructionNode.create('print', {
-        value: InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Integer }),
+        value: InstructionNode.create('integerValue', { value: 1000 }),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(6);
@@ -152,7 +152,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     const time = {
-      value: InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Integer }),
+      value: InstructionNode.create('integerValue', { value: 1000 }),
     };
 
     it('delay', () => {
@@ -175,17 +175,17 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('jumpTo', () => {
       const node = InstructionNode.create('jumpTo', {
-        address: InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Address }),
+        address: InstructionNode.create('addressValue', { value: 1000 }),
       });
       expect(InstructionNode.sizeOf(node)).toBe(6);
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.JumpTo, ValueType.Address, 0xe8, 0x03, 0, 0]);
     });
 
     it('jumpIf', () => {
-      const value = InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte });
+      const value = createByte(1);
       const node = InstructionNode.create('jumpIf', {
         condition: value,
-        address: InstructionNode.create('numberValue', { value: 1000, dataType: ValueType.Address }),
+        address: InstructionNode.create('addressValue', { value: 1000 }),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(8);
@@ -202,38 +202,43 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('ioWrite', () => {
-      expect(
-        InstructionNode.sizeOf(
-          InstructionNode.create('ioWrite', {
-            pin: 1,
-            value: InstructionNode.create('byteValue', { value: 1, dataType: ValueType.Byte }),
-          }),
-        ),
-      ).toBe(4);
+      const node = InstructionNode.create('ioWrite', {
+        pin: createByte(1),
+        value: createByte(1),
+      });
+
+      expect(InstructionNode.sizeOf(node)).toBe(5);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoWrite, ValueType.Byte, 1, ValueType.Byte, 1]);
     });
 
     it('ioRead', () => {
       const node = InstructionNode.create('ioRead', {
-        pin: 1,
+        pin: createByte(1),
         target: createIdentifier(1),
       });
 
-      expect(InstructionNode.sizeOf(node)).toBe(4);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoRead, 1, ValueType.Identifier, 1]);
+      expect(InstructionNode.sizeOf(node)).toBe(5);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoRead, ValueType.Byte, 1, ValueType.Identifier, 1]);
     });
 
     it('ioMode', () => {
-      const node = InstructionNode.create('ioMode', { pin: 1, mode: 2 });
+      const node = InstructionNode.create('ioMode', {
+        pin: createByte(1),
+        mode: createByte(2),
+      });
 
-      expect(InstructionNode.sizeOf(node)).toBe(3);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoMode, 1, 2]);
+      expect(InstructionNode.sizeOf(node)).toBe(5);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoMode, ValueType.Byte, 1, ValueType.Byte, 2]);
     });
 
     it('ioType', () => {
-      const node = InstructionNode.create('ioType', { pin: 1, pinType: 2 });
+      const node = InstructionNode.create('ioType', {
+        pin: createByte(1),
+        pinType: createByte(2),
+      });
 
-      expect(InstructionNode.sizeOf(node)).toBe(3);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoType, 1, 2]);
+      expect(InstructionNode.sizeOf(node)).toBe(5);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoType, ValueType.Byte, 1, ValueType.Byte, 2]);
     });
 
     it('ioAllOutput', () => {
@@ -245,7 +250,7 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('memoryGet', () => {
       const node = InstructionNode.create('memoryGet', {
-        address: InstructionNode.create('numberValue', { dataType: ValueType.Address, value: 1000 }),
+        address: InstructionNode.create('addressValue', { value: 1000 }),
         target: createIdentifier(1),
       });
 
@@ -264,8 +269,8 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('memorySet', () => {
       const node = InstructionNode.create('memorySet', {
-        target: InstructionNode.create('numberValue', { dataType: ValueType.Address, value: 1000 }),
-        value: InstructionNode.create('numberValue', { dataType: ValueType.Integer, value: 1001 }),
+        target: InstructionNode.create('addressValue', { value: 1000 }),
+        value: InstructionNode.create('integerValue', { value: 1001 }),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(11);
@@ -286,11 +291,27 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('wifiConnect', () => {
       const node = InstructionNode.create('wifiConnect', {
-        ssid: InstructionNode.create('stringValue', { dataType: ValueType.String, value: 'test' }),
-        password: InstructionNode.create('nullValue', { dataType: ValueType.Null, value: 0 }),
+        ssid: InstructionNode.create('stringValue', {
+          dataType: ValueType.String,
+          value: 'test',
+        }),
+        password: InstructionNode.create('nullValue', {
+          dataType: ValueType.Null,
+          value: 0,
+        }),
       });
       expect(InstructionNode.sizeOf(node)).toBe(9);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.WifiConnect, ValueType.String, 116, 101, 115, 116, 0, 0, 0]);
+      expect(InstructionNode.serialize(node)).toEqual([
+        OpCodes.WifiConnect,
+        ValueType.String,
+        116,
+        101,
+        115,
+        116,
+        0,
+        0,
+        0,
+      ]);
     });
 
     it('wifiDisconnect', () => {
