@@ -9,7 +9,7 @@ export function valueToByteArray(type: ValueNode): number[] {
       return numberToUnsignedInt32(type.value as number);
 
     case ValueType.SignedInteger:
-      return numberToInt32(type.value as number);
+      return numberToInt32(Number(type.value as number) );
 
     case ValueType.Byte:
     case ValueType.Pin:

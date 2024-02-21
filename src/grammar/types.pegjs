@@ -14,7 +14,7 @@ True = ('true' / '1' / 'on') { return 1 }
 False = ('false' / '0' / 'off') { return 0 }
 Boolean "boolean" = True / False
 Integer "integer" = "0" { return 0 } / NonZeroDigit (!Space Digit)* { return parseInt(text()) }
-SignedInteger "signedInteger" = signal:('-'/'+') int:Integer { return int * (signal === '-' ? -1 : 1) }
+SignedInteger "signedInteger" = signal:('-'/'+') int:Integer { return signal + String(int) }
 String "string" = SingleQuoteString / DoubleQuoteString
 SingleQuoteString = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 DoubleQuoteString = '"' string:(!'"' .)* '"' { return string.map(s => s[1]) }
