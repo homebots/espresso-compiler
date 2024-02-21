@@ -24,7 +24,7 @@ describe('Blinky program', () => {
     expect(program.counter).toBe(0);
     expect(program.pins[0]).toBe(0);
 
-    clock.tick(7);
+    clock.tick(5);
 
     expect(output.lines).toEqual([
       'io write pin 0, 1',
