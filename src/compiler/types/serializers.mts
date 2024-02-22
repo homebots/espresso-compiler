@@ -55,6 +55,7 @@ extend(serializers, {
   ],
   jumpTo: (node) => [OpCodes.JumpTo, ...serializeValue(node.address)],
   jumpIf: (node) => [OpCodes.JumpIf, ...serializeValue(node.condition), ...serializeValue(node.address)],
+  return: () => [OpCodes.Return],
   ioMode: (node) => [OpCodes.IoMode, ...serializeValue(node.pin), ...serializeValue(node.mode)],
   ioType: (node) => [OpCodes.IoType, ...serializeValue(node.pin), ...serializeValue(node.pinType)],
   ioWrite: (node) => [OpCodes.IoWrite, ...serializeValue(node.pin), ...serializeValue(node.value)],

@@ -42,6 +42,7 @@ extend(sizeOf, {
   sleep: (node) => 1 + serializeValue(node.value).length,
   yield: oneByte,
 
+  return: () => 1,
   jumpTo: () => 6,
   jumpIf: (node) => 6 + serializeValue(node.condition).length,
 

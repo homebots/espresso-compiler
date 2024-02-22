@@ -2,12 +2,13 @@
 SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
 
 Halt = 'halt' { return InstructionNode.create('halt') }
+Return = ('end'/'return') { return InstructionNode.create('return') }
 Restart = 'restart' { return InstructionNode.create('restart') }
 Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
 Dump = 'dump' { return InstructionNode.create('dump') }
 Debug = 'debug' __ value:BooleanValue { return InstructionNode.create('debug', { value }) }
-Print = 'print' __ values:ValueList { return values.map(v => InstructionNode.create('print', { value:v })) }
+Print = ('print'/'say') __ values:ValueList { return values.map(v => InstructionNode.create('print', { value:v })) }
 
 Delay =
   'delay' __ value:IntegerValue { return InstructionNode.create('delay', { value }) } /

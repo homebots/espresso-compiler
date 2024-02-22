@@ -182,6 +182,12 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.JumpTo, ValueType.Address, 0xe8, 0x03, 0, 0]);
     });
 
+    it('return', () => {
+      const node = InstructionNode.create('return');
+      expect(InstructionNode.sizeOf(node)).toBe(1);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Return]);
+    });
+
     it('jumpIf', () => {
       const value = createByte(1);
       const node = InstructionNode.create('jumpIf', {

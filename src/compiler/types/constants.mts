@@ -12,6 +12,7 @@ export const OpCodes = {
   JumpTo: 0x0a,
   JumpIf: 0x0b,
   Sleep: 0x0c,
+  Return: 0x0d,
 
   // operations
   Gt: 0x20,

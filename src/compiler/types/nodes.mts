@@ -17,6 +17,7 @@ export interface NodeTypeToNodeMap {
   useIdentifier: UseIdentifierNode;
   defineLabel: LabelNode;
   label: LabelNode;
+  return: InstructionNode;
 
   nullValue: NullValueNode;
   identifierValue: IdentifierValueNode;
@@ -78,7 +79,7 @@ export function extend<A>(target: A, properties: Partial<A>) {
 }
 
 export class InstructionNode {
-  type: keyof NodeTypeToNodeMap;
+  readonly type: keyof NodeTypeToNodeMap;
 
   static serialize(node: InstructionNode): Array<number | InstructionNode> | null {
     return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);

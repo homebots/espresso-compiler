@@ -174,53 +174,29 @@ describe('Compiler', () => {
 
   it('should jump to a given label', () => {
     const program = `
-    def begin
-      noop
-      end()
+    third()
 
-    def middle
-      noop
-      begin()
+    def first
+      print 1
+      halt
 
-    def end
-      noop
-      middle()
+    def second
+      print 2
+      first()
+
+    def third
+      print 3
+      second()
     `;
     const output = compile(program);
-
     expect(output).toStrictEqual([
-      // begin
-      0x01,
-
-      // jump to end (12)
-      OpCodes.JumpTo,
-      ValueType.Address,
-      0x0c,
-      0x00,
-      0x00,
-      0x00,
-
-      // middle
-      0x01,
-
-      // jump to begin (0)
-      OpCodes.JumpTo,
-      ValueType.Address,
-      0x00,
-      0x00,
-      0x00,
-      0x00,
-
-      // end
-      0x01,
-
-      // jump to middle (6)
-      OpCodes.JumpTo,
-      ValueType.Address,
-      0x06,
-      0x00,
-      0x00,
-      0x00,
+      OpCodes.JumpTo, ValueType.Address, 23, 0, 0, 0,
+      OpCodes.Print, ValueType.Integer, 1, 0, 0, 0,
+      OpCodes.Halt,
+      OpCodes.Print, ValueType.Integer, 2, 0, 0, 0,
+      OpCodes.JumpTo, ValueType.Address, 6, 0, 0, 0,
+      OpCodes.Print, ValueType.Integer, 3, 0, 0, 0,
+      OpCodes.JumpTo, ValueType.Address, 12, 0, 0, 0,
     ]);
   });
 
