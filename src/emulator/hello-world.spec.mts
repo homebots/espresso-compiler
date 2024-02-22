@@ -1,4 +1,4 @@
-import { CaptureOutput, compile, Emulator, StepClock, TimerClock } from '../index.mjs';
+import { CaptureOutput, compile, Emulator, TimerClock } from '../index.mjs';
 
 describe('Hello world program', () => {
   it('should run', () => {

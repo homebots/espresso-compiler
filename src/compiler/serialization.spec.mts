@@ -210,42 +210,42 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
     it('ioWrite', () => {
       const node = InstructionNode.create('ioWrite', {
-        pin: createByte(1),
+        pin: InstructionNode.create('pinValue', { value: 1 }),
         value: createByte(1),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(5);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoWrite, ValueType.Byte, 1, ValueType.Byte, 1]);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoWrite, ValueType.Pin, 1, ValueType.Byte, 1]);
     });
 
     it('ioRead', () => {
       const node = InstructionNode.create('ioRead', {
-        pin: createByte(1),
+        pin: InstructionNode.create('pinValue', { value: 1 }),
         target: createIdentifier(1),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(5);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoRead, ValueType.Byte, 1, ValueType.Identifier, 1]);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoRead, ValueType.Pin, 1, ValueType.Identifier, 1]);
     });
 
     it('ioMode', () => {
       const node = InstructionNode.create('ioMode', {
-        pin: createByte(1),
+        pin: InstructionNode.create('pinValue', { value: 1 }),
         mode: createByte(2),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(5);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoMode, ValueType.Byte, 1, ValueType.Byte, 2]);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoMode, ValueType.Pin, 1, ValueType.Byte, 2]);
     });
 
     it('ioType', () => {
       const node = InstructionNode.create('ioType', {
-        pin: createByte(1),
+        pin: InstructionNode.create('pinValue', { value: 1 }),
         pinType: createByte(2),
       });
 
       expect(InstructionNode.sizeOf(node)).toBe(5);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoType, ValueType.Byte, 1, ValueType.Byte, 2]);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoType, ValueType.Pin, 1, ValueType.Byte, 2]);
     });
 
     it('ioAllOutput', () => {
