@@ -64,6 +64,7 @@ export class Program {
   pinModes: number[] = Array(16).fill(0);
   pinTypes: number[] = Array(16).fill(0);
   variables: Value[] = Array(0xff);
+  callStack: number[] = [];
 
   private endOfTheProgram = 0;
 
@@ -86,6 +87,14 @@ export class Program {
       case OpCodes.Delay:
         this.delay();
         break;
+
+      case OpCodes.Return:
+        this.return();
+        break;
+
+      case OpCodes.Define:
+        this.define();
+        return;
 
       case OpCodes.JumpTo:
         this.jumpTo();
@@ -226,22 +235,6 @@ export class Program {
     this.trace('print', value);
   }
 
-  ioWrite(): void {
-    const pin = this.readValue();
-    const value = this.readValue();
-    const pinValue = Number(value.toBoolean());
-    this.pins[pin.toNumber()] = pinValue;
-    this.trace(`io write pin ${pin}, ${pinValue}`);
-  }
-
-  ioMode(): void {
-    const pin = this.readValue();
-    const value = this.readValue();
-
-    this.pinModes[pin.toNumber()] = value.toNumber();
-    this.trace(`io mode pin ${pin}, ${value}`);
-  }
-
   delay(): void {
     const delay = this.readValue().toNumber();
     this.trace('delay', delay);
@@ -249,9 +242,24 @@ export class Program {
     this.clock.delay(delay);
   }
 
+  return() {
+    const previous = this.callStack.pop();
+    this.trace('return to ' + previous)
+    this.counter = previous;
+  }
+
+  define() {
+    this.trace('define');
+  }
+
   jumpTo(): void {
     const position = this.readValue().toNumber();
     this.trace(`jump to ${position}`);
+
+    if (this.callStack[this.callStack.length - 1] !== this.counter) {
+      this.callStack.push(this.counter);
+    }
+
     this.counter = position;
   }
 
@@ -316,6 +324,22 @@ export class Program {
     const value = this.readValue();
     value.value = Number(value.value) - 1;
     this.trace('dec #' + value.id);
+  }
+
+  ioWrite(): void {
+    const pin = this.readValue();
+    const value = this.readValue();
+    const pinValue = Number(value.toBoolean());
+    this.pins[pin.toNumber()] = pinValue;
+    this.trace(`io write pin ${pin}, ${pinValue}`);
+  }
+
+  ioMode(): void {
+    const pin = this.readValue();
+    const value = this.readValue();
+
+    this.pinModes[pin.toNumber()] = value.toNumber();
+    this.trace(`io mode pin ${pin}, ${value}`);
   }
 }
 

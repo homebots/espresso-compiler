@@ -10,7 +10,7 @@ extend(sizeOf, {
   // values
   declareIdentifier: (node) => 2 + serializeValue(node.value).length,
   useIdentifier: () => 0,
-  defineLabel: () => 0,
+  define: () => 1,
   label: () => 0,
 
   nullValue: valueLength,

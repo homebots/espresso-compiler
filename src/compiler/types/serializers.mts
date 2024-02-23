@@ -1,5 +1,5 @@
-import { OpCodes, binaryOperatorMap, unaryOperatorMap } from './constants.mjs';
-import { NullValueNode, UseIdentifierNode, ValueNode, ValueType, extend, serializers } from './nodes.mjs';
+import { OpCodes, binaryOperatorMap, unaryOperatorMap, ValueType } from './constants.mjs';
+import { NullValueNode, UseIdentifierNode, ValueNode, extend, serializers } from './nodes.mjs';
 import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-conversion.mjs';
 
 export function valueToByteArray(type: ValueNode): number[] {
@@ -33,6 +33,7 @@ export function serializeValue(value: ValueNode | NullValueNode): number[] {
 
 extend(serializers, {
   comment: () => [],
+  define: () => [OpCodes.Define],
   declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
   halt: () => [OpCodes.Halt],
   restart: () => [OpCodes.Restart],

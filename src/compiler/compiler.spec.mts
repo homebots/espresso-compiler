@@ -96,13 +96,6 @@ describe('Compiler', () => {
     expect(output).toStrictEqual([OpCodes.Sleep, ValueType.Integer, 0xd0, 0x07, 0x00, 0x00]);
   });
 
-  it('should jump to a given address', () => {
-    const program = `jump to 0x00000001`;
-    const output = compile(program);
-
-    expect(output).toStrictEqual([OpCodes.JumpTo, ValueType.Address, 0x01, 0x00, 0x00, 0x00]);
-  });
-
   it('should delay a given time (micro seconds)', () => {
     const program = `yield`;
     const output = compile(program);
@@ -172,40 +165,90 @@ describe('Compiler', () => {
     expect(output).toStrictEqual([OpCodes.Debug, ValueType.Byte, 0x1, OpCodes.Noop, OpCodes.Debug, ValueType.Byte, 0]);
   });
 
-  it('should jump to a given label', () => {
+  it('should declare functions', () => {
+    const program = `
+    fn fn {
+    }
+    `;
+    const output = compile(program);
+
+    expect(output).toStrictEqual([OpCodes.Define, OpCodes.Return]);
+  });
+
+  it('should jump to a function', () => {
     const program = `
     third()
 
-    def first
+    fn first {
       print 1
-      halt
+    }
 
-    def second
+    fn second {
       print 2
       first()
+    }
 
-    def third
+    fn third {
       print 3
       second()
+    }
     `;
     const output = compile(program);
     expect(output).toStrictEqual([
-      OpCodes.JumpTo, ValueType.Address, 23, 0, 0, 0,
-      OpCodes.Print, ValueType.Integer, 1, 0, 0, 0,
-      OpCodes.Halt,
-      OpCodes.Print, ValueType.Integer, 2, 0, 0, 0,
-      OpCodes.JumpTo, ValueType.Address, 6, 0, 0, 0,
-      OpCodes.Print, ValueType.Integer, 3, 0, 0, 0,
-      OpCodes.JumpTo, ValueType.Address, 12, 0, 0, 0,
+      OpCodes.JumpTo,
+      ValueType.Address,
+      28,
+      0,
+      0,
+      0,
+      OpCodes.Define,
+      OpCodes.Print,
+      ValueType.Integer,
+      1,
+      0,
+      0,
+      0,
+      OpCodes.Return,
+      OpCodes.Define,
+      OpCodes.Print,
+      ValueType.Integer,
+      2,
+      0,
+      0,
+      0,
+      OpCodes.JumpTo,
+      ValueType.Address,
+      6,
+      0,
+      0,
+      0,
+      OpCodes.Return,
+      OpCodes.Define,
+      OpCodes.Print,
+      ValueType.Integer,
+      3,
+      0,
+      0,
+      0,
+      OpCodes.JumpTo,
+      ValueType.Address,
+      14,
+      0,
+      0,
+      0,
+      OpCodes.Return,
     ]);
   });
 
-  it('should jump to a given label if a condition is met', () => {
+  it('should call a function if a condition is met', () => {
     const program = `
     byte $a = ffh
-    def begin
-    if 0 then jump to begin
-    if $a then jump to 0x00000005
+
+    fn begin {
+    }
+
+    if 0 then
+      begin()
     `;
 
     const output = compile(program);
@@ -215,6 +258,8 @@ describe('Compiler', () => {
       0,
       ValueType.Byte,
       0xff,
+      OpCodes.Define,
+      OpCodes.Return,
       OpCodes.JumpIf,
       ValueType.Integer,
       0,
@@ -223,14 +268,6 @@ describe('Compiler', () => {
       0,
       ValueType.Address,
       0x04,
-      0,
-      0,
-      0,
-      OpCodes.JumpIf,
-      ValueType.Identifier,
-      0,
-      ValueType.Address,
-      0x05,
       0,
       0,
       0,

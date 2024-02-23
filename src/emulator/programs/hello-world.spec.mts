@@ -1,11 +1,13 @@
-import { CaptureOutput, compile, Emulator, TimerClock } from '../index.mjs';
+import { CaptureOutput, compile, Emulator, TimerClock } from '../../index.mjs';
 
 describe('Hello world program', () => {
   it('should run', () => {
     const emulator = new Emulator();
     const clock = new TimerClock();
     const output = new CaptureOutput();
-    const bytes = compile(`say 'hello'`);
+    const bytes = compile(`
+    say 'hello'
+    `);
 
     const program = emulator.load(bytes, clock, output);
 

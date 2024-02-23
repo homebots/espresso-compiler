@@ -1,47 +1,41 @@
 import { CompilationContext, CompilerPlugin } from '../compiler.mjs';
 import { InstructionNode } from '../types/index.mjs';
 
-export class FindLabelsPlugin implements CompilerPlugin {
+export class MapFunctionLocationsPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
-    const labelAddresses = new Map<string, number>();
+    const { functionMap } = context;
     let byteAccumulator = 0;
 
-    const nodes = context.nodes.filter((node) => {
-      if (InstructionNode.isOfType(node, 'defineLabel')) {
-        const position = byteAccumulator - labelAddresses.size;
-        labelAddresses.set(node.label, position);
+    context.nodes.forEach((node) => {
+      if (InstructionNode.isOfType(node, 'define')) {
+        // if (functionMap.has(node.label)) {
+        //   throw new Error(`Cannot redeclare function ${node.label}`);
+        // }
 
-        return false;
+        functionMap.set(node.label, byteAccumulator);
       }
 
       byteAccumulator += InstructionNode.sizeOf(node);
-
-      return true;
     });
 
     return {
       ...context,
-      labelAddresses,
-      nodes,
+      functionMap,
     };
   }
 }
 
-export class ReplaceLabelReferencesPlugin implements CompilerPlugin {
+export class AlignFunctionCallsPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
     context.nodes.forEach((node) => {
       if (InstructionNode.isOfType(node, 'jumpTo') || InstructionNode.isOfType(node, 'jumpIf')) {
-        if (node.address) {
-          return;
-        }
+        const { label } = node;
 
-        const label = node.label.label;
-
-        // if (!context.labelAddresses.has(label)) {
-        //   throw new Error(`Label ${label} not found`);
+        // if (!context.functionMap.has(label)) {
+        //   throw new Error(`Function ${label} not found`);
         // }
 
-        const address = context.labelAddresses.get(label);
+        const address = context.functionMap.get(label);
         node.address = InstructionNode.create('addressValue', { value: address });
       }
     });

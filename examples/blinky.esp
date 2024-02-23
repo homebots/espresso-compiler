@@ -1,10 +1,11 @@
 debug 1
 io_mode pin 2, output
 
-def loop
+fn loop {
   io write pin 2, 1
   delay 1000
   io write pin 2, 0
   delay 1000
+}
 
 loop()

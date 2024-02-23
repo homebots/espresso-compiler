@@ -81,11 +81,11 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       expect(() => InstructionNode.serialize(node)).toThrow();
     });
 
-    it('defineLabel', () => {
-      const node = InstructionNode.create('defineLabel', { label: 'foo' });
+    it('define', () => {
+      const node = InstructionNode.create('define', { label: 'foo' });
 
-      expect(InstructionNode.sizeOf(node)).toBe(0);
-      expect(() => InstructionNode.serialize(node)).toThrow();
+      expect(InstructionNode.sizeOf(node)).toBe(1);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Define]);
     });
 
     it('label', () => {

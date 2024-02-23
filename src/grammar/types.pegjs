@@ -20,9 +20,7 @@ SingleQuoteString = "'" string:(!"'" .)* "'" { return string.map(s => s[1]) }
 DoubleQuoteString = '"' string:(!'"' .)* '"' { return string.map(s => s[1]) }
 Address "address" = '0x' a:HexByte b:HexByte c:HexByte d:HexByte { return parseInt(a + b + c + d, 16) }
 Pin "pin" = ('pin ' / '#') pin:(Digit / '10' / '11' / '12' / '13' / '14' / '15') { return Number(pin) }
-LabelText = [a-z] [a-zA-Z0-9_]* { return text() }
-DefineLabel = 'def' __ label:LabelText { return InstructionNode.create('defineLabel', { label }) }
-Label = label:LabelText { return InstructionNode.create('label', { label }) }
+FunctionName = [a-z] [a-zA-Z0-9_]* { return text() }
 Identifier "identifier" = '$' head:IdentifierChar tail:IdentifierChar* { return text(); }
 IdentifierChar = Alphanumeric / "$" / "_"
 UseIdentifier = name:Identifier { return InstructionNode.create('useIdentifier', { name }) }

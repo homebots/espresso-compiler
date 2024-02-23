@@ -1,13 +1,4 @@
-export enum ValueType {
-  Null = 0,
-  Identifier,
-  Byte,
-  Pin,
-  Address,
-  Integer,
-  SignedInteger,
-  String,
-}
+import { ValueType } from './constants.mjs';
 
 export interface NodeTypeToNodeMap {
   comment: InstructionNode;
@@ -15,7 +6,7 @@ export interface NodeTypeToNodeMap {
   // values
   declareIdentifier: DeclareIdentifierNode;
   useIdentifier: UseIdentifierNode;
-  defineLabel: LabelNode;
+  define: LabelNode;
   label: LabelNode;
   return: InstructionNode;
 
@@ -168,7 +159,7 @@ export interface LabelNode extends InstructionNode {
 
 export interface SystemJumpToNode extends InstructionNode {
   address?: NumberValueNode;
-  label?: LabelNode;
+  label?: string;
 }
 
 export interface SystemJumpIfNode extends SystemJumpToNode {

@@ -1,8 +1,9 @@
 
-SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay
+SystemInstruction 'system instruction' = Halt / Restart / SystemInfo / Debug / Dump / Noop / Print / JumpTo / JumpIf / Delay / Return / Define
 
 Halt = 'halt' { return InstructionNode.create('halt') }
-Return = ('end'/'return') { return InstructionNode.create('return') }
+Return = 'return' { return InstructionNode.create('return') }
+End = 'end' { return InstructionNode.create('return') }
 Restart = 'restart' { return InstructionNode.create('restart') }
 Noop = 'noop' { return InstructionNode.create('noop') }
 SystemInfo = 'sysinfo' { return InstructionNode.create('systemInfo') }
@@ -15,13 +16,6 @@ Delay =
   'sleep' __ value:IntegerValue { return InstructionNode.create('sleep', { value }) } /
   'yield' { return InstructionNode.create('yield') }
 
-JumpTo =
-  'jump' __ 'to' __ address:AddressValue { return InstructionNode.create('jumpTo', { address }) } /
-  'jump' __ 'to' __ label:Label { return InstructionNode.create('jumpTo', { label }) } /
-  label:Label '()' { return InstructionNode.create('jumpTo', { label }) }
-
-JumpIf =
-  'if' __ condition:Value __ 'then' __ 'jump' __ 'to' __ address:AddressValue { return InstructionNode.create('jumpIf', { condition, address }) } /
-  'if' __ condition:Value __ 'then' __ 'jump' __ 'to' __ label:Label { return InstructionNode.create('jumpIf', { condition, label }) } /
-  'if' __ condition:Value __ 'then' __ label:Label '()' { return InstructionNode.create('jumpIf', { condition, label }) }
-
+JumpTo = label:FunctionName '()' { return InstructionNode.create('jumpTo', { label }) }
+JumpIf = 'if' __ condition:Value __ 'then' NewLine __ label:FunctionName '()' { return InstructionNode.create('jumpIf', { condition, label }) }
+Define = 'fn' __ label:FunctionName __ '{' NewLine body:Line* __ '}' { return [InstructionNode.create('define', { label }), ...body, InstructionNode.create('return')] }

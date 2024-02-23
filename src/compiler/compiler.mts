@@ -8,7 +8,7 @@ export interface CompilationContext {
   bytes: ByteArray;
   identifiers: Map<string, number>;
   identifierTypes: Map<string, ValueType>;
-  labelAddresses: Map<string, number>;
+  functionMap: Map<string, number>;
 }
 
 export interface CompilerPlugin {
@@ -69,23 +69,20 @@ export class Compiler {
     const initialContext = this.createCompilationContext(nodes);
     const context = plugins.reduce((context, plugin) => plugin.run(context), initialContext);
 
-    // console.log(JSON.stringify(context.nodes, null, 2));
-    // console.log(context.bytes);
-
     return context.bytes as ByteArray;
   }
 
   protected createCompilationContext(nodes: Array<InstructionNode>): CompilationContext {
     const identifiers = new Map<string, number>();
     const identifierTypes = new Map<string, ValueType>();
-    const labelAddresses = new Map<string, number>();
+    const functionMap = new Map<string, number>();
 
     return {
       bytes: [],
       nodes,
       identifiers,
       identifierTypes,
-      labelAddresses,
+      functionMap,
     };
   }
 }

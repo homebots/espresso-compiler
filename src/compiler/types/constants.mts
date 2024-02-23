@@ -1,3 +1,14 @@
+export enum ValueType {
+  Null = 0,
+  Identifier,
+  Byte,
+  Pin,
+  Address,
+  Integer,
+  SignedInteger,
+  String,
+}
+
 export const OpCodes = {
   // system instructions
   Noop: 0x01,
@@ -35,6 +46,7 @@ export const OpCodes = {
   Dec: 0x30,
   Assign: 0x31,
   Declare: 0x32,
+  Define: 0x33,
 
   // memory/io instructions
   MemGet: 0x40,

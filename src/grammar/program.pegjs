@@ -3,7 +3,6 @@ Program = c:Line* { return c }
 Line "statement" = __ c:Statement StatementSeparator { return c }
 StatementSeparator "EOL" = NewLine?
 Statement "statement" =
-DefineLabel /
 SystemInstruction /
 MemoryInstruction /
 Operator /

@@ -1,4 +1,5 @@
-import { ValueType, extend, factories } from './nodes.mjs';
+import { ValueType } from './constants.mjs';
+import { extend, factories } from './nodes.mjs';
 
 extend(factories, {
   nullValue(type) {
@@ -28,5 +29,4 @@ extend(factories, {
   stringValue(type, properties) {
     return { type, value: properties.value, dataType: ValueType.String };
   },
-
 });
