@@ -208,6 +208,47 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
       ]);
     });
 
+    it('ioInterrupt', () => {
+      const on = InstructionNode.create('ioInterrupt', {
+        pin: InstructionNode.create('pinValue', { value: 0 }),
+        value: InstructionNode.create('booleanValue', { value: 1 }),
+        address: InstructionNode.create('addressValue', { value: 1000 }),
+      });
+
+      const off = InstructionNode.create('ioInterrupt', {
+        pin: InstructionNode.create('pinValue', { value: 2 }),
+        value: InstructionNode.create('booleanValue', { value: 0 }),
+        address: InstructionNode.create('addressValue', { value: 1000 }),
+      });
+
+      expect(InstructionNode.sizeOf(on)).toBe(10);
+      expect(InstructionNode.serialize(on)).toEqual([
+        OpCodes.Iointerrupt,
+        ValueType.Pin,
+        0,
+        ValueType.Byte,
+        1,
+        ValueType.Address,
+        0xe8,
+        0x03,
+        0,
+        0,
+      ]);
+      expect(InstructionNode.sizeOf(off)).toBe(10);
+      expect(InstructionNode.serialize(off)).toEqual([
+        OpCodes.Iointerrupt,
+        ValueType.Pin,
+        2,
+        ValueType.Byte,
+        0,
+        ValueType.Address,
+        0xe8,
+        0x03,
+        0,
+        0,
+      ]);
+    });
+
     it('ioWrite', () => {
       const node = InstructionNode.create('ioWrite', {
         pin: InstructionNode.create('pinValue', { value: 1 }),
@@ -253,6 +294,13 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
 
       expect(InstructionNode.sizeOf(node)).toBe(1);
       expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoAllOutput]);
+    });
+
+    it('ioAllInput', () => {
+      const node = InstructionNode.create('ioAllInput');
+
+      expect(InstructionNode.sizeOf(node)).toBe(1);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IoAllInput]);
     });
 
     it('memoryGet', () => {

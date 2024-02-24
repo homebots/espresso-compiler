@@ -62,8 +62,10 @@ extend(serializers, {
   ioWrite: (node) => [OpCodes.IoWrite, ...serializeValue(node.pin), ...serializeValue(node.value)],
   ioRead: (node) => [OpCodes.IoRead, ...serializeValue(node.pin), ...serializeValue(node.target)],
   ioAllOutput: () => [OpCodes.IoAllOutput],
+  ioAllInput: () => [OpCodes.IoAllInput],
   memoryGet: (node) => [OpCodes.MemGet, ...serializeValue(node.target), ...serializeValue(node.address)],
   memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
   wifiConnect: (node) => [OpCodes.WifiConnect, ...serializeValue(node.ssid), ...serializeValue(node.password)],
   wifiDisconnect: () => [OpCodes.WifiDisconnect],
+  ioInterrupt: (node) => [OpCodes.Iointerrupt, ...serializeValue(node.pin), ...serializeValue(node.value), ...serializeValue(node.address)],
 });

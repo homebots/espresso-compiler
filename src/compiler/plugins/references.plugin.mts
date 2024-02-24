@@ -28,7 +28,11 @@ export class MapFunctionLocationsPlugin implements CompilerPlugin {
 export class AlignFunctionCallsPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
     context.nodes.forEach((node) => {
-      if (InstructionNode.isOfType(node, 'jumpTo') || InstructionNode.isOfType(node, 'jumpIf')) {
+      if (
+        InstructionNode.isOfType(node, 'jumpTo') ||
+        InstructionNode.isOfType(node, 'jumpIf') ||
+        InstructionNode.isOfType(node, 'ioInterrupt')
+        ) {
         const { label } = node;
 
         // if (!context.functionMap.has(label)) {

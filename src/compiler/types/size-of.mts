@@ -28,7 +28,9 @@ extend(sizeOf, {
   ioRead: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.target).length,
   ioMode: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.mode).length,
   ioType: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.pinType).length,
+  ioInterrupt: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.value).length + serializeValue(node.address).length,
   ioAllOutput: oneByte,
+  ioAllInput: oneByte,
 
   // system
   halt: oneByte,

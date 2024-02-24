@@ -18,7 +18,7 @@ export interface NodeTypeToNodeMap {
   integerValue: NumberValueNode;
   signedIntegerValue: NumberValueNode;
   stringValue: StringValueNode;
-  booleanValue: StringValueNode;
+  booleanValue: ByteValueNode;
 
   // operators
   assign: AssignOperationNode;
@@ -46,6 +46,8 @@ export interface NodeTypeToNodeMap {
   ioMode: IoModeNode;
   ioType: IoTypeNode;
   ioAllOutput: InstructionNode;
+  ioAllInput: InstructionNode;
+  ioInterrupt: IoInterruptNode;
 
   // memory
   memoryGet: MemoryGetNode;
@@ -132,6 +134,13 @@ export type ByteValueNode = ValueNode<number>;
 export type NumberValueNode = ValueNode<number>;
 export type StringValueNode = ValueNode<string>;
 export type IdentifierValueNode = ValueNode<UseIdentifierNode>;
+
+export interface IoInterruptNode extends InstructionNode {
+  pin: ByteValueNode;
+  value: ValueNode;
+  address?: NumberValueNode;
+  label?: string;
+}
 
 export interface IoWriteNode extends InstructionNode {
   pin: ByteValueNode;

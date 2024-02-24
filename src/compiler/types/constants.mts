@@ -56,6 +56,7 @@ export const OpCodes = {
   IoMode: 0x45,
   IoType: 0x46,
   IoAllOutput: 0x47,
+  IoAllInput: 0x50,
 
   // --- not implemented ---
   Iointerrupt: 0x48,
