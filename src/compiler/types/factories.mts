@@ -29,4 +29,16 @@ extend(factories, {
   stringValue(type, properties) {
     return { type, value: properties.value, dataType: ValueType.String };
   },
+  jumpIf(type, properties) {
+    return { type, address: { type: 'addressValue', value: 0, dataType: ValueType.Address }, ...properties };
+  },
+  jumpTo(type, properties) {
+    return { type, address: { type: 'addressValue', value: 0, dataType: ValueType.Address }, ...properties };
+  },
+  ioInterrupt(type, properties) {
+    return { type, address: { type: 'addressValue', value: 0, dataType: ValueType.Address }, ...properties };
+  },
+  define(type, properties) {
+    return { type, ...properties, size: { type: 'integerValue', value: 0, dataType: ValueType.Integer } };
+  },
 });

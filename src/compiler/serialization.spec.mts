@@ -82,10 +82,13 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
     });
 
     it('define', () => {
-      const node = InstructionNode.create('define', { label: 'foo' });
+      const node = InstructionNode.create('define', {
+        label: 'foo',
+        body: [InstructionNode.create('return')],
+      });
 
-      expect(InstructionNode.sizeOf(node)).toBe(1);
-      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Define]);
+      expect(InstructionNode.sizeOf(node)).toBe(7);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.Define, ValueType.Integer, 1, 0, 0, 0, OpCodes.Return]);
     });
 
     it('label', () => {
@@ -247,6 +250,15 @@ describe('InstructionNode.sizeOf and InstructionNode.serialize', () => {
         0,
         0,
       ]);
+    });
+
+    it('ioInterruptToggle', () => {
+      const node = InstructionNode.create('ioInterruptToggle', {
+        value: createByte(1),
+      });
+
+      expect(InstructionNode.sizeOf(node)).toBe(3);
+      expect(InstructionNode.serialize(node)).toEqual([OpCodes.IointerruptToggle, ValueType.Byte, 1]);
     });
 
     it('ioWrite', () => {

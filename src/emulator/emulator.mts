@@ -1,4 +1,4 @@
-import { bytesToNumber, OpCodes, ValueType } from '../compiler/index.mjs';
+import { bytesToNumber, NodeTypeToNodeMap, OpCodes, ValueType } from '../compiler/index.mjs';
 import { Clock, TimerClock } from './clock.mjs';
 import { NullOutput, ProgramOutput } from './output.mjs';
 
@@ -49,7 +49,11 @@ class Value {
   }
 }
 
-export class Program {
+type InstructionProgram = {
+  [P in keyof NodeTypeToNodeMap]?: (...args: unknown[]) => void;
+};
+
+export class Program implements InstructionProgram {
   constructor(
     readonly bytes: number[],
     readonly clock: Clock,
@@ -244,21 +248,23 @@ export class Program {
 
   return() {
     const previous = this.callStack.pop();
-    this.trace('return to ' + previous)
+    this.trace('return to ' + previous);
     this.counter = previous;
   }
 
   define() {
-    this.trace('define');
+    const size = this.readValue().toNumber();
+    this.trace(`define ${size}`);
+    this.counter += size;
   }
 
   jumpTo(): void {
     const position = this.readValue().toNumber();
     this.trace(`jump to ${position}`);
 
-    if (this.callStack[this.callStack.length - 1] !== this.counter) {
-      this.callStack.push(this.counter);
-    }
+    // if (this.callStack[this.callStack.length - 1] !== this.counter) {
+    this.callStack.push(this.counter);
+    // }
 
     this.counter = position;
   }

@@ -10,8 +10,6 @@ describe('Blinky program', () => {
       // blinks a pin and loops back to zero
       // use tick() instead of run() to avoid infinite loop
 
-      loop()
-
       fn on {
         io_write #0, true
         delay 1000
@@ -27,6 +25,8 @@ describe('Blinky program', () => {
         off()
         loop()
       }
+
+      loop()
       `,
     );
     const program = emulator.load(bytes, clock, output);
@@ -37,19 +37,19 @@ describe('Blinky program', () => {
     clock.tick(13);
 
     expect(output.lines).toEqual([
-      'jump to 32',
-      'define',
+      'define 12',
+      'define 12',
+      'define 19',
+      'jump to 42',
       'jump to 6',
-      'define',
       'io write pin 0, 1',
       'delay 1000',
-      'return to 39',
-      'jump to 19',
-      'define',
+      'return to 48',
+      'jump to 24',
       'io write pin 0, 0',
       'delay 1000',
-      'return to 45',
-      'jump to 32',
+      'return to 54',
+      'jump to 42',
     ]);
   });
 });

@@ -1,5 +1,5 @@
 import { OpCodes, binaryOperatorMap, unaryOperatorMap, ValueType } from './constants.mjs';
-import { NullValueNode, UseIdentifierNode, ValueNode, extend, serializers } from './nodes.mjs';
+import { InstructionNode, NullValueNode, UseIdentifierNode, ValueNode, extend, serializers } from './nodes.mjs';
 import { charArrayToBytes, numberToInt32, numberToUnsignedInt32 } from './data-conversion.mjs';
 
 export function valueToByteArray(type: ValueNode): number[] {
@@ -9,7 +9,7 @@ export function valueToByteArray(type: ValueNode): number[] {
       return numberToUnsignedInt32(type.value as number);
 
     case ValueType.SignedInteger:
-      return numberToInt32(Number(type.value as number) );
+      return numberToInt32(Number(type.value as number));
 
     case ValueType.Byte:
     case ValueType.Pin:
@@ -33,7 +33,12 @@ export function serializeValue(value: ValueNode | NullValueNode): number[] {
 
 extend(serializers, {
   comment: () => [],
-  define: () => [OpCodes.Define],
+  define: (node) => {
+    const body = node.body.map((n) => InstructionNode.serialize(n as InstructionNode)).flat();
+    const size = InstructionNode.create('integerValue', { value: body.length });
+
+    return [OpCodes.Define, ...serializeValue(size), ...body];
+  },
   declareIdentifier: (node) => [OpCodes.Declare, node.id, ...serializeValue(node.value)],
   halt: () => [OpCodes.Halt],
   restart: () => [OpCodes.Restart],
@@ -67,5 +72,11 @@ extend(serializers, {
   memorySet: (node) => [OpCodes.MemSet, ...serializeValue(node.target), ...serializeValue(node.value)],
   wifiConnect: (node) => [OpCodes.WifiConnect, ...serializeValue(node.ssid), ...serializeValue(node.password)],
   wifiDisconnect: () => [OpCodes.WifiDisconnect],
-  ioInterrupt: (node) => [OpCodes.Iointerrupt, ...serializeValue(node.pin), ...serializeValue(node.value), ...serializeValue(node.address)],
+  ioInterrupt: (node) => [
+    OpCodes.Iointerrupt,
+    ...serializeValue(node.pin),
+    ...serializeValue(node.value),
+    ...serializeValue(node.address),
+  ],
+  ioInterruptToggle: (node) => [OpCodes.IointerruptToggle, ...serializeValue(node.value)],
 });

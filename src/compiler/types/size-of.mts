@@ -1,4 +1,4 @@
-import { extend, sizeOf } from './nodes.mjs';
+import { InstructionNode, extend, sizeOf } from './nodes.mjs';
 import { serializeValue } from './serializers.mjs';
 
 const oneByte = () => 1;
@@ -10,7 +10,7 @@ extend(sizeOf, {
   // values
   declareIdentifier: (node) => 2 + serializeValue(node.value).length,
   useIdentifier: () => 0,
-  define: () => 1,
+  define: (node) => node.body.reduce((sum, n) => sum + InstructionNode.sizeOf(n), 1 + serializeValue(node.size).length),
   label: () => 0,
 
   nullValue: valueLength,
@@ -28,7 +28,9 @@ extend(sizeOf, {
   ioRead: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.target).length,
   ioMode: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.mode).length,
   ioType: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.pinType).length,
-  ioInterrupt: (node) => 1 + serializeValue(node.pin).length + serializeValue(node.value).length + serializeValue(node.address).length,
+  ioInterrupt: (node) =>
+    1 + serializeValue(node.pin).length + serializeValue(node.value).length + serializeValue(node.address).length,
+  ioInterruptToggle: (node) => 1 + serializeValue(node.value).length,
   ioAllOutput: oneByte,
   ioAllInput: oneByte,
 

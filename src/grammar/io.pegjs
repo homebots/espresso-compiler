@@ -1,5 +1,5 @@
 
-IoInstruction = IoWrite / IoRead / IoMode / IoType / IoAllOutput / IoAllInput / IoInterrupt
+IoInstruction = IoWrite / IoRead / IoMode / IoType / IoAllOutput / IoAllInput / IoInterrupt / IoInterruptToggle
 IoValue = ByteValue / IdentifierValue / BooleanValue
 
 IoWrite = 'io_write' __ pin:PinValue Separator value:IoValue { return InstructionNode.create('ioWrite', { pin, value }) }
@@ -26,3 +26,5 @@ IoInterrupt = 'on' __ pin:PinValue __ value:BooleanValue __ label:FunctionName '
   value.value = value.value ? 5 : 4;
   return InstructionNode.create('ioInterrupt', { pin, value })
 }
+
+IoInterruptToggle = 'interrupts' value:BooleanValue { return InstructionNode.create('ioInterrupt', { value }) }

@@ -172,13 +172,11 @@ describe('Compiler', () => {
     `;
     const output = compile(program);
 
-    expect(output).toStrictEqual([OpCodes.Define, OpCodes.Return]);
+    expect(output).toStrictEqual([OpCodes.Define, ValueType.Integer, 1, 0, 0, 0, OpCodes.Return]);
   });
 
   it('should jump to a function', () => {
     const program = `
-    third()
-
     fn first {
       print 1
     }
@@ -192,16 +190,17 @@ describe('Compiler', () => {
       print 3
       second()
     }
+
+    third()
     `;
     const output = compile(program);
     expect(output).toStrictEqual([
-      OpCodes.JumpTo,
-      ValueType.Address,
-      28,
-      0,
-      0,
-      0,
       OpCodes.Define,
+      ValueType.Integer,
+      7,
+      0,
+      0,
+      0,
       OpCodes.Print,
       ValueType.Integer,
       1,
@@ -210,6 +209,11 @@ describe('Compiler', () => {
       0,
       OpCodes.Return,
       OpCodes.Define,
+      ValueType.Integer,
+      13,
+      0,
+      0,
+      0,
       OpCodes.Print,
       ValueType.Integer,
       2,
@@ -224,6 +228,11 @@ describe('Compiler', () => {
       0,
       OpCodes.Return,
       OpCodes.Define,
+      ValueType.Integer,
+      13,
+      0,
+      0,
+      0,
       OpCodes.Print,
       ValueType.Integer,
       3,
@@ -232,11 +241,17 @@ describe('Compiler', () => {
       0,
       OpCodes.JumpTo,
       ValueType.Address,
-      14,
+      19,
       0,
       0,
       0,
       OpCodes.Return,
+      OpCodes.JumpTo,
+      ValueType.Address,
+      38,
+      0,
+      0,
+      0,
     ]);
   });
 
@@ -259,6 +274,11 @@ describe('Compiler', () => {
       ValueType.Byte,
       0xff,
       OpCodes.Define,
+      ValueType.Integer,
+      1,
+      0,
+      0,
+      0,
       OpCodes.Return,
       OpCodes.JumpIf,
       ValueType.Integer,
@@ -267,7 +287,7 @@ describe('Compiler', () => {
       0,
       0,
       ValueType.Address,
-      0x04,
+      10,
       0,
       0,
       0,

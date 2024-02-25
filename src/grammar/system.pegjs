@@ -18,4 +18,6 @@ Delay =
 
 JumpTo = label:FunctionName '()' { return InstructionNode.create('jumpTo', { label }) }
 JumpIf = 'if' __ condition:Value __ 'then' NewLine __ label:FunctionName '()' { return InstructionNode.create('jumpIf', { condition, label }) }
-Define = 'fn' __ label:FunctionName __ '{' NewLine body:Line* __ '}' { return [InstructionNode.create('define', { label, body }), InstructionNode.create('return')] }
+Define = 'fn' __ label:FunctionName __ '{' NewLine body:Line* __ '}' {
+  return [InstructionNode.create('define', { label, body: [...body, InstructionNode.create('return')].flat(2) })]
+}

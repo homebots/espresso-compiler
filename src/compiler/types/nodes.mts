@@ -6,7 +6,7 @@ export interface NodeTypeToNodeMap {
   // values
   declareIdentifier: DeclareIdentifierNode;
   useIdentifier: UseIdentifierNode;
-  define: LabelNode;
+  define: DefineNode;
   label: LabelNode;
   return: InstructionNode;
 
@@ -48,6 +48,7 @@ export interface NodeTypeToNodeMap {
   ioAllOutput: InstructionNode;
   ioAllInput: InstructionNode;
   ioInterrupt: IoInterruptNode;
+  ioInterruptToggle: NodeWithSingleValue<ValueNode<number>>;
 
   // memory
   memoryGet: MemoryGetNode;
@@ -90,7 +91,7 @@ export class InstructionNode {
     type: K,
     properties?: Partial<Omit<NodeTypeToNodeMap[K], 'type'>>,
   ): NodeTypeToNodeMap[K] {
-    properties ||= ({} as NodeTypeToNodeMap[K]);
+    properties ||= {} as NodeTypeToNodeMap[K];
 
     if (factories[type]) {
       const factory = factories[type];
@@ -164,6 +165,11 @@ export interface IoReadNode extends InstructionNode {
 
 export interface LabelNode extends InstructionNode {
   label: string;
+}
+
+export interface DefineNode extends LabelNode {
+  body: InstructionNode[];
+  size: NumberValueNode;
 }
 
 export interface SystemJumpToNode extends InstructionNode {

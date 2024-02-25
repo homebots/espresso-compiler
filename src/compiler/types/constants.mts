@@ -80,7 +80,7 @@ export const OpCodes = {
   I2cFind: 0x77,
   I2cWriteAck: 0x78,
   I2cWriteAck_b: 0x79,
-};
+} as const;
 
 export const binaryOperatorMap = {
   '>=': OpCodes.Gte,
@@ -97,10 +97,10 @@ export const binaryOperatorMap = {
   xor: OpCodes.Xor,
   and: OpCodes.And,
   or: OpCodes.Or,
-};
+} as const;
 
 export const unaryOperatorMap = {
   not: OpCodes.Not,
   inc: OpCodes.Inc,
   dec: OpCodes.Dec,
-};
+} as const;

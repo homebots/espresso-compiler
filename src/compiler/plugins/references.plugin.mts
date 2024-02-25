@@ -12,7 +12,7 @@ export class MapFunctionLocationsPlugin implements CompilerPlugin {
         //   throw new Error(`Cannot redeclare function ${node.label}`);
         // }
 
-        functionMap.set(node.label, byteAccumulator);
+        functionMap.set(node.label, byteAccumulator + 6);
       }
 
       byteAccumulator += InstructionNode.sizeOf(node);
@@ -28,22 +28,30 @@ export class MapFunctionLocationsPlugin implements CompilerPlugin {
 export class AlignFunctionCallsPlugin implements CompilerPlugin {
   run(context: CompilationContext): CompilationContext {
     context.nodes.forEach((node) => {
-      if (
-        InstructionNode.isOfType(node, 'jumpTo') ||
-        InstructionNode.isOfType(node, 'jumpIf') ||
-        InstructionNode.isOfType(node, 'ioInterrupt')
-        ) {
-        const { label } = node;
+      this.updateAddress(context, node);
 
-        // if (!context.functionMap.has(label)) {
-        //   throw new Error(`Function ${label} not found`);
-        // }
-
-        const address = context.functionMap.get(label);
-        node.address = InstructionNode.create('addressValue', { value: address });
+      if (InstructionNode.isOfType(node, 'define')) {
+        node.body.forEach((bodyNode) => this.updateAddress(context, bodyNode));
       }
     });
 
     return context;
+  }
+
+  updateAddress(context: CompilationContext, node: InstructionNode) {
+    if (
+      InstructionNode.isOfType(node, 'jumpTo') ||
+      InstructionNode.isOfType(node, 'jumpIf') ||
+      InstructionNode.isOfType(node, 'ioInterrupt')
+    ) {
+      const { label } = node;
+
+      // if (!context.functionMap.has(label)) {
+      //   throw new Error(`Function ${label} not found`);
+      // }
+
+      const address = context.functionMap.get(label);
+      node.address = InstructionNode.create('addressValue', { value: address });
+    }
   }
 }
