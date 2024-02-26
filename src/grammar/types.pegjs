@@ -32,3 +32,12 @@ PinModeOutput = ('output' / '1' ) { return 1 }
 PinModeOpenDrain = ('open-drain' / '2') { return 2 }
 PinModeInputPullUp = ('pull-up' / '3') { return 3 }
 
+ValueTypeMap =
+  'byte' { return ValueType.Byte } /
+  'boolean' { return ValueType.Byte } /
+  'address' { return ValueType.Address } /
+  'uint' { return  ValueType.Integer } /
+  'int' { return ValueType.SignedInteger } /
+  'string' { return ValueType.String }
+
+

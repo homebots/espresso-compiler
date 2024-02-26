@@ -8,9 +8,9 @@ export class MapFunctionLocationsPlugin implements CompilerPlugin {
 
     context.nodes.forEach((node) => {
       if (InstructionNode.isOfType(node, 'define')) {
-        // if (functionMap.has(node.label)) {
-        //   throw new Error(`Cannot redeclare function ${node.label}`);
-        // }
+        if (functionMap.has(node.label)) {
+          throw new Error(`Cannot redeclare function "${node.label}"`);
+        }
 
         functionMap.set(node.label, byteAccumulator + 6);
       }
@@ -18,10 +18,7 @@ export class MapFunctionLocationsPlugin implements CompilerPlugin {
       byteAccumulator += InstructionNode.sizeOf(node);
     });
 
-    return {
-      ...context,
-      functionMap,
-    };
+    return context;
   }
 }
 
@@ -46,9 +43,10 @@ export class AlignFunctionCallsPlugin implements CompilerPlugin {
     ) {
       const { label } = node;
 
-      // if (!context.functionMap.has(label)) {
-      //   throw new Error(`Function ${label} not found`);
-      // }
+
+      if (!context.functionMap.has(label)) {
+        throw new Error(`Function "${label}" was not defined`);
+      }
 
       const address = context.functionMap.get(label);
       node.address = InstructionNode.create('addressValue', { value: address });

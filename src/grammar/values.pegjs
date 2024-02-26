@@ -11,15 +11,7 @@ SignedIntegerValue = value:SignedInteger { return InstructionNode.create('signed
 StringValue = value:String { return InstructionNode.create('stringValue', { value }) }
 NumberValue = IntegerValue / SignedIntegerValue
 
-Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue / BooleanValue / NullValue
+Value "value" = IdentifierValue / ByteValue / AddressValue / NumberValue / StringValue / BooleanValue / NullValue / PinValue
 IntrinsicValue = ByteValue / NumberValue / StringValue / BooleanValue / NullValue
 ValueArg "arg" = arg:(Value Separator?) { return arg[0] }
 ValueList "values" = values:ValueArg* { return values }
-
-ValueTypeMap =
-  'byte' { return ValueType.Byte } /
-  'boolean' { return ValueType.Byte } /
-  'address' { return ValueType.Address } /
-  'uint' { return  ValueType.Integer } /
-  'int' { return ValueType.SignedInteger } /
-  'string' { return ValueType.String }

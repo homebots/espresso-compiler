@@ -3,13 +3,11 @@ import { ValueType } from './constants.mjs';
 export interface NodeTypeToNodeMap {
   comment: InstructionNode;
 
-  // values
   declareIdentifier: DeclareIdentifierNode;
   useIdentifier: UseIdentifierNode;
-  define: DefineNode;
   label: LabelNode;
-  return: InstructionNode;
 
+  // values
   nullValue: NullValueNode;
   identifierValue: IdentifierValueNode;
   byteValue: ByteValueNode;
@@ -37,8 +35,10 @@ export interface NodeTypeToNodeMap {
   delay: NodeWithSingleValue<ValueNode<number>>;
   sleep: NodeWithSingleValue<ValueNode<number>>;
   yield: InstructionNode;
-  jumpTo: SystemJumpToNode;
-  jumpIf: SystemJumpIfNode;
+  jumpTo: JumpNode;
+  jumpIf: JumpIfNode;
+  define: DefineNode;
+  return: InstructionNode;
 
   // io
   ioWrite: IoWriteNode;
@@ -76,11 +76,20 @@ export class InstructionNode {
   readonly type: keyof NodeTypeToNodeMap;
 
   static serialize(node: InstructionNode): Array<number | InstructionNode> | null {
+
+    if (!serializers[node.type]) {
+      throw new Error('Invalid node type: ' + node.type);
+    }
+
     return (serializers[node.type] as NodeSerializer<InstructionNode>)(node);
   }
 
   static sizeOf(node: InstructionNode): number {
-    return (sizeOf[node.type] as NodeSizeOf<InstructionNode>)(node);
+    if (sizeOf[node.type]) {
+      return (sizeOf[node.type] as NodeSizeOf<InstructionNode>)(node);
+    }
+
+    return InstructionNode.serialize(node).length
   }
 
   static isOfType<K extends keyof NodeTypeToNodeMap>(item: InstructionNode, type: K): item is NodeTypeToNodeMap[K] {
@@ -136,11 +145,9 @@ export type NumberValueNode = ValueNode<number>;
 export type StringValueNode = ValueNode<string>;
 export type IdentifierValueNode = ValueNode<UseIdentifierNode>;
 
-export interface IoInterruptNode extends InstructionNode {
+export interface IoInterruptNode extends JumpNode {
   pin: ByteValueNode;
-  value: ValueNode;
-  address?: NumberValueNode;
-  label?: string;
+  value: ByteValueNode;
 }
 
 export interface IoWriteNode extends InstructionNode {
@@ -172,12 +179,12 @@ export interface DefineNode extends LabelNode {
   size: NumberValueNode;
 }
 
-export interface SystemJumpToNode extends InstructionNode {
+export interface JumpNode extends InstructionNode {
   address?: NumberValueNode;
   label?: string;
 }
 
-export interface SystemJumpIfNode extends SystemJumpToNode {
+export interface JumpIfNode extends JumpNode {
   condition: ValueNode;
 }
 

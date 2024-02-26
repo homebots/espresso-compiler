@@ -22,9 +22,10 @@ IoType = 'io_type' __ pin:PinValue Separator pinType:Digit {
 IoAllOutput = 'io_all_output' { return InstructionNode.create('ioAllOut') }
 IoAllInput = 'io_all_input' { return InstructionNode.create('ioAllIn') }
 
-IoInterrupt = 'on' __ pin:PinValue __ value:BooleanValue __ label:FunctionName '()' {
+IoInterrupt = 'when' __ pin:PinValue __ 'is' __ value:BooleanValue __ label:FunctionName '()' {
+  // interrupt edge
   value.value = value.value ? 5 : 4;
-  return InstructionNode.create('ioInterrupt', { pin, value })
+  return InstructionNode.create('ioInterrupt', { pin, value, label })
 }
 
-IoInterruptToggle = 'interrupts' value:BooleanValue { return InstructionNode.create('ioInterrupt', { value }) }
+IoInterruptToggle = 'interrupts' __ value:BooleanValue { return InstructionNode.create('ioInterruptToggle', { value }) }

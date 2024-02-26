@@ -293,4 +293,106 @@ describe('Compiler', () => {
       0,
     ]);
   });
+
+  it('should throw an error if a function is called but not defined', () => {
+    const program = `
+    foo()
+    `;
+    expect(() => compile(program)).toThrow('Function "foo" was not defined');
+  });
+
+  it('should throw an error if a function is defined twice', () => {
+    const program = `
+    fn foo {
+
+    }
+
+    fn foo {
+
+    }
+    `;
+    expect(() => compile(program)).toThrow('Cannot redeclare function "foo"');
+  });
+
+  it('should enable interrupts', () => {
+    const program = `
+    fn onPinUp {
+    }
+
+    when pin 2 is true onPinUp()
+    `;
+    const output = compile(program);
+
+    expect(output).toStrictEqual([
+      OpCodes.Define,
+      ValueType.Integer,
+      1,
+      0,
+      0,
+      0,
+      OpCodes.Return,
+      OpCodes.Iointerrupt,
+      ValueType.Pin,
+      2,
+      ValueType.Byte,
+      5,
+      ValueType.Address,
+      6,
+      0,
+      0,
+      0,
+    ]);
+  });
+
+  it('should compute length of all valid types', () => {
+    const output = compile(`
+    byte $byte = 1h
+    boolean $bool = true
+    address $address = 0x00000000
+    uint $uint = 1
+    int $int = -2
+    string $string = 'hello'
+    `);
+
+    expect(output).toEqual([
+      OpCodes.Declare,
+      0,
+      ValueType.Byte,
+      1,
+      OpCodes.Declare,
+      1,
+      ValueType.Byte,
+      1,
+      OpCodes.Declare,
+      2,
+      ValueType.Address,
+      0,
+      0,
+      0,
+      0,
+      OpCodes.Declare,
+      3,
+      ValueType.Integer,
+      1,
+      0,
+      0,
+      0,
+      OpCodes.Declare,
+      4,
+      ValueType.SignedInteger,
+      254,
+      255,
+      255,
+      255,
+      OpCodes.Declare,
+      5,
+      ValueType.String,
+      104,
+      101,
+      108,
+      108,
+      111,
+      0,
+    ]);
+  });
 });

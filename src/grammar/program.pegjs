@@ -10,6 +10,4 @@ IoInstruction /
 WifiInstruction /
 Comment
 
-// / I2cInstruction
-
 Comment "comment" = ('//' [^\n]+) { return [] }

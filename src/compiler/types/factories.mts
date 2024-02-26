@@ -41,4 +41,7 @@ extend(factories, {
   define(type, properties) {
     return { type, ...properties, size: { type: 'integerValue', value: 0, dataType: ValueType.Integer } };
   },
+  // declareIdentifier(type, properties) {
+  //   return { type, }
+  // },
 });
