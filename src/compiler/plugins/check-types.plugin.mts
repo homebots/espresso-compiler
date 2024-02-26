@@ -19,7 +19,7 @@ export class CheckTypesPlugin implements CompilerPlugin {
           assignedType = context.identifierTypes.get(node.value.value.name);
         }
 
-        if (targetType !== assignedType) {
+        if (!this.areTypesCompatible(targetType, assignedType)) {
           throw new Error(
             `Invalid value for ${targetName}. Expected ${ValueType[targetType]} but found ${ValueType[assignedType]}`,
           );
@@ -28,5 +28,9 @@ export class CheckTypesPlugin implements CompilerPlugin {
     });
 
     return context;
+  }
+
+  areTypesCompatible(left, right) {
+    return left === right;
   }
 }

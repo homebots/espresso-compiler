@@ -1,7 +1,6 @@
 // operators
 Operator = BinaryOperation / UnaryOperation / DeclareIdentifier / Assign
 
-Equals = '='
 Assign = target:IdentifierValue __ Equals __ value:Value { return InstructionNode.create('assign', { target, value }) }
 
 UnaryOperation = Not / Step

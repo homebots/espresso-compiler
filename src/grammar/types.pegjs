@@ -6,6 +6,7 @@ Space = [ \t]
 __ "spaces" = Space*
 NewLine "new line" = [\n]+
 Separator "separator" = ',' __
+Equals = '='
 Digit "0..9" = [0-9]
 NonZeroDigit "1..9" = [1-9]
 Alpha "a-z" = [a-z]i
