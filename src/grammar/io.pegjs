@@ -27,9 +27,8 @@ IoType = 'io_type' __ pin:PinValue Separator pinType:Digit {
 IoAllOutput = 'io_all_output' { return InstructionNode.create('ioAllOut') }
 IoAllInput = 'io_all_input' { return InstructionNode.create('ioAllIn') }
 
-IoInterrupt = 'when' __ pin:PinValue __ 'is' __ value:BooleanValue __ label:FunctionName '()' {
-  // interrupt edge
-  value.value = value.value ? 5 : 4;
+IoInterrupt = 'when' __ pin:PinValue __ 'is' __ value:InterruptTriggerMap __ label:FunctionName '()' {
+  const interrupt = InstructionNode.create('byteValue', { value });
   return InstructionNode.create('ioInterrupt', { pin, value, label })
 }
 

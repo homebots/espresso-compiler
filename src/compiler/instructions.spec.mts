@@ -238,8 +238,8 @@ describe('language instructions', () => {
     const program = `
     fn onPinUp {
     }
-
-    when pin 2 is true onPinUp()
+    
+    when pin 2 is on onPinUp()
     `;
     const output = compile(program);
 

@@ -41,4 +41,10 @@ ValueTypeMap =
   'int' { return ValueType.SignedInteger } /
   'string' { return ValueType.String }
 
-
+InterruptTriggerMap =
+  'disabled' { return 0 } /
+  'rising' { return 1 } /
+  'falling' { return 2 } /
+  'changing' { return 3 } /
+  'off' { return 4 } /
+  'on' { return 5 }
