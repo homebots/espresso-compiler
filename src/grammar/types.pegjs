@@ -48,3 +48,7 @@ InterruptTriggerMap =
   'changing' { return 3 } /
   'off' { return 4 } /
   'on' { return 5 }
+
+CodeBlock =
+  '{}' { return [InstructionNode.create('return')] } /
+  '{' NewLine body:Line* __ '}' { return [...body, InstructionNode.create('return')].flat(2) }

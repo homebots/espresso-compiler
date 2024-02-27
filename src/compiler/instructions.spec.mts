@@ -236,14 +236,15 @@ describe('language instructions', () => {
 
   it('should enable interrupts', () => {
     const program = `
-    fn onPinUp {
-    }
-    
-    when pin 2 is on onPinUp()
+    noop
+    fn onPinUp {}
+
+    when pin 2 is rising onPinUp()
     `;
     const output = compile(program);
 
     expect(output).toStrictEqual([
+      OpCodes.Noop,
       OpCodes.Define,
       ValueType.Integer,
       1,
@@ -255,16 +256,16 @@ describe('language instructions', () => {
       ValueType.Pin,
       2,
       ValueType.Byte,
-      5,
+      1,
       ValueType.Address,
-      6,
+      7,
       0,
       0,
       0,
     ]);
   });
 
-  it.only('should read and write from IO pins', () => {
+  it('should read and write from IO pins', () => {
     const program = `
     byte $value = 0h
 
